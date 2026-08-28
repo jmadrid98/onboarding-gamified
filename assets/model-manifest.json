@@ -1,0 +1,112 @@
+{
+  "trees": [
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_pineDefaultA.glb", "stem": "tree_pinedefaulta", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_pineDefaultB.glb", "stem": "tree_pinedefaultb", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_pineRoundA.glb", "stem": "tree_pinerounda", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_pineRoundB.glb", "stem": "tree_pineroundb", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_pineRoundC.glb", "stem": "tree_pineroundc", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_pineTallA.glb", "stem": "tree_pinetalla", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_oak.glb", "stem": "tree_oak", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_detailed.glb", "stem": "tree_detailed", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_fat.glb", "stem": "tree_fat", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tree_palm.glb", "stem": "tree_palm", "ext": ".glb", "package": "kenney_nature_kit" }
+  ],
+  "rocks": [
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_smallA.glb", "stem": "rock_smalla", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_smallC.glb", "stem": "rock_smallc", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_smallE.glb", "stem": "rock_smalle", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_largeA.glb", "stem": "rock_largea", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_largeB.glb", "stem": "rock_largeb", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_largeC.glb", "stem": "rock_largec", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_tallA.glb", "stem": "rock_talla", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_tallB.glb", "stem": "rock_tallb", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/rock_tallH.glb", "stem": "rock_tallh", "ext": ".glb", "package": "kenney_nature_kit" }
+  ],
+  "plants": [
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/plant_bushDetailed.glb", "stem": "plant_bushdetailed", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/plant_bushLarge.glb", "stem": "plant_bushlarge", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/plant_bush.glb", "stem": "plant_bush", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/flower_redA.glb", "stem": "flower_reda", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/flower_purpleA.glb", "stem": "flower_purplea", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/flower_yellowA.glb", "stem": "flower_yellowa", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/mushroom_redGroup.glb", "stem": "mushroom_redgroup", "ext": ".glb", "package": "kenney_nature_kit" }
+  ],
+  "camp": [
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/campfire_stones.glb", "stem": "campfire_stones", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/campfire_logs.glb", "stem": "campfire_logs", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tent_detailedOpen.glb", "stem": "tent_detailedopen", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tent_detailedClosed.glb", "stem": "tent_detailedclosed", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/tent_smallOpen.glb", "stem": "tent_smallopen", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/canoe.glb", "stem": "canoe", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/sign.glb", "stem": "sign", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/log_stackLarge.glb", "stem": "log_stacklarge", "ext": ".glb", "package": "kenney_nature_kit" }
+  ],
+  "sanctuary": [
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/statue_column.glb", "stem": "statue_column", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/statue_columnDamaged.glb", "stem": "statue_columndamaged", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/statue_obelisk.glb", "stem": "statue_obelisk", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/statue_ring.glb", "stem": "statue_ring", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/statue_head.glb", "stem": "statue_head", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/statue_block.glb", "stem": "statue_block", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/stairs-stone.glb", "stem": "stairs-stone", "ext": ".glb", "package": "kenney_castle_kit" }
+  ],
+  "garden": [
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/bridge_stone.glb", "stem": "bridge_stone", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/bridge_woodRound.glb", "stem": "bridge_woodround", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/pot_large.glb", "stem": "pot_large", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/pot_small.glb", "stem": "pot_small", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/flower_purpleA.glb", "stem": "flower_purplea", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/flower_redA.glb", "stem": "flower_reda", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/flower_yellowA.glb", "stem": "flower_yellowa", "ext": ".glb", "package": "kenney_nature_kit" },
+    { "path": "./assets/library/kenney_nature_kit/Models/GLTF format/plant_bushDetailed.glb", "stem": "plant_bushdetailed", "ext": ".glb", "package": "kenney_nature_kit" }
+  ],
+  "city": [
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-a.glb", "stem": "building-a", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-b.glb", "stem": "building-b", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-c.glb", "stem": "building-c", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-d.glb", "stem": "building-d", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-e.glb", "stem": "building-e", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-f.glb", "stem": "building-f", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-g.glb", "stem": "building-g", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-h.glb", "stem": "building-h", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-i.glb", "stem": "building-i", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-j.glb", "stem": "building-j", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-k.glb", "stem": "building-k", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-l.glb", "stem": "building-l", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-m.glb", "stem": "building-m", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/building-n.glb", "stem": "building-n", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/detail-awning.glb", "stem": "detail-awning", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/detail-parasol-a.glb", "stem": "detail-parasol-a", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" },
+    { "path": "./assets/library/kenney_city_kit_commercial_2_1/Models/GLB format/detail-parasol-b.glb", "stem": "detail-parasol-b", "ext": ".glb", "package": "kenney_city_kit_commercial_2_1" }
+  ],
+  "castle": [
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/wall.glb", "stem": "wall", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/wall-corner-half-tower.glb", "stem": "wall-corner-half-tower", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/wall-corner.glb", "stem": "wall-corner", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/wall-doorway.glb", "stem": "wall-doorway", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/wall-narrow-gate.glb", "stem": "wall-narrow-gate", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/wall-pillar.glb", "stem": "wall-pillar", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/tower-square.glb", "stem": "tower-square", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/tower-square-mid-door.glb", "stem": "tower-square-mid-door", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/tower-square-top.glb", "stem": "tower-square-top", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/tower-hexagon-base.glb", "stem": "tower-hexagon-base", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/tower-hexagon-mid.glb", "stem": "tower-hexagon-mid", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/tower-hexagon-roof.glb", "stem": "tower-hexagon-roof", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/gate.glb", "stem": "gate", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/metal-gate.glb", "stem": "metal-gate", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/door.glb", "stem": "door", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/bridge-draw.glb", "stem": "bridge-draw", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/bridge-straight.glb", "stem": "bridge-straight", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/flag.glb", "stem": "flag", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/flag-wide.glb", "stem": "flag-wide", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/flag-banner-long.glb", "stem": "flag-banner-long", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/siege-catapult.glb", "stem": "siege-catapult", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/siege-ballista.glb", "stem": "siege-ballista", "ext": ".glb", "package": "kenney_castle_kit" }
+  ],
+  "props": [
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/bridge-straight.glb", "stem": "bridge-straight", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/bridge-draw.glb", "stem": "bridge-draw", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/flag-wide.glb", "stem": "flag-wide", "ext": ".glb", "package": "kenney_castle_kit" },
+    { "path": "./assets/library/kenney_castle_kit/Models/GLB format/flag-banner-long.glb", "stem": "flag-banner-long", "ext": ".glb", "package": "kenney_castle_kit" }
+  ]
+}

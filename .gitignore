@@ -1,0 +1,12 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Redundant duplicate folder
+Mapa Videojuego/
+
+# Logs & Caches
+*.log
+.vscode/
+.idea/

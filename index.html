@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#8fcad8">
+  <title>NEXT GEN ONBOARDING | Expedición Cinematográfica</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=65.0.0">
+  <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
+<body>
+  <!-- Pantalla de Carga Inicial (Fixed Overlay) -->
+  <div id="boot" class="boot"><div class="crest large">A</div><h1>NEXT GEN ONBOARDING</h1><p>Preparando la expedición...</p><div class="boot-line"><i></i></div></div>
+
+  <main id="screen" class="screen">
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <header class="brand"><div class="crest">A</div><div><span class="eyebrow">NEXT GEN ONBOARDING</span><h1 class="display">Misión actual</h1></div></header>
+        
+        <section class="mission-card">
+          <span id="missionEyebrow" class="eyebrow">Checkpoint en curso</span>
+          <h2 id="missionName" class="display"></h2>
+          <p id="missionDesc"></p>
+          
+          <div class="mission-nav-bar">
+            <button id="cardBackBtn" class="nav-arrow-btn" type="button">◀ Anterior</button>
+            <button id="cardNextBtn" class="nav-arrow-btn primary" type="button">Avanzar Misión ▶</button>
+          </div>
+        </section>
+
+        <div class="kpis">
+          <article><span class="eyebrow">Misión</span><b id="missionNumber"></b><small id="missionStatus">En curso</small></article>
+          <article><span class="eyebrow">Progreso</span><b id="progressPct"></b><small>Ruta desbloqueada</small></article>
+        </div>
+
+        <section>
+          <span class="eyebrow">Ruta de misiones (Haz clic para volar)</span>
+          <div id="missionsList" class="missions-list"></div>
+        </section>
+
+        <!-- TABLA DE POSICIONES / RANKING EN VIVO (FUERA DEL PANEL DE CONTROL) -->
+        <section class="ranking-section">
+          <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div>
+              <span class="eyebrow">Expedición</span>
+              <h2 class="display" style="font-size:1.15rem;margin:2px 0">Tabla de Posiciones (XP)</h2>
+            </div>
+            <button id="rankingToggle" class="icon-button" type="button" title="Minimizar ranking" style="padding:4px 8px;font-size:0.72rem;background:#0e6e7118;color:var(--teal);border:0;border-radius:6px;cursor:pointer">↕ Ocultar</button>
+          </div>
+
+          <!-- Solo la lista de posiciones / ranking -->
+          <div id="rankingList" class="leaderboard"></div>
+        </section>
+
+        <!-- PANEL DE CONTROL Y AJUSTES -->
+        <section class="admin-section">
+          <button id="adminToggle" class="admin-toggle" type="button">Panel de Control y Ajustes <span>⚙</span></button>
+          <div id="adminDrawer" class="admin open">
+            <div class="admin-content">
+              <!-- 1. GESTIÓN Y REGISTRO DE PARTICIPANTES -->
+              <span class="eyebrow" style="color:var(--teal);font-size:0.75rem">👥 Registro y Gestión de Aventureros</span>
+
+              <!-- Registrar nuevo participante -->
+              <span class="eyebrow" style="margin-top:2px">Registrar nuevo aventurero</span>
+              <div class="add-player-row" style="display:flex;gap:6px;margin-top:2px">
+                <input id="quickPlayerName" placeholder="Escribe un nombre (ej. Pedro)..." maxlength="24" style="flex:1" onkeydown="if(event.key==='Enter')window.addParticipantFromUI()">
+                <button id="quickAddPlayerBtn" class="primary" type="button" onclick="window.addParticipantFromUI()">+ Añadir</button>
+              </div>
+
+              <!-- Lista Rápida de Aventureros con Asignación de Puntos Directa -->
+              <span class="eyebrow" style="margin-top:4px">Aventureros Registrados (Dar / Quitar Puntos)</span>
+              <div id="adminPlayersList" class="admin-players-list"></div>
+
+              <!-- Asignación Individual de Puntos XP con Selector -->
+              <div style="background:rgba(255,255,255,0.75);border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:8px;margin-top:2px">
+                <label>Seleccionar Aventurero
+                  <select id="playerSelect"></select>
+                </label>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end">
+                  <label>Puntos a Modificar
+                    <input id="pointsInput" type="number" value="10" min="1" step="5">
+                  </label>
+                  <button id="addPointsBtn" class="primary" type="button" onclick="window.modifyPlayerXpFromSelect(1)" style="height:38px;font-size:0.72rem">+ Sumar XP</button>
+                </div>
+
+                <div class="buttons">
+                  <button id="removePointsBtn" class="soft" type="button" onclick="window.modifyPlayerXpFromSelect(-1)" style="flex:1">- Restar XP</button>
+                  <button id="removePlayerBtn" class="warn" type="button" onclick="window.deletePlayerFromSelect()" title="Eliminar este participante">🗑️ Eliminar</button>
+                </div>
+              </div>
+
+              <!-- Acciones Grupales de Equipo -->
+              <div class="buttons" style="margin-top:2px">
+                <button id="grantTeamXpBtn" class="gold wide" type="button" onclick="window.grantTeamXp(10)" title="Otorgar 10 XP a cada integrante">✨ +10 XP a todo el equipo</button>
+                <button id="syncAllBtn" class="soft wide" type="button" onclick="window.syncAllPlayersToCurrent()" title="Mover a todos los personajes 3D al checkpoint activo">🚶‍♂️ Agrupar a todos los participantes aquí</button>
+              </div>
+
+              <hr>
+
+              <!-- 2. NAVEGACIÓN GLOBAL -->
+              <span class="eyebrow">Saltar a Checkpoint</span>
+              <select id="sessionSelect"></select>
+
+              <hr>
+
+              <!-- 3. EDITOR DE CONTENIDO DE MISIONES -->
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="eyebrow">Editor de Misiones</span>
+                <span id="saveFeedback" class="pill" style="display:none;padding:2px 8px;font-size:0.65rem;background:#e6f7f0;color:#159b67">✓ Guardado</span>
+              </div>
+              
+              <label>Seleccionar Checkpoint a editar
+                <select id="missionEditorSelect"></select>
+              </label>
+              
+              <label>Nombre de la Misión
+                <input id="missionEditName" placeholder="Nombre de la misión...">
+              </label>
+
+              <label>Región / Entorno
+                <input id="missionEditRegion" placeholder="Nombre de la región...">
+              </label>
+
+              <label>Descripción y Objetivos
+                <textarea id="missionEditDesc" placeholder="Describe los objetivos..."></textarea>
+              </label>
+
+              <button id="saveMissionBtn" class="primary wide" type="button">💾 Guardar Cambios de Misión</button>
+
+              <hr>
+
+              <!-- 4. GESTIÓN DE SESIÓN Y RESPALDO -->
+              <span class="eyebrow">Gestión de Sesión</span>
+              <div class="buttons">
+                <button id="exportBtn" class="soft" type="button" style="flex:1">📥 Exportar (.json)</button>
+                <button id="importBtn" class="soft" type="button" style="flex:1">📤 Importar (.json)</button>
+                <input id="importFile" type="file" accept=".json" hidden>
+              </div>
+
+              <button id="resetBtn" class="warn wide" type="button" style="margin-top:4px">⚠️ Reiniciar Todo de Fábrica</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </aside>
+    <section id="stage" class="stage">
+      <canvas id="game"></canvas><div id="weatherOverlay" class="weather-overlay"></div><div id="lightningFlash" class="lightning-flash"></div><div class="sun-glow"></div><div class="vignette"></div>
+      <div class="hud">
+        <div class="hud-nav-bar">
+          <button id="hudPrevBtn" class="hud-btn arrow-btn" type="button" title="Misión Anterior">◀</button>
+          <button id="hudNextBtn" class="hud-btn arrow-btn" type="button" title="Misión Siguiente">▶</button>
+        </div>
+      </div>
+      <!-- Controles de Cámara Libre, Clima y Pantalla Completa unificados en la esquina inferior izquierda -->
+      <div class="world-controls-bottom-left" aria-label="Controles de cámara, clima y pantalla">
+        <button id="freeCameraBtn" class="map-icon-btn" type="button" title="Cámara libre: Desactivada (Clic para orbitar)">🎥</button>
+        <button id="weatherBtn" class="map-icon-btn" type="button" title="Clima: Día claro (Clic para cambiar)">☀️</button>
+        <button id="fullscreenBtn" class="map-icon-btn" type="button" title="Pantalla Completa">⛶</button>
+      </div>
+
+      <!-- Cartel Elevado en el Cielo con Tipografía Épica Blanca -->
+      <div id="missionSkyTitle" class="mission-sky-title">
+        <span id="skyMissionNum">MISIÓN 01</span>
+        <b id="skyMissionName">ARSENAL Y EQUIPOS</b>
+        <small id="skyMissionRegion">Puesto de Inicio</small>
+      </div>
+
+      <div id="checkpointLabels" class="checkpoint-labels"></div>
+      <div id="characterLabels" class="character-labels"></div>
+      <div id="cinematicSequence" class="cinematic-sequence" aria-hidden="true"><div class="cinematic-letterbox top"></div><div class="cinematic-letterbox bottom"></div><div class="cinematic-route"><i id="cinematicBar"></i></div></div>
+    </section>
+  </main>
+  
+  <dialog id="missionDialog"><button id="closeDialog" class="close">Cerrar</button><span id="dialogRegion" class="eyebrow"></span><h2 id="dialogTitle" class="display"></h2><p id="dialogDesc"></p><b id="dialogStatus" class="pill"></b></dialog>
+
+  <!-- Modal Interactivo: Entrega de Equipos (Misión 1) -->
+  <dialog id="gearDialog">
+    <button id="closeGearDialog" class="close">✕</button>
+    <span class="eyebrow">MISIÓN 01 · PUESTO DE INICIO</span>
+    <h2 class="display" style="margin-top:.3rem">Arsenal y Equipos</h2>
+    <p>Checklist del kit de aventurero necesario para iniciar la travesía corporativa:</p>
+    
+    <div class="gear-grid">
+      <div class="gear-card" id="cardLaptop">
+        <div class="gear-header"><span class="gear-icon">💻</span><b class="gear-title">Laptop de Trabajo</b></div>
+        <span class="gear-desc">Equipo principal configurado con accesos, software y herramientas.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkLaptop"> Entregado y Verificado</label>
+      </div>
+
+      <div class="gear-card" id="cardAccess">
+        <div class="gear-header"><span class="gear-icon">🪪</span><b class="gear-title">Tarjeta & Credenciales</b></div>
+        <span class="gear-desc">Pase de acceso a edificios, torniquetes y doble factor (MFA).</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkAccess"> Entregado y Activado</label>
+      </div>
+
+      <div class="gear-card" id="cardTech">
+        <div class="gear-header"><span class="gear-icon">🎧</span><b class="gear-title">Periféricos Tech</b></div>
+        <span class="gear-desc">Headset para reuniones, mouse ergonómico y cargador/adaptador.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkTech"> Entregado y Probado</label>
+      </div>
+
+      <div class="gear-card" id="cardSwag">
+        <div class="gear-header"><span class="gear-icon">🎒</span><b class="gear-title">Kit de Bienvenida (Swag)</b></div>
+        <span class="gear-desc">Mochila, libreta corporativa, termo y distintivos de la tribu.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkSwag"> Entregado al Aventurero</label>
+      </div>
+    </div>
+
+    <button id="grantGearXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">+ Otorgar 20 XP de Equipamiento al Equipo</button>
+  </dialog>
+
+  <!-- Modal Interactivo: Firma de Contrato y Beneficios (Misión 2) -->
+  <dialog id="contractDialog">
+    <button id="closeContractDialog" class="close">✕</button>
+    <span class="eyebrow">MISIÓN 02 · SANTUARIO DEL PACTO</span>
+    <h2 class="display" style="margin-top:.3rem">Firma de Contrato y Beneficios</h2>
+    <p>Sellado del pacto laboral y activación del catálogo de beneficios y coberturas:</p>
+    
+    <div class="gear-grid">
+      <div class="gear-card" id="cardContract">
+        <div class="gear-header"><span class="gear-icon">📜</span><b class="gear-title">Contrato Laboral</b></div>
+        <span class="gear-desc">Firma formal del contrato, confidencialidad y registro en el gremio.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkContract"> Contrato Firmado</label>
+      </div>
+
+      <div class="gear-card" id="cardHealth">
+        <div class="gear-header"><span class="gear-icon">🏥</span><b class="gear-title">Póliza de Salud & Vida</b></div>
+        <span class="gear-desc">Seguro de gastos médicos mayores, dental y seguro de vida integral.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkHealth"> Póliza Activa</label>
+      </div>
+
+      <div class="gear-card" id="cardPerks">
+        <div class="gear-header"><span class="gear-icon">💳</span><b class="gear-title">Vales & Compensación</b></div>
+        <span class="gear-desc">Vales de despensa/gasolina, fondo de ahorro y calendario de pagos.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkPerks"> Asignado</label>
+      </div>
+
+      <div class="gear-card" id="cardVacation">
+        <div class="gear-header"><span class="gear-icon">🏖️</span><b class="gear-title">Vacaciones & Balance</b></div>
+        <span class="gear-desc">Días de descanso superiores a la ley, días flotantes y horario flexible.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkVacation"> Explicado</label>
+      </div>
+    </div>
+
+    <button id="grantContractXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">✍️ Sellar Pacto y Otorgar +25 XP al Equipo</button>
+  </dialog>
+
+  <!-- Modal Interactivo: Humand y Comedor (Misión 3) -->
+  <dialog id="humandDialog">
+    <button id="closeHumandDialog" class="close">✕</button>
+    <span class="eyebrow">MISIÓN 03 · VALLE DEL REFECTORIO</span>
+    <h2 class="display" style="margin-top:.3rem">Humand y Comedor</h2>
+    <p>Guía de uso para registro de asistencia, checado, comedor corporativo e incidencias:</p>
+    
+    <div class="gear-grid">
+      <div class="gear-card" id="cardAppHumand">
+        <div class="gear-header"><span class="gear-icon">📱</span><b class="gear-title">App Humand (Checado)</b></div>
+        <span class="gear-desc">Registro diario de entradas y salidas, geolocalización o reloj biométrico.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkAppHumand"> App Instalada & Probada</label>
+      </div>
+
+      <div class="gear-card" id="cardIncidents">
+        <div class="gear-header"><span class="gear-icon">⏱️</span><b class="gear-title">Reporte de Incidencias</b></div>
+        <span class="gear-desc">Solicitud de permisos, faltas justificadas, home office y horas extra.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkIncidents"> Flujo Comprendido</label>
+      </div>
+
+      <div class="gear-card" id="cardDining">
+        <div class="gear-header"><span class="gear-icon">🍽️</span><b class="gear-title">Acceso al Comedor</b></div>
+        <span class="gear-desc">Horarios de comida, turnos asignados, menú diario y reserva de platillos.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkDining"> Horario Asignado</label>
+      </div>
+
+      <div class="gear-card" id="cardHygiene">
+        <div class="gear-header"><span class="gear-icon">🥗</span><b class="gear-title">Reglas del Comedor</b></div>
+        <span class="gear-desc">Uso de áreas comunes, estación de café/agua, limpieza y reciclaje.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkHygiene"> Normas Explicadas</label>
+      </div>
+    </div>
+
+    <button id="grantHumandXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">🥗 Validar Asistencia y Otorgar +30 XP al Equipo</button>
+  </dialog>
+
+  <script type="module" src="main.js?v=65.0.0"></script>
+</body>
+</html>
+
