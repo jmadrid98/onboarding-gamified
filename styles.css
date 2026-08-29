@@ -126,12 +126,12 @@ label{display:grid;gap:4px;font-size:.65rem;font-weight:800;text-transform:upper
   box-shadow: none !important;
 }
 
-/* Cartel Flotante en el Cielo con Tipografía Épica Blanca */
+/* Cartel Elevado en el Cielo con Tipografía Épica Blanca (Activación por proximidad) */
 .mission-sky-title {
   position: absolute;
   top: 32px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -10px);
   text-align: center;
   color: #ffffff;
   pointer-events: none;
@@ -141,43 +141,47 @@ label{display:grid;gap:4px;font-size:.65rem;font-weight:800;text-transform:upper
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.mission-sky-title.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 .mission-sky-title span {
   display: block;
   font-family: var(--body);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   letter-spacing: 0.26em;
   font-weight: 800;
   color: #ffd880;
   text-transform: uppercase;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 .mission-sky-title b {
   display: block;
   font-family: var(--display); /* Cinzel */
-  font-size: clamp(1.4rem, 2.6vw, 2.3rem);
+  font-size: clamp(1.5rem, 2.8vw, 2.4rem);
   font-weight: 700;
   color: #ffffff;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 255, 255, 0.5);
   line-height: 1.15;
   margin: 1px 0;
 }
 .mission-sky-title small {
   display: block;
   font-family: var(--body);
-  font-size: 0.76rem;
-  color: rgba(255, 255, 255, 0.92);
-  font-weight: 600;
+  font-size: 0.80rem;
+  color: #cde4e2;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
 .checkpoint-labels { display: none; }
-  z-index: 15;
-}
 .sun-glow{background:radial-gradient(circle at 22% 10%,rgba(255,250,219,.65),transparent 30%)}
 .vignette{box-shadow:inset 0 0 135px rgba(40,68,72,.16)}
 .mission-card{background:linear-gradient(135deg,rgba(23,105,109,.11),rgba(184,137,66,.14))}
@@ -257,3 +261,11 @@ label{display:grid;gap:4px;font-size:.65rem;font-weight:800;text-transform:upper
 /* v4.1 slightly faster flights, mission title stays on screen longer */
 .transition-title.show{animation:cinematicTitleLong 5.8s cubic-bezier(.22,.61,.36,1) both}
 @keyframes cinematicTitleLong{0%{opacity:0;transform:translate(-50%,-47%) scale(.99)}16%,78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-52%) scale(1.004)}}
+
+.map-icon-btn.first-person-active{
+  background:#17696d !important;
+  color:#fff !important;
+  border-color:#d7a24c !important;
+  box-shadow:0 0 16px rgba(215,162,76,0.6) !important;
+}
+

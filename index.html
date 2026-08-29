@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=65.0.0">
+  <link rel="stylesheet" href="styles.css?v=102.0.0">
   <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
 <body>
   <!-- Pantalla de Carga Inicial (Fixed Overlay) -->
@@ -25,9 +25,13 @@
           <h2 id="missionName" class="display"></h2>
           <p id="missionDesc"></p>
           
-          <div class="mission-nav-bar">
+          <div class="mission-nav-bar" id="standardMissionNav">
             <button id="cardBackBtn" class="nav-arrow-btn" type="button">◀ Anterior</button>
             <button id="cardNextBtn" class="nav-arrow-btn primary" type="button">Avanzar Misión ▶</button>
+          </div>
+
+          <div id="lobbyCtaContainer" style="display:none;margin-top:.85rem">
+            <button id="startJourneyBtn" class="primary wide pulse-glow" type="button" style="padding:14px;font-size:0.95rem;font-weight:700;background:linear-gradient(135deg,#e67e22,#d35400);border:0;border-radius:10px;color:#fff;cursor:pointer;box-shadow:0 4px 18px rgba(230,126,34,.45);width:100%">🚀 Iniciar Aventura (Partir a Misión 01)</button>
           </div>
         </section>
 
@@ -155,15 +159,16 @@
           <button id="hudNextBtn" class="hud-btn arrow-btn" type="button" title="Misión Siguiente">▶</button>
         </div>
       </div>
-      <!-- Controles de Cámara Libre, Clima y Pantalla Completa unificados en la esquina inferior izquierda -->
+      <!-- Controles de Cámara Libre, Explorador 1ra Persona, Clima y Pantalla Completa -->
       <div class="world-controls-bottom-left" aria-label="Controles de cámara, clima y pantalla">
-        <button id="freeCameraBtn" class="map-icon-btn" type="button" title="Cámara libre: Desactivada (Clic para orbitar)">🎥</button>
+        <button id="freeCameraBtn" class="map-icon-btn" type="button" title="Cámara libre aérea: Desactivada (Clic para orbitar y volar con WASD)">🎥</button>
+        <button id="firstPersonBtn" class="map-icon-btn" type="button" title="Modo Explorador (1ra Persona): Caminar por el suelo a pie a escala humana">🚶‍♂️</button>
         <button id="weatherBtn" class="map-icon-btn" type="button" title="Clima: Día claro (Clic para cambiar)">☀️</button>
         <button id="fullscreenBtn" class="map-icon-btn" type="button" title="Pantalla Completa">⛶</button>
       </div>
 
-      <!-- Cartel Elevado en el Cielo con Tipografía Épica Blanca -->
-      <div id="missionSkyTitle" class="mission-sky-title">
+      <!-- Cartel Elevado en el Cielo con Tipografía Épica Blanca (Activación por proximidad) -->
+      <div id="missionSkyTitle" class="mission-sky-title visible">
         <span id="skyMissionNum">MISIÓN 01</span>
         <b id="skyMissionName">ARSENAL Y EQUIPOS</b>
         <small id="skyMissionRegion">Puesto de Inicio</small>
@@ -285,7 +290,7 @@
     <button id="grantHumandXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">🥗 Validar Asistencia y Otorgar +30 XP al Equipo</button>
   </dialog>
 
-  <script type="module" src="main.js?v=65.0.0"></script>
+  <script type="module" src="main.js?v=127.0.0"></script>
 </body>
 </html>
 

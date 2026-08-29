@@ -1,12 +1,15 @@
-# Operating System Files
-.DS_Store
+# Operating System files
 Thumbs.db
-desktop.ini
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
 
-# Redundant duplicate folder
-Mapa Videojuego/
-
-# Logs & Caches
+# Logs & temp files
 *.log
-.vscode/
-.idea/
+*.tmp
+npm-debug.log*
+yarn-debug.log*
+
+# Duplicate internal subfolder
+/Mapa Videojuego/
