@@ -2,7 +2,7 @@ import * as THREE from 'three';
 window.THREE = THREE;
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter } from './realistic-assets.js?v=127.0.0';
+import { installRealisticWorld, createHumanoidCharacter } from './realistic-assets.js?v=154.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -21,16 +21,16 @@ const SEED = [
   { id: 1, name: 'Arsenal y Equipos', desc: 'Entrega y verificación del equipamiento inicial: Laptop corporativa, tarjeta de acceso, periféricos tech y kit de bienvenida.', region: 'Puesto de Inicio', x: -220, z: 85, baseY: 0.0, type: 'camp' },
   { id: 2, name: 'Firma de Contrato y Beneficios', desc: 'Formalización del pacto laboral, firma de contrato, pólizas de salud, vales y catálogo de beneficios corporativos.', region: 'Santuario del Pacto', x: -160, z: -90, baseY: 4.5, type: 'sanctuary' },
   { id: 3, name: 'Humand y Comedor', desc: 'Guía de uso de la App Humand para checar entradas/salidas, reporte de incidencias, turnos y normas del comedor corporativo.', region: 'Valle del Refectorio', x: -85, z: 55, baseY: 0.0, type: 'garden' },
-  { id: 4, name: 'NPS y Voz del Cliente', desc: 'Importancia del NPS, la experiencia y la obsesión por el cliente.', region: 'Valle de Beneficios', x: -25, z: 120, baseY: 7.5, type: 'observatory' },
-  { id: 5, name: 'Sindicato y Ecosistema Laboral', desc: 'Contexto, reglas y entendimiento del entorno sindical.', region: 'Consejo Laboral', x: 45, z: 55, baseY: 0.0, type: 'plaza' },
-  { id: 6, name: 'Negocio y Producto', desc: 'Cómo genera valor la empresa, qué ofrece y dónde impacta tu función.', region: 'Bahía de Comercio', x: 110, z: -85, baseY: 0.0, type: 'harbor' },
-  { id: 7, name: 'Compliance Quest', desc: 'Riesgo, ética, políticas y decisiones críticas del negocio.', region: 'Gran Archivo de Ética', x: 175, z: -105, baseY: 5.0, type: 'archive' },
+  { id: 4, name: 'Protección Civil y Estacionamiento', desc: 'Protocolos de emergencia, brigadas de auxilio, rutas de evacuación y registro de vehículos en el estacionamiento corporativo.', region: 'Altos de la Vigilancia', x: -25, z: 120, baseY: 7.5, type: 'safety' },
+  { id: 5, name: 'Tarjeta Cosmos', desc: 'Beneficios, convenios comerciales, descuentos y privilegios exclusivos con la Tarjeta Cosmos.', region: 'Bóveda Cosmos', x: 45, z: 55, baseY: 0.0, type: 'vault' },
+  { id: 6, name: 'Introducción a la compañía', desc: 'Historia, origen, evolución, pilares, propósito y cultura que definen el camino de nuestra organización.', region: 'Salón de las Crónicas', x: 110, z: -85, baseY: 3.2, type: 'history' },
+  { id: 7, name: 'NPS', desc: 'Metodología, escala y aplicación de la encuesta NPS a clientes para medir satisfacción, lealtad y calidad de servicio.', region: 'Pabellón NPS', x: 175, z: -105, baseY: 5.0, type: 'nps' },
   { id: 8, name: 'Herramientas y Operación', desc: 'Sistemas, accesos, canales y operación del día a día.', region: 'Forja Operativa', x: 225, z: 40, baseY: 7.8, type: 'forge' },
   { id: 9, name: 'Boss Final', desc: 'Cierre integral, último checkpoint y símbolo de pertenencia.', region: 'Bastión de Cierre', x: 280, z: 115, baseY: 16.0, type: 'castle' }
 ];
 
 // ── State Management ─────────────────────────────────────────────────────────
-const KEY = 'nextGenOnboardingDay.v68_megamap';
+const KEY = 'nextGenOnboardingDay.v69_megamap';
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 let missions = structuredClone(SEED);
@@ -40,6 +40,26 @@ if (Array.isArray(saved.missions) && saved.missions.length === SEED.length) {
       missions[idx] = { ...SEED[idx], ...m };
     }
   });
+}
+if (missions[5]) {
+  missions[5].name = 'Tarjeta Cosmos';
+  missions[5].region = 'Bóveda Cosmos';
+  missions[5].desc = 'Beneficios, convenios comerciales, descuentos y privilegios exclusivos con la Tarjeta Cosmos.';
+  missions[5].type = 'vault';
+}
+if (missions[6]) {
+  missions[6].name = 'Introducción a la compañía';
+  missions[6].region = 'Salón de las Crónicas';
+  missions[6].desc = 'Historia, origen, evolución, pilares, propósito y cultura que definen el camino de nuestra organización.';
+  missions[6].type = 'history';
+  missions[6].baseY = 3.2;
+}
+if (missions[7]) {
+  missions[7].name = 'NPS';
+  missions[7].region = 'Pabellón NPS';
+  missions[7].desc = 'Metodología, escala y aplicación de la encuesta NPS a clientes para medir satisfacción, lealtad y calidad de servicio.';
+  missions[7].type = 'nps';
+  missions[7].baseY = 5.0;
 }
 function getMission(id) {
   const num = Number(id);
@@ -96,6 +116,10 @@ function getCleanPlayers() {
 let gearChecklist = saved.gearChecklist || { laptop: false, access: false, tech: false, swag: false };
 let contractChecklist = saved.contractChecklist || { contract: false, health: false, perks: false, vacation: false };
 let humandChecklist = saved.humandChecklist || { appHumand: false, incidents: false, dining: false, hygiene: false };
+let safetyChecklist = saved.safetyChecklist || { evac: false, meeting: false, vehicle: false, rules: false };
+let cosmosChecklist = saved.cosmosChecklist || { cosmosApp: false, cosmosPerks: false, cosmosHealth: false, cosmosRewards: false };
+let companyChecklist = saved.companyChecklist || { companyOrigins: false, companyMission: false, companyValues: false, companyFuture: false };
+let npsChecklist = saved.npsChecklist || { npsGoldenQuestion: false, npsCustomerSegments: false, npsFormulaScore: false, npsClosedLoop: false };
 
 const save = () => {
   try {
@@ -105,7 +129,11 @@ const save = () => {
       players: getCleanPlayers(),
       gearChecklist,
       contractChecklist,
-      humandChecklist
+      humandChecklist,
+      safetyChecklist,
+      cosmosChecklist,
+      companyChecklist,
+      npsChecklist
     }));
   } catch (err) {
     console.error('Error saving state to localStorage:', err);
@@ -135,8 +163,7 @@ const RIVER_PTS = [
   [-20, -32],
   [35, -28],
   [80, -20],
-  [100, -50],
-  [110, -85]
+  [82, -45]
 ];
 
 function getRiverZ(x) {
@@ -164,12 +191,12 @@ function getTerrainY(wx, wz) {
   if (wx < -280) { const t = clamp((-280 - wx) / 50, 0, 1); h += t * t * (fbm(wx * s * 1.7 + 2.1, wz * s * 1.7 + 6.3) * 30 + 16); }
   if (wx > 310) { const t = clamp((wx - 310) / 45, 0, 1); h += t * t * (fbm(wx * s * 1.7 + 8.5, wz * s * 1.7 + 3.1) * 34 + 20); }
 
-  // Lake Basin
-  const ld = Math.hypot((wx - 110) * 0.7, wz + 85);
-  if (ld < 68) { const lf = clamp(1 - ld / 68, 0, 1); h -= lf * lf * 8.5; }
+  // Lake Basin (situated north at z = -150 so it never touches Station 6 at z = -85)
+  const ld = Math.hypot((wx - 110) * 0.7, wz + 150);
+  if (ld < 45) { const lf = clamp(1 - ld / 45, 0, 1); h -= lf * lf * 6.5; }
 
-  // River Channel - smoothly passing under Bridge 1 (-125, -20), Bridge 2 (80, -20) into Lake Basin (110, -85)
-  if (wx > -155 && wx < 110) {
+  // River Channel - smoothly passing under Bridge 1 (-125, -20), Bridge 2 (80, -20)
+  if (wx > -155 && wx < 82) {
     const rz = getRiverZ(wx);
     const rDist = Math.abs(wz - rz);
     if (rDist < 12.0) {
@@ -633,9 +660,9 @@ terrainMat.onBeforeCompile = shader => {
     rockWeight = clamp(rockWeight + highPeak, 0.0, 1.0);
 
     // 2. Shoreline Sand
-    float distLake = length(vec2((vWorldPos.x - 110.0) * 0.7, vWorldPos.z + 85.0));
-    float lakeSand = smoothstep(64.0, 44.0, distLake);
-    float riverSand = (vWorldPos.x > -155.0 && vWorldPos.x < 110.0 && vWorldPos.y < 0.1) ? smoothstep(0.1, -1.2, vWorldPos.y) : 0.0;
+    float distLake = length(vec2((vWorldPos.x - 110.0) * 0.7, vWorldPos.z + 150.0));
+    float lakeSand = smoothstep(45.0, 30.0, distLake);
+    float riverSand = (vWorldPos.x > -155.0 && vWorldPos.x < 82.0 && vWorldPos.y < 0.1) ? smoothstep(0.1, -1.2, vWorldPos.y) : 0.0;
     float sandWeight = clamp((lakeSand + riverSand) * (1.0 - rockWeight * 0.8), 0.0, 1.0);
 
     // 3. Station Courtyard Plazas: Clean, elegant, noble medieval cobblestone foundation
@@ -952,21 +979,21 @@ const anim = { water: [], poi: [], players: [], clouds: [], motes: null, streame
     waterMat.userData.shader = shader;
   };
   const water = new THREE.Mesh(wGeo, waterMat);
-  water.position.set(110, 0.05, -85);
+  water.position.set(110, -2.5, -150);
   scene.add(water);
   anim.water.push(water);
 
-  // Continuous River Ribbon following getRiverZ from x = -155 to x = 110 into Lake Basin
+  // Continuous River Ribbon following getRiverZ from x = -155 to x = 82
   {
-    const rSteps = 140;
+    const rSteps = 100;
     const rHalfW = 7.5;
     const rVerts = [], rNormals = [], rUvs = [], rIndices = [];
 
     for (let i = 0; i <= rSteps; i++) {
-      const rx = -155 + (i / rSteps) * (110 - (-155));
+      const rx = -155 + (i / rSteps) * (82 - (-155));
       const rz = getRiverZ(rx);
 
-      const nextRx = Math.min(110, rx + 1.0);
+      const nextRx = Math.min(82, rx + 1.0);
       const prevRx = Math.max(-155, rx - 1.0);
       const ddx = nextRx - prevRx;
       const ddz = getRiverZ(nextRx) - getRiverZ(prevRx);
@@ -975,7 +1002,7 @@ const anim = { water: [], poi: [], players: [], clouds: [], motes: null, streame
       const nz = ddx / dLen;
 
       const p = i / rSteps;
-      const waterY = THREE.MathUtils.lerp(-0.35, 0.05, Math.pow(p, 1.3));
+      const waterY = THREE.MathUtils.lerp(-0.35, -0.05, Math.pow(p, 1.3));
 
       const lx = rx + nx * rHalfW;
       const lz = rz + nz * rHalfW;
@@ -1177,6 +1204,8 @@ function renderUI() {
   const regEl = document.getElementById('skyMissionRegion');
   if (regEl) regEl.textContent = q.region;
 
+
+
   // Navigation button states
   updateNavButtons();
 
@@ -1302,9 +1331,9 @@ const SHOTS = {
   1: { o: [4.2, 5.8, 8.5], h: 1.2 },
   2: { o: [4.8, 6.8, 9.2], h: 1.5 },
   3: { o: [4.5, 6.5, 9.0], h: 1.4 },
-  4: { o: [5.2, 7.8, 10.2], h: 2.0 },
-  5: { o: [5.2, 7.8, 10.2], h: 2.0 },
-  6: { o: [4.8, 6.8, 9.2], h: 1.5 },
+  4: { o: [5.8, 9.6, 14.5], h: 2.2 },
+  5: { o: [4.8, 6.8, 9.5], h: 1.5 },
+  6: { o: [4.8, 6.8, 10.2], h: 1.6 },
   7: { o: [5.2, 7.5, 10.2], h: 2.0 },
   8: { o: [5.0, 7.2, 9.8], h: 1.8 },
   9: { o: [7.0, 10.5, -13.0], h: 4.2 }
@@ -1983,7 +2012,7 @@ document.getElementById('resetBtn')?.addEventListener('click', () => {
 
 document.getElementById('exportBtn')?.addEventListener('click', () => {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify({ missions, current, players, gearChecklist, contractChecklist, humandChecklist }, null, 2)], { type: 'application/json' }));
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({ missions, current, players, gearChecklist, contractChecklist, humandChecklist, safetyChecklist }, null, 2)], { type: 'application/json' }));
   a.download = 'next-gen-onboarding-completo.json';
   a.click();
 });
@@ -2000,6 +2029,7 @@ document.getElementById('importFile')?.addEventListener('change', e => {
       if (d.gearChecklist) gearChecklist = d.gearChecklist;
       if (d.contractChecklist) contractChecklist = d.contractChecklist;
       if (d.humandChecklist) humandChecklist = d.humandChecklist;
+      if (d.safetyChecklist) safetyChecklist = d.safetyChecklist;
       save();
       location.reload();
     } catch {
@@ -2079,6 +2109,104 @@ document.getElementById('grantHumandXpBtn')?.addEventListener('click', () => {
   humandDialog?.close();
 });
 
+const safetyDialog = document.getElementById('safetyDialog');
+document.getElementById('closeSafetyDialog')?.addEventListener('click', () => safetyDialog?.close());
+['Evac', 'Meeting', 'Vehicle', 'Rules'].forEach(k => {
+  const key = k.toLowerCase();
+  const el = document.getElementById(`check${k}`);
+  if (el) {
+    el.checked = !!safetyChecklist[key];
+    document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+    el.onchange = () => {
+      safetyChecklist[key] = el.checked;
+      document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+      save();
+    };
+  }
+});
+document.getElementById('grantSafetyXpBtn')?.addEventListener('click', () => {
+  players.forEach(p => { p.points = (p.points || 0) + 25; });
+  save();
+  renderUI();
+  safetyDialog?.close();
+});
+
+const cosmosDialog = document.getElementById('cosmosDialog');
+document.getElementById('closeCosmosDialog')?.addEventListener('click', () => cosmosDialog?.close());
+['CosmosApp', 'CosmosPerks', 'CosmosHealth', 'CosmosRewards'].forEach(k => {
+  const key = k.charAt(0).toLowerCase() + k.slice(1);
+  const el = document.getElementById(`check${k}`);
+  if (el) {
+    el.checked = !!cosmosChecklist[key];
+    document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+    el.onchange = () => {
+      cosmosChecklist[key] = el.checked;
+      document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+      save();
+    };
+  }
+});
+document.getElementById('grantCosmosXpBtn')?.addEventListener('click', () => {
+  players.forEach(p => { p.points = (p.points || 0) + 25; });
+  save();
+  renderUI();
+  cosmosDialog?.close();
+});
+
+const companyDialog = document.getElementById('companyDialog');
+document.getElementById('closeCompanyDialog')?.addEventListener('click', () => companyDialog?.close());
+['CompanyOrigins', 'CompanyMission', 'CompanyValues', 'CompanyFuture'].forEach(k => {
+  const key = k.charAt(0).toLowerCase() + k.slice(1);
+  const el = document.getElementById(`check${k}`);
+  if (el) {
+    el.checked = !!companyChecklist[key];
+    document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+    el.onchange = () => {
+      companyChecklist[key] = el.checked;
+      document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+      save();
+    };
+  }
+});
+document.getElementById('grantCompanyXpBtn')?.addEventListener('click', () => {
+  players.forEach(p => { p.points = (p.points || 0) + 25; });
+  save();
+  renderUI();
+  companyDialog?.close();
+});
+
+const npsDialog = document.getElementById('npsDialog');
+document.getElementById('closeNpsDialog')?.addEventListener('click', () => npsDialog?.close());
+['NpsGoldenQuestion', 'NpsCustomerSegments', 'NpsFormulaScore', 'NpsClosedLoop'].forEach(k => {
+  const key = k.charAt(0).toLowerCase() + k.slice(1);
+  const el = document.getElementById(`check${k}`);
+  if (el) {
+    el.checked = !!npsChecklist[key];
+    document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+    el.onchange = () => {
+      npsChecklist[key] = el.checked;
+      document.getElementById(`card${k}`)?.classList.toggle('delivered', el.checked);
+      save();
+    };
+  }
+});
+document.getElementById('grantNpsXpBtn')?.addEventListener('click', () => {
+  players.forEach(p => { p.points = (p.points || 0) + 25; });
+  save();
+  renderUI();
+  npsDialog?.close();
+});
+
+function openCurrentMissionModal() {
+  if (current === 1) gearDialog?.showModal();
+  else if (current === 2) contractDialog?.showModal();
+  else if (current === 3) humandDialog?.showModal();
+  else if (current === 4) safetyDialog?.showModal();
+  else if (current === 5) cosmosDialog?.showModal();
+  else if (current === 6) companyDialog?.showModal();
+  else if (current === 7) npsDialog?.showModal();
+}
+
 function resize() {
   const s = document.getElementById('stage');
   if (!s) return;
@@ -2137,6 +2265,17 @@ function loop() {
     }
     if (g.userData?.humandTerminal) {
       g.userData.humandTerminal.rotation.y += dt * 1.1;
+    }
+    if (g.userData?.cosmosCard) {
+      g.userData.cosmosCard.rotation.y += dt * 0.85;
+      const baseY = g.userData.cosmosCardBaseY || 1.85;
+      g.userData.cosmosCard.position.y = baseY + Math.sin(t * 2.2) * 0.06;
+    }
+    if (g.userData?.armillaryRing1) {
+      g.userData.armillaryRing1.rotation.y += dt * 0.6;
+    }
+    if (g.userData?.armillaryRing2) {
+      g.userData.armillaryRing2.rotation.x += dt * 0.45;
     }
   });
 

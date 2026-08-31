@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=102.0.0">
+  <link rel="stylesheet" href="styles.css?v=151.0.0">
   <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
 <body>
   <!-- Pantalla de Carga Inicial (Fixed Overlay) -->
@@ -31,7 +31,7 @@
           </div>
 
           <div id="lobbyCtaContainer" style="display:none;margin-top:.85rem">
-            <button id="startJourneyBtn" class="primary wide pulse-glow" type="button" style="padding:14px;font-size:0.95rem;font-weight:700;background:linear-gradient(135deg,#e67e22,#d35400);border:0;border-radius:10px;color:#fff;cursor:pointer;box-shadow:0 4px 18px rgba(230,126,34,.45);width:100%">🚀 Iniciar Aventura (Partir a Misión 01)</button>
+            <button id="startJourneyBtn" class="primary wide" type="button">🚀 Iniciar Aventura (Partir a Misión 01)</button>
           </div>
         </section>
 
@@ -52,7 +52,7 @@
               <span class="eyebrow">Expedición</span>
               <h2 class="display" style="font-size:1.15rem;margin:2px 0">Tabla de Posiciones (XP)</h2>
             </div>
-            <button id="rankingToggle" class="icon-button" type="button" title="Minimizar ranking" style="padding:4px 8px;font-size:0.72rem;background:#0e6e7118;color:var(--teal);border:0;border-radius:6px;cursor:pointer">↕ Ocultar</button>
+            <button id="rankingToggle" class="icon-button" type="button" title="Minimizar ranking" style="padding:4px 8px;font-size:0.72rem;background:rgba(204,9,47,0.08);color:var(--teal);border:0;border-radius:6px;cursor:pointer">↕ Ocultar</button>
           </div>
 
           <!-- Solo la lista de posiciones / ranking -->
@@ -290,7 +290,148 @@
     <button id="grantHumandXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">🥗 Validar Asistencia y Otorgar +30 XP al Equipo</button>
   </dialog>
 
-  <script type="module" src="main.js?v=127.0.0"></script>
+  <!-- Modal Interactivo: Protección Civil y Estacionamiento (Misión 4) -->
+  <dialog id="safetyDialog">
+    <button id="closeSafetyDialog" class="close">✕</button>
+    <span class="eyebrow">MISIÓN 04 · ALTOS DE LA VIGILANCIA</span>
+    <h2 class="display" style="margin-top:.3rem">Protección Civil y Estacionamiento</h2>
+    <p>Protocolos de seguridad, brigadas de primeros auxilios y control de acceso vehicular:</p>
+    
+    <div class="gear-grid">
+      <div class="gear-card" id="cardEvac">
+        <div class="gear-header"><span class="gear-icon">🏃‍♂️</span><b class="gear-title">Rutas de Evacuación</b></div>
+        <span class="gear-desc">Ubicación de escaleras de emergencia, salidas de escape y puertas cortafuegos.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkEvac"> Ruta Identificada</label>
+      </div>
+
+      <div class="gear-card" id="cardMeeting">
+        <div class="gear-header"><span class="gear-icon">🟢</span><b class="gear-title">Punto de Encuentro & Brigada</b></div>
+        <span class="gear-desc">Zona segura exterior en conatos o sismos y contacto con los brigadistas de piso.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkMeeting"> Zona y Brigadista Ubicados</label>
+      </div>
+
+      <div class="gear-card" id="cardVehicle">
+        <div class="gear-header"><span class="gear-icon">🚗</span><b class="gear-title">Registro Vehicular & Tag</b></div>
+        <span class="gear-desc">Registro de placas y modelo de auto, moto o bici para apertura de la pluma.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkVehicle"> Vehículo Registrado</label>
+      </div>
+
+      <div class="gear-card" id="cardRules">
+        <div class="gear-header"><span class="gear-icon">🅿️</span><b class="gear-title">Reglamento del Estacionamiento</b></div>
+        <span class="gear-desc">Estacionarse siempre en reversa, respetar cajones preferenciales y 10 km/h.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkRules"> Normas Aceptadas</label>
+      </div>
+    </div>
+
+    <button id="grantSafetyXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">🛡️ Validar Seguridad y Otorgar +25 XP al Equipo</button>
+  </dialog>
+
+  <dialog id="cosmosDialog">
+    <button id="closeCosmosDialog" class="close">✕</button>
+    <span class="eyebrow">MISIÓN 05 · BÓVEDA COSMOS</span>
+    <h2 class="display" style="margin-top:.3rem">Tarjeta Cosmos</h2>
+    <p>Conoce los beneficios exclusivos, convenios comerciales y privilegios para colaboradores:</p>
+    
+    <div class="gear-grid">
+      <div class="gear-card" id="cardCosmosApp">
+        <div class="gear-header"><span class="gear-icon">💳</span><b class="gear-title">Activación Digital</b></div>
+        <span class="gear-desc">Descarga y activación de tu credencial digital con código QR para identificación inmediata.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCosmosApp"> Tarjeta Activada</label>
+      </div>
+
+      <div class="gear-card" id="cardCosmosPerks">
+        <div class="gear-header"><span class="gear-icon">🛍️</span><b class="gear-title">Red de Convenios y Descuentos</b></div>
+        <span class="gear-desc">Descuentos directos en restaurantes, farmacias, ópticas, tiendas departamentales y entretenimiento.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCosmosPerks"> Catálogo de Convenios Consultado</label>
+      </div>
+
+      <div class="gear-card" id="cardCosmosHealth">
+        <div class="gear-header"><span class="gear-icon">🏋️</span><b class="gear-title">Salud, Fitness y Bienestar</b></div>
+        <span class="gear-desc">Membresías con tarifas preferenciales en gimnasios, chequeos médicos y servicios dentales.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCosmosHealth"> Beneficios de Salud Explorados</label>
+      </div>
+
+      <div class="gear-card" id="cardCosmosRewards">
+        <div class="gear-header"><span class="gear-icon">⭐</span><b class="gear-title">Puntos y Recompensas Cosmos</b></div>
+        <span class="gear-desc">Acumulación de puntos por antigüedad, metas cumplidas y canje de bonos especiales.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCosmosRewards"> Programa de Puntos Entendido</label>
+      </div>
+    </div>
+
+    <button id="grantCosmosXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">✨ Desbloquear Beneficios Cosmos y Otorgar +25 XP</button>
+  </dialog>
+
+  <dialog id="companyDialog">
+    <button id="closeCompanyDialog" class="close">✕</button>
+    <span class="eyebrow">MISIÓN 06 · SALÓN DE LAS CRÓNICAS</span>
+    <h2 class="display" style="margin-top:.3rem">Introducción a la compañía</h2>
+    <p>Descubre los orígenes, hitos históricos, propósito y cultura que definen a nuestra empresa:</p>
+    
+    <div class="gear-grid">
+      <div class="gear-card" id="cardCompanyOrigins">
+        <div class="gear-header"><span class="gear-icon">🏛️</span><b class="gear-title">Historia y Orígenes</b></div>
+        <span class="gear-desc">Cómo nació la organización, los primeros desafíos superados y el camino que nos trajo hasta hoy.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCompanyOrigins"> Historia Conocida</label>
+      </div>
+
+      <div class="gear-card" id="cardCompanyMission">
+        <div class="gear-header"><span class="gear-icon">🎯</span><b class="gear-title">Misión, Visión y Propósito</b></div>
+        <span class="gear-desc">Nuestra razón de ser, a dónde queremos llegar y el impacto positivo que generamos cada día.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCompanyMission"> Propósito Interiorizado</label>
+      </div>
+
+      <div class="gear-card" id="cardCompanyValues">
+        <div class="gear-header"><span class="gear-icon">🧭</span><b class="gear-title">Valores y ADN Cultural</b></div>
+        <span class="gear-desc">Los pilares éticos, el trabajo colaborativo, la innovación constante y el respeto mutuo.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCompanyValues"> Valores Asimilados</label>
+      </div>
+
+      <div class="gear-card" id="cardCompanyFuture">
+        <div class="gear-header"><span class="gear-icon">🚀</span><b class="gear-title">Evolución y Futuro</b></div>
+        <span class="gear-desc">Hitos estratégicos actuales, proyectos de expansión y tu rol clave como nuevo protagonista.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkCompanyFuture"> Visión de Futuro Alineada</label>
+      </div>
+    </div>
+
+    <button id="grantCompanyXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">✨ Conocer la Compañía y Otorgar +25 XP</button>
+  </dialog>
+
+  <dialog id="npsDialog">
+    <button id="closeNpsDialog" class="close">✕</button>
+    <span class="eyebrow">MISIÓN 07 · PABELLÓN NPS</span>
+    <h2 class="display" style="margin-top:.3rem">NPS (Net Promoter Score)</h2>
+    <p>Aprende cómo medir la lealtad y satisfacción del cliente a través de la metodología NPS:</p>
+    
+    <div class="gear-grid">
+      <div class="gear-card" id="cardNpsGoldenQuestion">
+        <div class="gear-header"><span class="gear-icon">⭐</span><b class="gear-title">1. La Pregunta de Oro</b></div>
+        <span class="gear-desc">"En escala de 0 a 10, ¿con qué probabilidad recomendarías nuestro servicio a un colega?". Clave formularla inmediatamente post-atención.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkNpsGoldenQuestion"> Pregunta Dominada</label>
+      </div>
+
+      <div class="gear-card" id="cardNpsCustomerSegments">
+        <div class="gear-header"><span class="gear-icon">🚦</span><b class="gear-title">2. Los 3 Grupos de Clientes</b></div>
+        <span class="gear-desc">🔴 <b>0-6 Detractores</b> (riesgo de fuga, rescatar ya). 🟡 <b>7-8 Neutros</b> (satisfechos pero vulnerables). 🟢 <b>9-10 Promotores</b> (leales y embajadores).</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkNpsCustomerSegments"> Segmentos Claros</label>
+      </div>
+
+      <div class="gear-card" id="cardNpsFormulaScore">
+        <div class="gear-header"><span class="gear-icon">📊</span><b class="gear-title">3. Fórmula y Medición</b></div>
+        <span class="gear-desc"><b>% Promotores - % Detractores = NPS</b>. Rango de -100 a +100. Superar +50 es excelente y más de +70 es estándar mundial.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkNpsFormulaScore"> Cálculo Entendido</label>
+      </div>
+
+      <div class="gear-card" id="cardNpsClosedLoop">
+        <div class="gear-header"><span class="gear-icon">🔄</span><b class="gear-title">4. Cierre de Ciclo (Closed Loop)</b></div>
+        <span class="gear-desc">Pregunta abierta: "¿Cuál fue el motivo de tu calificación?". Contactar a detractores en &lt;24h para resolver y transformar su experiencia.</span>
+        <label class="gear-check-label"><input type="checkbox" id="checkNpsClosedLoop"> Protocolo Asimilado</label>
+      </div>
+    </div>
+
+    <button id="grantNpsXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">✨ Dominar Metodología NPS y Otorgar +25 XP</button>
+  </dialog>
+
+  <script type="module" src="main.js?v=154.0.0"></script>
 </body>
 </html>
 
