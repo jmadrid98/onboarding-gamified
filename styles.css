@@ -912,6 +912,67 @@ dialog button.primary.wide:hover {
   border-radius: 14px;
 }
 
+.media-doc-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 24px;
+  gap: 16px;
+  max-width: 440px;
+}
+
+.media-doc-icon-box {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: rgba(204, 9, 47, 0.12);
+  border: 1.5px solid rgba(204, 9, 47, 0.4);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 24px rgba(204, 9, 47, 0.2);
+}
+
+.media-doc-title {
+  font-family: var(--body);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.media-doc-desc {
+  font-family: var(--body);
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.media-doc-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #CC092F, #900F15);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  box-shadow: 0 4px 16px rgba(204, 9, 47, 0.4);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 215, 128, 0.3);
+}
+
+.media-doc-download-btn:hover {
+  background: linear-gradient(135deg, #E00B39, #A5091B);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(204, 9, 47, 0.6);
+}
+
 /* Playlist Lateral Cyber */
 .media-hub-playlist-section {
   display: flex;

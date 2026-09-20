@@ -1,0 +1,268 @@
+{
+  "1": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción",
+      "file": "assets/media/station_01/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "video",
+      "title": "Detalles",
+      "file": "assets/media/station_01/02_Detalles.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Descubre los beneficios",
+      "file": "assets/media/station_01/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 4,
+      "type": "file",
+      "title": "Explora las áreas",
+      "file": "assets/media/station_01/04_Explora las areas.pptx",
+      "desc": "Documento",
+      "badge": "Archivo"
+    },
+    {
+      "order": 5,
+      "type": "image",
+      "title": "Analiza el flujo",
+      "file": "assets/media/station_01/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "2": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción",
+      "file": "assets/media/station_02/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "video",
+      "title": "Detalles",
+      "file": "assets/media/station_02/02_Detalles.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Descubre los beneficios",
+      "file": "assets/media/station_02/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 4,
+      "type": "file",
+      "title": "Explora las áreas",
+      "file": "assets/media/station_02/04_Explora las areas.pptx",
+      "desc": "Documento",
+      "badge": "Archivo"
+    },
+    {
+      "order": 5,
+      "type": "image",
+      "title": "Analiza el flujo",
+      "file": "assets/media/station_02/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "3": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción a la Misión",
+      "file": "assets/media/station_01/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "image",
+      "title": "Guía de Estrategia y Objetivos",
+      "file": "assets/media/station_01/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Diagrama de Procesos",
+      "file": "assets/media/station_01/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "4": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción a la Misión",
+      "file": "assets/media/station_02/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "image",
+      "title": "Guía de Estrategia y Objetivos",
+      "file": "assets/media/station_02/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Diagrama de Procesos",
+      "file": "assets/media/station_02/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "5": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción a la Misión",
+      "file": "assets/media/station_01/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "image",
+      "title": "Guía de Estrategia y Objetivos",
+      "file": "assets/media/station_01/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Diagrama de Procesos",
+      "file": "assets/media/station_01/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "6": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción a la Misión",
+      "file": "assets/media/station_02/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "image",
+      "title": "Guía de Estrategia y Objetivos",
+      "file": "assets/media/station_02/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Diagrama de Procesos",
+      "file": "assets/media/station_02/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "7": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción a la Misión",
+      "file": "assets/media/station_01/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "image",
+      "title": "Guía de Estrategia y Objetivos",
+      "file": "assets/media/station_01/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Diagrama de Procesos",
+      "file": "assets/media/station_01/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "8": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción a la Misión",
+      "file": "assets/media/station_02/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "image",
+      "title": "Guía de Estrategia y Objetivos",
+      "file": "assets/media/station_02/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Diagrama de Procesos",
+      "file": "assets/media/station_02/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ],
+  "9": [
+    {
+      "order": 1,
+      "type": "video",
+      "title": "Introducción a la Misión",
+      "file": "assets/media/station_01/01_Introduccion.mp4",
+      "desc": "Cápsula de Video",
+      "badge": "Video"
+    },
+    {
+      "order": 2,
+      "type": "image",
+      "title": "Guía de Estrategia y Objetivos",
+      "file": "assets/media/station_01/03_Descrubre los beneficios.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    },
+    {
+      "order": 3,
+      "type": "image",
+      "title": "Diagrama de Procesos",
+      "file": "assets/media/station_01/05_Analiza el flujo.png",
+      "desc": "Infografía Visual",
+      "badge": "Infografía"
+    }
+  ]
+}

@@ -22,7 +22,10 @@ const MIME = {
   '.eot': 'application/vnd.ms-fontobject',
   '.mp4': 'video/mp4',
   '.webm': 'video/webm',
-  '.pdf': 'application/pdf'
+  '.pdf': 'application/pdf',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.ppt': 'application/vnd.ms-powerpoint',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 };
 
 const server = http.createServer((req, res) => {

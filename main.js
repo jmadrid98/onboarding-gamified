@@ -1192,19 +1192,79 @@ function updateNavButtons() {
   }
 }
 
-let STATION_MEDIA = {};
+const DEFAULT_STATION_MEDIA = {
+  1: [
+    { order: 1, type: 'video', title: 'Introducción', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'video', title: 'Detalles', file: 'assets/media/station_01/02_Detalles.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 3, type: 'image', title: 'Descubre los beneficios', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 4, type: 'file', title: 'Explora las áreas', file: 'assets/media/station_01/04_Explora las areas.pptx', desc: 'Documento', badge: 'Archivo' },
+    { order: 5, type: 'image', title: 'Analiza el flujo', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  2: [
+    { order: 1, type: 'video', title: 'Introducción', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'video', title: 'Detalles', file: 'assets/media/station_02/02_Detalles.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 3, type: 'image', title: 'Descubre los beneficios', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 4, type: 'file', title: 'Explora las áreas', file: 'assets/media/station_02/04_Explora las areas.pptx', desc: 'Documento', badge: 'Archivo' },
+    { order: 5, type: 'image', title: 'Analiza el flujo', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  3: [
+    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  4: [
+    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  5: [
+    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  6: [
+    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  7: [
+    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  8: [
+    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  9: [
+    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ]
+};
+
+let STATION_MEDIA = Object.assign({}, DEFAULT_STATION_MEDIA);
 
 async function syncStationMediaFromAPI() {
+  try {
+    const res = await fetch('./assets/media/media-manifest.json', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      STATION_MEDIA = Object.assign({}, DEFAULT_STATION_MEDIA, data);
+      updateStationMediaTrigger();
+      return;
+    }
+  } catch (err) {}
+
   try {
     const res = await fetch('/api/media', { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
-      STATION_MEDIA = data;
+      STATION_MEDIA = Object.assign({}, DEFAULT_STATION_MEDIA, data);
       updateStationMediaTrigger();
     }
-  } catch (err) {
-    console.warn('Media auto-sync notice:', err);
-  }
+  } catch (err) {}
 }
 
 // Initial sync
@@ -2549,7 +2609,7 @@ const mediaHubItemsList = document.getElementById('mediaHubItemsList');
 let activeStationMediaItem = null;
 
 function renderMediaStageItem(item) {
-  if (!mediaStageScreen) return;
+  if (!mediaStageScreen || !item) return;
   activeStationMediaItem = item;
 
   // Clear previous player/content cleanly and release video resources
@@ -2561,10 +2621,12 @@ function renderMediaStageItem(item) {
   }
   mediaStageScreen.innerHTML = '';
 
+  const encodedUrl = encodeURI(item.file);
+
   if (item.type === 'video') {
     const vid = document.createElement('video');
     vid.className = 'media-video-element';
-    vid.src = item.file;
+    vid.src = encodedUrl;
     vid.controls = true;
     vid.autoplay = true;
     vid.playsInline = true;
@@ -2581,36 +2643,52 @@ function renderMediaStageItem(item) {
   } else if (item.type === 'image') {
     const img = document.createElement('img');
     img.className = 'media-img-element';
-    img.src = item.file;
+    img.src = encodedUrl;
     img.alt = item.title;
     mediaStageScreen.appendChild(img);
   } else if (item.type === 'pdf') {
     const iframe = document.createElement('iframe');
     iframe.className = 'media-pdf-element';
-    iframe.src = `${item.file}#toolbar=0&navpanes=0`;
+    iframe.src = `${encodedUrl}#toolbar=0&navpanes=0`;
     iframe.title = item.title;
     mediaStageScreen.appendChild(iframe);
+  } else {
+    // Document or downloadable file (e.g. .pptx, .docx, .zip)
+    const fileCard = document.createElement('div');
+    fileCard.className = 'media-doc-preview-card';
+    fileCard.innerHTML = `
+      <div class="media-doc-icon-box">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#CC092F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </div>
+      <div class="media-doc-details">
+        <h3 class="media-doc-title">${item.title}</h3>
+        <p class="media-doc-desc">${item.desc || 'Material complementario de apoyo para esta misión'}</p>
+        <a href="${encodedUrl}" download target="_blank" rel="noopener noreferrer" class="media-doc-download-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Descargar Presentación / Archivo
+        </a>
+      </div>
+    `;
+    mediaStageScreen.appendChild(fileCard);
   }
 }
 
 async function openStationMediaHub(stationId) {
-  try {
-    const res = await fetch('/api/media', { cache: 'no-store' });
-    if (res.ok) {
-      STATION_MEDIA = await res.json();
-      updateStationMediaTrigger();
-    }
-  } catch (err) {}
-
-  const items = (typeof STATION_MEDIA !== 'undefined' && STATION_MEDIA[stationId]) ? STATION_MEDIA[stationId] : [];
+  const sId = Number(stationId) || current || 1;
+  const items = (STATION_MEDIA && STATION_MEDIA[sId]) ? STATION_MEDIA[sId] : (DEFAULT_STATION_MEDIA[sId] || DEFAULT_STATION_MEDIA[1] || []);
   if (!items.length) return;
-  const q = getMission(stationId);
+  const q = getMission(sId);
 
   const eyebrowEl = document.getElementById('mediaHubStationEyebrow');
   const titleEl = document.getElementById('mediaHubStationTitle');
   const countBadge = document.getElementById('playlistSectionBadge');
 
-  if (eyebrowEl) eyebrowEl.textContent = `MISIÓN ${String(stationId).padStart(2, '0')} · ${q ? q.region.toUpperCase() : ''}`;
+  if (eyebrowEl) eyebrowEl.textContent = `MISIÓN ${String(sId).padStart(2, '0')} · ${q ? q.region.toUpperCase() : ''}`;
   if (titleEl) titleEl.textContent = q ? `Cápsulas: ${q.name}` : 'Centro de Aprendizaje';
   if (countBadge) countBadge.textContent = `${items.length} ${items.length === 1 ? 'cápsula' : 'cápsulas'}`;
 
