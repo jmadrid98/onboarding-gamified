@@ -4,6 +4,8 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+__MACOSX/
+._*
 
 # Logs & temp files
 *.log

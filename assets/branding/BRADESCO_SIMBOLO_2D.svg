@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1920 1080">
+  <!-- Generator: Adobe Illustrator 30.1.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 136)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #cc092f;
+      }
+
+      .st1 {
+        fill: url(#Gradiente_sem_nome_36);
+      }
+
+      .st2 {
+        fill: url(#Gradiente_sem_nome_39);
+      }
+
+      .st3 {
+        fill: url(#Gradiente_sem_nome_38);
+      }
+
+      .st4 {
+        fill: url(#Gradiente_sem_nome_37);
+      }
+
+      .st5 {
+        fill: url(#Gradiente_sem_nome_13);
+      }
+
+      .st6 {
+        fill: url(#Gradiente_sem_nome_47);
+      }
+
+      .st7 {
+        fill: url(#Gradiente_sem_nome_14);
+      }
+
+      .st8 {
+        fill: url(#Gradiente_sem_nome_15);
+      }
+
+      .st9 {
+        fill: url(#Gradiente_sem_nome_18);
+      }
+
+      .st10 {
+        fill: url(#Gradiente_sem_nome_17);
+      }
+
+      .st11 {
+        fill: url(#Gradiente_sem_nome_16);
+      }
+
+      .st12 {
+        fill: url(#Gradiente_sem_nome_29);
+      }
+
+      .st13 {
+        fill: url(#Gradiente_sem_nome_28);
+      }
+
+      .st14 {
+        fill: url(#Gradiente_sem_nome_27);
+      }
+
+      .st15 {
+        fill: url(#Gradiente_sem_nome_26);
+      }
+
+      .st16 {
+        fill: url(#Gradiente_sem_nome_19);
+      }
+
+      .st16, .st17 {
+        opacity: .53;
+      }
+
+      .st16, .st17, .st18, .st19, .st20, .st21, .st22, .st23, .st24, .st25, .st26, .st27, .st28, .st29, .st30, .st31, .st32, .st33, .st34, .st35, .st36, .st37, .st38, .st39, .st40, .st41, .st42, .st43, .st44 {
+        isolation: isolate;
+      }
+
+      .st17 {
+        fill: url(#Gradiente_sem_nome_40);
+      }
+
+      .st18 {
+        fill: url(#Gradiente_sem_nome_35);
+      }
+
+      .st18, .st19, .st20, .st21, .st22, .st23, .st24, .st25, .st26, .st27, .st28, .st29, .st30, .st31, .st32, .st33, .st34, .st35, .st36, .st37, .st38, .st39, .st40, .st41, .st42 {
+        opacity: .7;
+      }
+
+      .st19 {
+        fill: url(#Gradiente_sem_nome_33);
+      }
+
+      .st20 {
+        fill: url(#Gradiente_sem_nome_34);
+      }
+
+      .st21 {
+        fill: url(#Gradiente_sem_nome_45);
+      }
+
+      .st22 {
+        fill: url(#Gradiente_sem_nome_12);
+      }
+
+      .st23 {
+        fill: url(#Gradiente_sem_nome_44);
+      }
+
+      .st24 {
+        fill: url(#Gradiente_sem_nome_20);
+      }
+
+      .st25 {
+        fill: url(#Gradiente_sem_nome_25);
+      }
+
+      .st26 {
+        fill: url(#Gradiente_sem_nome_24);
+      }
+
+      .st27 {
+        fill: url(#Gradiente_sem_nome_21);
+      }
+
+      .st28 {
+        fill: url(#Gradiente_sem_nome_10);
+      }
+
+      .st29 {
+        fill: url(#Gradiente_sem_nome_23);
+      }
+
+      .st30 {
+        fill: url(#Gradiente_sem_nome_11);
+      }
+
+      .st31 {
+        fill: url(#Gradiente_sem_nome_43);
+      }
+
+      .st32 {
+        fill: url(#Gradiente_sem_nome_42);
+      }
+
+      .st33 {
+        fill: url(#Gradiente_sem_nome_41);
+      }
+
+      .st34 {
+        fill: url(#Gradiente_sem_nome_46);
+      }
+
+      .st35 {
+        fill: url(#Gradiente_sem_nome_22);
+      }
+
+      .st36 {
+        fill: url(#Gradiente_sem_nome_4);
+      }
+
+      .st37 {
+        fill: url(#Gradiente_sem_nome_3);
+      }
+
+      .st38 {
+        fill: url(#Gradiente_sem_nome_9);
+      }
+
+      .st39 {
+        fill: url(#Gradiente_sem_nome_5);
+      }
+
+      .st40 {
+        fill: url(#Gradiente_sem_nome_7);
+      }
+
+      .st41 {
+        fill: url(#Gradiente_sem_nome_8);
+      }
+
+      .st42 {
+        fill: url(#Gradiente_sem_nome_6);
+      }
+
+      .st43 {
+        fill: url(#Gradiente_sem_nome_2);
+        opacity: .27;
+      }
+
+      .st45 {
+        fill: url(#Gradiente_sem_nome_101);
+      }
+
+      .st46 {
+        fill: url(#Gradiente_sem_nome_102);
+      }
+
+      .st47, .st48 {
+        display: none;
+      }
+
+      .st47, .st49 {
+        fill: #fff;
+      }
+
+      .st48 {
+        fill: url(#Gradiente_sem_nome_32);
+      }
+
+      .st48, .st50, .st51 {
+        fill-opacity: 0;
+      }
+
+      .st50 {
+        fill: url(#Gradiente_sem_nome_31);
+      }
+
+      .st51 {
+        fill: url(#Gradiente_sem_nome_30);
+      }
+
+      .st44 {
+        fill: url(#Gradiente_sem_nome);
+        opacity: .44;
+      }
+    </style>
+    <radialGradient id="Gradiente_sem_nome" data-name="Gradiente sem nome" cx="919.56" cy="371.84" fx="919.56" fy="371.84" r="47.1" gradientTransform="translate(-125.27 1126.31) scale(1.15 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".18" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".33" stop-color="#fff" stop-opacity=".36"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".52" stop-color="#fff" stop-opacity=".21"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".13"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_2" data-name="Gradiente sem nome 2" cx="909.09" cy="358.15" fx="909.09" fy="358.15" r="47.1" gradientTransform="translate(-122.49 1128.31) scale(1.15 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".18" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".33" stop-color="#fff" stop-opacity=".36"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".52" stop-color="#fff" stop-opacity=".21"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".13"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_3" data-name="Gradiente sem nome 3" cx="1378.98" cy="355.34" fx="1378.98" fy="355.34" r="15.73" gradientTransform="translate(6047.55 -477.37) rotate(-180) scale(3.73 -3.73)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_4" data-name="Gradiente sem nome 4" cx="1112.34" cy="329.72" fx="1112.34" fy="329.72" r="51.63" gradientTransform="translate(-121.29 1084.17) scale(1.15 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".61" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_5" data-name="Gradiente sem nome 5" cx="1122.09" cy="339.53" fx="1122.09" fy="339.53" r="51.63" gradientTransform="translate(-123.33 1082.26) scale(1.15 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".61" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_6" data-name="Gradiente sem nome 6" cx="1143.97" cy="406.53" fx="1143.97" fy="406.53" r="51.63" gradientTransform="translate(-124.66 1066.69) scale(1.15 -.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_7" data-name="Gradiente sem nome 7" cx="1421.83" cy="474.6" fx="1421.83" fy="474.6" r="51.63" gradientTransform="translate(-1714.57 1117.82) scale(2.06 -.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_8" data-name="Gradiente sem nome 8" cx="1432.88" cy="484.14" fx="1432.88" fy="484.14" r="51.63" gradientTransform="translate(-1717.52 1111.92) scale(2.06 -.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_9" data-name="Gradiente sem nome 9" cx="1479.15" cy="596.26" fx="1479.15" fy="596.26" r="51.63" gradientTransform="translate(-1772.21 1181.7) scale(2.06 -.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_10" data-name="Gradiente sem nome 10" cx="436.14" cy="459.78" fx="436.14" fy="459.78" r="16.27" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_11" data-name="Gradiente sem nome 11" cx="421.59" cy="449.42" fx="421.59" fy="449.42" r="19.95" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_12" data-name="Gradiente sem nome 12" cx="432.45" cy="401.54" fx="432.45" fy="401.54" r="22.24" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_13" data-name="Gradiente sem nome 13" cx="412.4" cy="433.74" fx="412.4" fy="433.74" r="25.96" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_14" data-name="Gradiente sem nome 14" cx="411.89" cy="415.51" fx="411.89" fy="415.51" r="28.9" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_15" data-name="Gradiente sem nome 15" cx="408.38" cy="411.54" fx="408.38" fy="411.54" r="36.68" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_16" data-name="Gradiente sem nome 16" cx="422.95" cy="406.5" fx="422.95" fy="406.5" r="29.81" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_17" data-name="Gradiente sem nome 17" cx="417.46" cy="440.34" fx="417.46" fy="440.34" r="24.81" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_18" data-name="Gradiente sem nome 18" cx="412.91" cy="424.66" fx="412.91" fy="424.66" r="22.72" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_19" data-name="Gradiente sem nome 19" cx="700.58" cy="801.03" fx="700.58" fy="801.03" r="47.1" gradientTransform="translate(-393.31 1197.4) scale(1.3 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".1" stop-color="#fff" stop-opacity=".83"/>
+      <stop offset=".26" stop-color="#fff" stop-opacity=".56"/>
+      <stop offset=".4" stop-color="#fff" stop-opacity=".37"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".56" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".59" stop-color="#fff" stop-opacity=".18"/>
+      <stop offset=".74" stop-color="#fff" stop-opacity=".08"/>
+      <stop offset=".89" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_20" data-name="Gradiente sem nome 20" cx="1465.4" cy="229.2" fx="1465.4" fy="229.2" r="24.84" gradientTransform="translate(6047.55 -477.37) rotate(-180) scale(3.73 -3.73)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".18" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".33" stop-color="#fff" stop-opacity=".36"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".52" stop-color="#fff" stop-opacity=".21"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".13"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_21" data-name="Gradiente sem nome 21" cx="611.53" cy="368.02" fx="611.53" fy="368.02" r="24.84" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_22" data-name="Gradiente sem nome 22" cx="598.03" cy="350.49" fx="598.03" fy="350.49" r="24.84" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_23" data-name="Gradiente sem nome 23" cx="591.66" cy="347.22" fx="591.66" fy="347.22" r="24.84" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_24" data-name="Gradiente sem nome 24" cx="583.05" cy="336.72" fx="583.05" fy="336.72" r="21.74" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_25" data-name="Gradiente sem nome 25" cx="604.79" cy="357.62" fx="604.79" fy="357.62" r="21.74" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_26" data-name="Gradiente sem nome 26" cx="539.91" cy="537.48" fx="539.91" fy="537.48" r="24.57" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_27" data-name="Gradiente sem nome 27" cx="517.25" cy="540.27" fx="517.25" fy="540.27" r="17.95" gradientTransform="translate(220.07 351.07) rotate(45) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_28" data-name="Gradiente sem nome 28" cx="510.09" cy="476.05" fx="510.09" fy="476.05" r="27.54" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_29" data-name="Gradiente sem nome 29" cx="510.09" cy="476.05" fx="510.09" fy="476.05" r="24" gradientTransform="translate(58.56 262.05) rotate(45) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_30" data-name="Gradiente sem nome 30" cx="1112.34" cy="329.72" fx="1112.34" fy="329.72" r="51.63" gradientTransform="translate(-121.29 1084.17) scale(1.15 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".61" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_31" data-name="Gradiente sem nome 31" cx="1143.97" cy="448.03" fx="1143.97" fy="448.03" r="51.63" gradientTransform="translate(-123.77 1052.27) scale(1.15 -.71)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_32" data-name="Gradiente sem nome 32" cx="1432.88" cy="484.14" fx="1432.88" fy="484.14" r="51.63" gradientTransform="translate(-1717.52 1111.92) scale(2.06 -.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_33" data-name="Gradiente sem nome 33" cx="1479.15" cy="586.32" fx="1479.15" fy="586.32" r="46.92" gradientTransform="translate(-1314.1 2372.37) rotate(-23.9) scale(2.06 -.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".29" stop-color="#fff" stop-opacity=".5"/>
+      <stop offset=".39" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".09"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".77" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_34" data-name="Gradiente sem nome 34" cx="421.59" cy="447.91" fx="421.59" fy="447.91" r="16.75" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_35" data-name="Gradiente sem nome 35" cx="430.16" cy="400.36" fx="430.16" fy="400.36" r="22.24" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_36" data-name="Gradiente sem nome 36" cx="1250.84" cy="280.93" fx="1250.84" fy="280.93" r="31.67" gradientTransform="translate(6008.07 -477.37) rotate(-180) scale(3.68 -3.73)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_37" data-name="Gradiente sem nome 37" cx="408.68" cy="418.37" fx="408.68" fy="418.37" r="28.91" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_38" data-name="Gradiente sem nome 38" cx="1248.16" cy="269.72" fx="1248.16" fy="269.72" r="28.91" gradientTransform="translate(6933.21 -837.43) rotate(-180) scale(4.42 -5.02)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_101" data-name="Gradiente sem nome 10" cx="1259.06" cy="255.46" fx="1259.06" fy="255.46" r="28.91" gradientTransform="translate(6544.44 -828.66) rotate(-180) scale(4.13 -5.02)" xlink:href="#Gradiente_sem_nome_10"/>
+    <radialGradient id="Gradiente_sem_nome_102" data-name="Gradiente sem nome 10" cx="1231.56" cy="283.38" fx="1231.56" fy="283.38" r="28.91" gradientTransform="translate(2775.81 4932.73) rotate(-90) scale(3.5 -5.02)" xlink:href="#Gradiente_sem_nome_10"/>
+    <radialGradient id="Gradiente_sem_nome_39" data-name="Gradiente sem nome 39" cx="1267.28" cy="256.95" fx="1267.28" fy="256.95" r="25.9" gradientTransform="translate(5878.98 -477.37) rotate(-180) scale(3.57 -3.73)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_40" data-name="Gradiente sem nome 40" cx="700.58" cy="801.03" fx="700.58" fy="801.03" r="47.1" gradientTransform="translate(-393.31 1197.4) scale(1.3 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".1" stop-color="#fff" stop-opacity=".83"/>
+      <stop offset=".26" stop-color="#fff" stop-opacity=".56"/>
+      <stop offset=".4" stop-color="#fff" stop-opacity=".37"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".56" stop-color="#fff" stop-opacity=".2"/>
+      <stop offset=".59" stop-color="#fff" stop-opacity=".18"/>
+      <stop offset=".74" stop-color="#fff" stop-opacity=".08"/>
+      <stop offset=".89" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_41" data-name="Gradiente sem nome 41" cx="1465.4" cy="229.2" fx="1465.4" fy="229.2" r="17.7" gradientTransform="translate(6047.55 -477.37) rotate(-180) scale(3.73 -3.73)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".18" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".33" stop-color="#fff" stop-opacity=".36"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".52" stop-color="#fff" stop-opacity=".21"/>
+      <stop offset=".6" stop-color="#fff" stop-opacity=".13"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_42" data-name="Gradiente sem nome 42" cx="611.53" cy="368.02" fx="611.53" fy="368.02" r="21.36" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_43" data-name="Gradiente sem nome 43" cx="590.18" cy="354" fx="590.18" fy="354" r="21.65" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_44" data-name="Gradiente sem nome 44" cx="588.47" cy="350.41" fx="588.47" fy="350.41" r="21.65" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_45" data-name="Gradiente sem nome 45" cx="581.2" cy="338.58" fx="581.2" fy="338.58" r="19.88" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_46" data-name="Gradiente sem nome 46" cx="602.96" cy="361.14" fx="602.96" fy="361.14" r="20.15" gradientTransform="translate(0 1077.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="Gradiente_sem_nome_47" data-name="Gradiente sem nome 47" cx="1418.43" cy="294.33" fx="1418.43" fy="294.33" r="19.26" gradientTransform="translate(2698.98 5671.98) rotate(-90) scale(3.73 -6.79)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".53"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".24"/>
+      <stop offset=".63" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".73" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g id="Camada_11">
+    <rect class="st0" x="-.87" y="0" width="1920" height="1080"/>
+  </g>
+  <path class="st47" d="M928.65,262.86c305.6,0,546.86,115.52,546.86,265.07,0,109.99-127.87,200.98-296.75,256.37-12.06,3.96-22.52.79-25.73-8.7-3.22-10.29-.8-17.41,22.52-27.69,96.51-42.73,177.73-106.82,177.73-170.91,0-126.6-246.89-223.14-539.63-223.14-45.04,0-86.05,2.37-123.85,5.54-18.5,41.94-28.15,88.62-28.15,136.89,0,95.74,40.21,192.28,112.59,257.16,9.65,8.7,10.45,16.62,4.02,25.32s-16.08,8.7-27.34,1.58c-114.2-72-188.19-203.35-184.97-341.82,0-21.36,2.41-41.94,6.43-61.72-37.8,7.91-73.99,16.62-109.37,26.9-11.26,3.17-19.3,0-23.32-8.7-4.02-9.5,0-17.41,11.26-23.74,41.01-22.95,87.66-41.94,138.32-57.76,55.49-150.34,201.05-258.74,372.35-261.91,131.09-2.37,242.07,56.97,317.66,144.8,8.85,10.29,9.65,18.2,1.61,26.11s-16.08,7.12-26.54-1.58c-57.9-48.27-143.95-80.71-230-80.71-116.61,0-221.16,54.6-287.1,139.26,65.14-11.08,131.09-16.62,191.4-16.62M1046.81,691.94l-86.67,49.88v297.27h92.71c8.61,0,15.59-6.98,15.59-15.59v-320.37c0-12.28-11.85-16.75-21.63-11.19h0ZM935.71,755.87l-59.36,34.16c-6.27,3.57-10.14,9.2-10.14,17.46v221.56c0,5.55,4.5,10.04,10.04,10.04h59.47v-283.22h0Z"/>
+  <g>
+    <g>
+      <ellipse class="st44" cx="929.73" cy="754.47" rx="54.02" ry="47.1" transform="translate(-124.81 187.39) rotate(-10.79)"/>
+      <ellipse class="st43" cx="920.5" cy="770.16" rx="54.02" ry="47.1" transform="translate(-127.91 185.94) rotate(-10.79)"/>
+      <circle class="st37" cx="904.39" cy="848.55" r="58.65"/>
+    </g>
+    <g>
+      <ellipse class="st36" cx="1154.81" cy="754.45" rx="59.21" ry="51.63" transform="translate(-120.82 229.53) rotate(-10.79)"/>
+      <ellipse class="st39" cx="1163.96" cy="742.73" rx="59.21" ry="51.63" transform="translate(-118.47 231.04) rotate(-10.79)"/>
+      <ellipse class="st42" cx="1187.72" cy="733.39" rx="59.21" ry="41.57" transform="translate(-116.3 235.32) rotate(-10.79)"/>
+      <ellipse class="st40" cx="1209.43" cy="729.37" rx="106.1" ry="41.57" transform="translate(-152.96 357.1) rotate(-15.81)"/>
+      <ellipse class="st41" cx="1229.17" cy="715.8" rx="106.1" ry="41.57" transform="translate(-148.52 361.96) rotate(-15.81)"/>
+      <ellipse class="st38" cx="1269.69" cy="694.81" rx="106.1" ry="41.57" transform="translate(-172.62 573.98) rotate(-23.9)"/>
+      <circle class="st28" cx="1289.86" cy="679.99" r="60.68"/>
+      <circle class="st30" cx="1344.1" cy="641.36" r="74.4"/>
+      <circle class="st22" cx="1303.63" cy="462.8" r="82.93"/>
+      <path class="st5" d="M1284.43,585.1c0-55,33.32-101.84,88.32-101.84s99.59,44.59,99.59,99.59-44.59,99.59-99.59,99.59-88.32-42.34-88.32-97.34Z"/>
+      <path class="st7" d="M1284.43,525.57c0-59.55,6.56-129.15,66.11-129.15s118.49,64.64,124.68,123.87c6.86,65.52-23.43,113.1-82.98,113.1s-107.82-48.27-107.82-107.82h0Z"/>
+      <path class="st8" d="M1284.43,499.68c0-59.55-23.19-156.35,36.35-156.35s174.39,59.53,185.16,160.67c9.25,86.79-59.83,152.83-119.38,152.83s-102.14-97.6-102.14-157.15h.01Z"/>
+      <path class="st11" d="M1242.4,444.09c-45.99-37.83,15.19-87.04,89.51-68.64,57.8,14.31,119.65,57.1,119.65,116.65s-37.83,98.99-97.37,98.99,35.46-25.86-111.79-147h0Z"/>
+      <path class="st10" d="M1269.7,607.34c0-52.54,31.95-94.97,84.49-94.97s95.13,42.59,95.13,95.13-42.59,95.13-95.13,95.13-84.49-42.75-84.49-95.29Z"/>
+      <path class="st9" d="M1303.63,550.05c0-52.54-1.98-96.18,50.56-96.18s95.13,42.59,95.13,95.13-42.59,95.13-95.13,95.13-50.56-41.54-50.56-94.08Z"/>
+    </g>
+    <g>
+      <ellipse class="st16" cx="516.18" cy="396.37" rx="61.12" ry="47.1" transform="translate(-65.08 103.64) rotate(-10.79)"/>
+      <circle class="st24" cx="582.15" cy="378.14" r="92.63"/>
+      <circle class="st27" cx="635.78" cy="337.78" r="92.63"/>
+      <circle class="st35" cx="686.12" cy="272.4" r="92.63"/>
+      <circle class="st29" cx="709.89" cy="260.22" r="92.63"/>
+      <circle class="st26" cx="741.98" cy="221.07" r="81.06"/>
+      <circle class="st25" cx="660.92" cy="299" r="81.06"/>
+    </g>
+    <g>
+      <circle class="st15" cx="902.87" cy="969.74" r="91.63"/>
+      <circle class="st14" cx="987.38" cy="980.13" r="66.92" transform="translate(-403.86 985.26) rotate(-45)"/>
+      <circle class="st13" cx="1014.09" cy="740.66" r="102.69"/>
+      <circle class="st12" cx="1014.09" cy="740.66" r="89.49" transform="translate(-226.71 934) rotate(-45)"/>
+    </g>
+    <g>
+      <ellipse class="st51" cx="1154.81" cy="754.45" rx="59.21" ry="51.63" transform="translate(-120.82 229.53) rotate(-10.79)"/>
+      <ellipse class="st50" cx="1188.6" cy="737.98" rx="59.21" ry="36.89" transform="translate(-117.14 235.57) rotate(-10.79)"/>
+      <ellipse class="st48" cx="1229.17" cy="715.8" rx="106.1" ry="41.57" transform="translate(-148.52 361.96) rotate(-15.81)"/>
+      <path class="st19" d="M1366.7,651.79c9.3,20.99-26.59,57.25-80.16,81-53.57,23.74-104.55,25.97-113.85,4.98-9.3-20.99,32.79-42.5,86.37-66.24,53.57-23.74,98.34-40.73,107.64-19.74Z"/>
+      <path class="st20" d="M1278.44,642.28c0-36.26,29.39-65.66,65.66-65.66s65.66,29.39,65.66,65.66-29.39,52.5-65.66,52.5-65.66-16.24-65.66-52.5Z"/>
+      <circle class="st18" cx="1312.16" cy="458.38" r="82.93"/>
+      <path class="st1" d="M1334.47,566.96c0-55-12.88-107.54,39.19-122.83,77.9-22.88,144.45,75.21,133.12,132.49-10.71,54.13-55.22,164.04-189.41,110.59-50.42-20.08,42.08-65.24,42.08-120.25h-24.98Z"/>
+      <circle class="st4" cx="1392.24" cy="525.57" r="107.82"/>
+      <ellipse class="st3" cx="1412.29" cy="516.72" rx="127.87" ry="145.25"/>
+      <ellipse class="st45" cx="1350.54" cy="453.87" rx="119.25" ry="145.25" transform="translate(-32.21 797.33) rotate(-32.53)"/>
+      <ellipse class="st46" cx="1353.04" cy="623.43" rx="145.25" ry="101.15" transform="translate(88.21 1410.58) rotate(-56.63)"/>
+      <path class="st2" d="M1269.7,491.27c0-51.82,5.18-113.14,54.79-113.14s115.82,53.31,115.82,105.13-31.19,101.84-80.79,101.84-89.81-42.01-89.81-93.83h-.01Z"/>
+    </g>
+    <g>
+      <ellipse class="st17" cx="516.18" cy="396.37" rx="61.12" ry="47.1" transform="translate(-65.08 103.64) rotate(-10.79)"/>
+      <circle class="st33" cx="582.15" cy="378.14" r="65.99"/>
+      <circle class="st32" cx="635.78" cy="337.78" r="79.64"/>
+      <circle class="st31" cx="715.42" cy="285.5" r="80.75"/>
+      <circle class="st23" cx="721.78" cy="272.11" r="80.74"/>
+      <circle class="st21" cx="748.91" cy="228" r="74.13"/>
+      <path class="st34" d="M593.49,313.93c0-41.01,45.88-77.81,86.88-77.81s61.61,36.8,61.61,77.81-33.24,74.25-74.25,74.25-74.25-33.24-74.25-74.25h.01Z"/>
+      <ellipse class="st6" cx="703.05" cy="381.76" rx="130.86" ry="71.83" transform="translate(-11.79 740.95) rotate(-55.18)"/>
+    </g>
+    <path class="st49" d="M932.45,287.15c281.95,0,504.55,106.58,504.55,244.56,0,101.47-117.97,185.43-273.79,236.53-11.13,3.65-20.78.73-23.74-8.03-2.97-9.49-.74-16.06,20.78-25.55,89.04-39.42,163.98-98.55,163.98-157.69,0-116.8-227.79-205.87-497.87-205.87-41.55,0-79.39,2.19-114.26,5.11-17.07,38.69-25.97,81.76-25.97,126.3,0,88.33,37.1,177.4,103.88,237.26,8.9,8.03,9.65,15.33,3.71,23.36-5.94,8.03-14.84,8.03-25.23,1.46-105.36-66.43-173.62-187.62-170.65-315.37,0-19.71,2.23-38.69,5.94-56.94-34.87,7.3-68.26,15.33-100.91,24.82-10.39,2.92-17.81,0-21.52-8.03-3.71-8.76,0-16.06,10.39-21.9,37.84-21.17,80.88-38.69,127.62-53.29,51.2-138.71,185.49-238.72,343.54-241.64,120.94-2.19,223.34,52.56,293.08,133.59,8.16,9.49,8.9,16.79,1.48,24.09s-14.84,6.57-24.49-1.46c-53.42-44.53-132.81-74.46-212.21-74.46-107.59,0-204.04,50.37-264.89,128.49,60.1-10.22,120.94-15.33,176.59-15.33M1041.46,683.02l-79.96,46.02v274.27h85.54c7.94,0,14.38-6.44,14.38-14.38v-295.58c0-11.33-10.94-15.46-19.95-10.32h-.01ZM938.97,742.01l-54.77,31.52c-5.79,3.3-9.36,8.49-9.36,16.1v204.41c0,5.12,4.15,9.26,9.26,9.26h54.86v-261.3h.01Z"/>
+  </g>
+</svg>

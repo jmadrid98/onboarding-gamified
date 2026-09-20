@@ -2,16 +2,46 @@ import * as THREE from 'three';
 window.THREE = THREE;
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter } from './realistic-assets.js?v=154.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=167.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
 const clamp = THREE.MathUtils.clamp;
 
-function hideBoot() {
+function updateBootProgress(value, label) {
+  const statusEl = document.getElementById('bootStatusText');
+  const barEl = document.getElementById('bootProgressBar');
+  const pctEl = document.getElementById('bootPct');
+  const pct = Math.round(clamp(value, 0, 1) * 100);
+  if (statusEl && label) statusEl.textContent = label;
+  if (barEl) barEl.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+function showBootReady() {
+  updateBootProgress(1, 'Carga completada');
+  const loaderBox = document.getElementById('bootLoaderBox');
+  const actions = document.getElementById('bootActions');
+  const startBtn = document.getElementById('bootStartBtn');
+  if (loaderBox) {
+    loaderBox.style.display = 'none';
+  }
+  if (actions) {
+    actions.style.display = 'block';
+  }
+  if (startBtn) {
+    startBtn.onclick = () => dismissBoot();
+    startBtn.focus();
+  }
+}
+
+function dismissBoot() {
   const b = document.getElementById('boot');
   if (b && !b.classList.contains('hidden')) {
     b.classList.add('hidden');
+    setTimeout(() => {
+      try { b.remove(); } catch {}
+    }, 750);
   }
 }
 
@@ -82,6 +112,7 @@ if (Array.isArray(saved.players) && saved.players.length > 0) {
       name: String(p.name).trim(),
       initials: p.initials || initials(p.name),
       color: p.color || colors[idx % colors.length],
+      avatarId: p.avatarId || (AVATAR_PRESETS[idx % AVATAR_PRESETS.length]?.id || 'ranger'),
       points: Math.max(0, Number(p.points) || 0),
       missionId: clamp(Number(p.missionId) || current, 1, missions.length)
     }));
@@ -108,6 +139,7 @@ function getCleanPlayers() {
     name: p.name,
     initials: p.initials,
     color: p.color,
+    avatarId: p.avatarId || 'ranger',
     points: p.points,
     missionId: p.missionId
   }));
@@ -1079,9 +1111,7 @@ const worldReady = installRealisticWorld({
   getTerrainY,
   trailPoints: trailPoints2D,
   onProgress: (value, label) => {
-    const p = $('boot')?.querySelector('p'), bar = $('boot')?.querySelector('.boot-line i');
-    if (p) p.textContent = label;
-    if (bar) bar.style.width = Math.round(value * 100) + '%';
+    updateBootProgress(value, label);
   }
 }).then(streamer => {
   anim.streamer = streamer;
@@ -1089,11 +1119,13 @@ const worldReady = installRealisticWorld({
     if (q.structGroup) anim.poi.push(q.structGroup);
   });
   renderer.compile(scene, camera);
-  hideBoot();
-  // Tranquil, peaceful start directly at Station 0 Lobby (No flight on boot!)
+  rebuildPlayers();
+  showBootReady();
+  // Tranquil, peaceful start directly at Station 0 Lobby
 }).catch(error => {
   console.error('Error inicializando streaming:', error);
-  hideBoot();
+  rebuildPlayers();
+  showBootReady();
 });
 
 // ── Players / Adventurers Management ──────────────────────────────────────────
@@ -1108,11 +1140,19 @@ function rebuildPlayers(startMission = null, targetMission = null) {
   anim.players.forEach(x => scene.remove(x));
   anim.players = [];
 
+  // Si la cámara está en pleno vuelo cinematográfico, los personajes esperan hasta la llegada
+  if (travel) {
+    return;
+  }
+
   players.forEach((p, i) => {
     const targetStationId = (p.missionId !== undefined && p.missionId !== null) ? p.missionId : current;
     const q = getMission(targetStationId);
     p.totalInStation = players.filter(o => ((o.missionId !== undefined && o.missionId !== null) ? o.missionId : current) === targetStationId).length;
     const char = createHumanoidCharacter(p, i, q, getTerrainY, targetMission, startMission);
+    // Entrada animada suave al aparecer en la locación
+    char.scale.set(0.001, 0.001, 0.001);
+    char.userData.spawnProgress = 0;
     scene.add(char);
     anim.players.push(char);
   });
@@ -1149,6 +1189,44 @@ function updateNavButtons() {
   if (hudNext) {
     hudNext.disabled = isLast;
     hudNext.style.opacity = isLast ? '0.35' : '1.0';
+  }
+}
+
+let STATION_MEDIA = {};
+
+async function syncStationMediaFromAPI() {
+  try {
+    const res = await fetch('/api/media', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      STATION_MEDIA = data;
+      updateStationMediaTrigger();
+    }
+  } catch (err) {
+    console.warn('Media auto-sync notice:', err);
+  }
+}
+
+// Initial sync
+syncStationMediaFromAPI();
+
+function updateStationMediaTrigger() {
+  const mapMediaTrigger = document.getElementById('mapStationMediaTrigger');
+  if (!mapMediaTrigger) return;
+  // If camera is currently in flight / travel, keep hidden until landing
+  if (travel) {
+    mapMediaTrigger.style.display = 'none';
+    return;
+  }
+  const stationMediaItems = (STATION_MEDIA && STATION_MEDIA[current]) ? STATION_MEDIA[current] : [];
+  if (stationMediaItems.length > 0) {
+    mapMediaTrigger.style.display = 'block';
+    const badge = document.getElementById('mapMediaCountBadge');
+    if (badge) badge.textContent = stationMediaItems.length;
+    const tag = document.getElementById('mapMediaStationTag');
+    if (tag) tag.textContent = `MISIÓN ${String(current).padStart(2, '0')} · CÁPSULAS`;
+  } else {
+    mapMediaTrigger.style.display = 'none';
   }
 }
 
@@ -1204,7 +1282,8 @@ function renderUI() {
   const regEl = document.getElementById('skyMissionRegion');
   if (regEl) regEl.textContent = q.region;
 
-
+  // Update In-Map Media Hub Trigger visibility (only after arrival)
+  updateStationMediaTrigger();
 
   // Navigation button states
   updateNavButtons();
@@ -1212,20 +1291,26 @@ function renderUI() {
   // Render clickable missions list
   renderMissionsList();
 
+  // Render avatar picker grid for registration
+  renderAvatarPickerGrid();
+
   // Render Clean Scoreboard / Ranking Leaderboard
   const rankList = document.getElementById('rankingList');
   if (rankList) {
     rankList.innerHTML = players.length
-      ? [...players].sort((a, b) => b.points - a.points).map((p, i) => `
+      ? [...players].sort((a, b) => b.points - a.points).map((p, i) => {
+        const preset = AVATAR_PRESETS.find(a => a.id === p.avatarId) || AVATAR_PRESETS[0];
+        return `
         <div class="rank">
-          <b style="font-size:${i === 0 ? '1rem' : '0.8rem'}">${i === 0 ? '👑' : i + 1}</b>
-          <span class="avatar-dot" style="background:${p.color}">${p.initials}</span>
+          <b style="font-size:0.85rem">${i + 1}</b>
+          <span class="avatar-dot" style="background:${p.color};display:flex;align-items:center;justify-content:center" title="${preset.name}">${preset.iconSvg || ''}</span>
           <div class="rank-info">
-            <b>${p.name}</b>
-            <small>${i === 0 ? '👑 Líder de la expedición' : 'En travesía'}</small>
+            <b>${p.name} <span class="rank-role-tag">${preset.name}</span></b>
+            <small>${i === 0 ? 'Líder de la expedición' : preset.role}</small>
           </div>
           <span class="xp-pill">${p.points} XP</span>
-        </div>`).join('')
+        </div>`;
+      }).join('')
       : '<p style="color:var(--muted);font-size:.78rem;padding:8px;text-align:center">No hay aventureros aún. Regístralos en el Panel de Control.</p>';
   }
 
@@ -1233,20 +1318,29 @@ function renderUI() {
   const adminPList = document.getElementById('adminPlayersList');
   if (adminPList) {
     adminPList.innerHTML = players.length
-      ? players.map(p => `
+      ? players.map(p => {
+        const preset = AVATAR_PRESETS.find(a => a.id === p.avatarId) || AVATAR_PRESETS[0];
+        const avatarOptions = AVATAR_PRESETS.map(av => `<option value="${av.id}" ${av.id === p.avatarId ? 'selected' : ''}>${av.name}</option>`).join('');
+        return `
         <div class="admin-player-row">
-          <div class="admin-player-info">
-            <span class="avatar-dot" style="background:${p.color};width:26px;height:26px;font-size:0.68rem">${p.initials}</span>
-            <b style="font-size:0.8rem">${p.name}</b>
-            <span class="xp-pill" style="font-size:0.72rem;padding:2px 7px">${p.points} XP</span>
+          <div class="admin-player-info" style="align-items:center">
+            <span class="avatar-dot" style="background:${p.color};width:28px;height:28px;display:flex;align-items:center;justify-content:center">${preset.iconSvg || ''}</span>
+            <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
+              <b style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</b>
+              <select class="admin-player-avatar-sel" onchange="window.setPlayerAvatar(${p.id}, this.value)" title="Cambiar avatar 3D">
+                ${avatarOptions}
+              </select>
+            </div>
+            <span class="xp-pill" style="font-size:0.72rem;padding:2px 7px;margin-left:auto">${p.points} XP</span>
           </div>
           <div class="admin-player-actions">
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, 5)" type="button" title="Sumar 5 XP a ${p.name}">+5 XP</button>
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, 10)" type="button" title="Sumar 10 XP a ${p.name}">+10 XP</button>
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, -5)" type="button" title="Restar 5 XP a ${p.name}">-5 XP</button>
-            <button class="quick-xp-btn del" onclick="window.deletePlayer(${p.id})" type="button" title="Eliminar a ${p.name}">🗑️</button>
+            <button class="quick-xp-btn del" onclick="window.deletePlayer(${p.id})" type="button" title="Eliminar a ${p.name}">✕</button>
           </div>
-        </div>`).join('')
+        </div>`;
+      }).join('')
       : '<p style="color:var(--muted);font-size:.78rem;padding:8px;text-align:center">No hay aventureros registrados aún. Usa el campo de arriba para añadir.</p>';
   }
 
@@ -1352,6 +1446,9 @@ function cinematicEase(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t
 
 function startTravel(id, show = true) {
   if (freeCamera) setFreeCamera(false);
+  const mapMediaTrigger = document.getElementById('mapStationMediaTrigger');
+  if (mapMediaTrigger) mapMediaTrigger.style.display = 'none';
+
   if (Number(id) === 0) {
     // Station 0 Lobby: completely peaceful, zero camera flight!
     const destination = getMission(0);
@@ -1363,6 +1460,7 @@ function startTravel(id, show = true) {
     cinematicUI(false);
     travel = null;
     rebuildPlayers();
+    updateStationMediaTrigger();
     return;
   }
   const destination = getMission(id);
@@ -1404,7 +1502,7 @@ function startTravel(id, show = true) {
     duration
   };
 
-  // Teleport characters to destination immediately as flight begins!
+  // Ocultar aventureros del mapa mientras se ejecuta el vuelo de cámara
   rebuildPlayers();
 
   cinematicUI(true, `Rumbo a ${destination.name}...`);
@@ -1414,6 +1512,9 @@ function cinematicUI(active, phase = '') {
   const layer = document.getElementById('cinematicSequence'), stage = document.getElementById('stage');
   if (layer) layer.classList.toggle('active', active);
   if (stage) stage.classList.toggle('cinematic-running', active);
+  document.body.classList.toggle('cinematic-active', active);
+  const screen = document.querySelector('.screen');
+  if (screen) screen.classList.toggle('cinematic-active', active);
   const label = document.getElementById('cinematicPhase'), bar = document.getElementById('cinematicBar');
   if (label && phase) label.textContent = phase;
   if (bar && !active) bar.style.width = '0%';
@@ -1657,14 +1758,7 @@ if (fullscreenBtn) {
   });
 }
 
-// ── Boot Loading Screen ─────────────────────────────────────────────────────
-const bootScreen = document.getElementById('boot');
-if (bootScreen) {
-  setTimeout(() => {
-    bootScreen.classList.add('hidden');
-    setTimeout(() => { try { bootScreen.remove(); } catch {} }, 700);
-  }, 900);
-}
+
 
 function updateWeather(t, dt) {
   weatherBlend += (weatherTarget - weatherBlend) * Math.min(1, dt * 1.2);
@@ -1832,7 +1926,243 @@ renderer.domElement.addEventListener('pointerup', e => {
   }
 });
 
-function addParticipant(name) {
+let selectedRegisterAvatar = 'ranger';
+
+function renderAvatarPickerGrid() {
+  const container = document.getElementById('avatarPickerGrid');
+  if (!container) return;
+  container.innerHTML = AVATAR_PRESETS.map(preset => {
+    const isSelected = preset.id === selectedRegisterAvatar;
+    return `
+      <div class="avatar-card ${isSelected ? 'selected' : ''}" onclick="window.selectRegisterAvatar('${preset.id}')" title="${preset.name}">
+        <span class="avatar-card-icon">${preset.iconSvg || ''}</span>
+        <div class="avatar-card-details">
+          <span class="avatar-card-name">${preset.name}</span>
+          <span class="avatar-card-role">${preset.role}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.selectRegisterAvatar = function(avatarId) {
+  selectedRegisterAvatar = avatarId;
+  renderAvatarPickerGrid();
+};
+
+let modalPreviewRenderer = null;
+let modalPreviewScene = null;
+let modalPreviewCamera = null;
+let modalPreviewHero = null;
+let modalPreviewPlinth = null;
+let modalPreviewAnimId = null;
+let modalUserDragging = false;
+let modalDragStartX = 0;
+let modalManualAngle = 0;
+
+function initModalHeroPreview3D() {
+  const canvas = document.getElementById('heroPreviewCanvas');
+  if (!canvas) return;
+
+  const width = canvas.parentElement?.clientWidth || 320;
+  const height = canvas.parentElement?.clientHeight || 230;
+
+  if (!modalPreviewRenderer) {
+    modalPreviewRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+    modalPreviewRenderer.setSize(width, height, false);
+    modalPreviewRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    modalPreviewRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+    modalPreviewRenderer.toneMappingExposure = 1.25;
+
+    modalPreviewScene = new THREE.Scene();
+
+    modalPreviewCamera = new THREE.PerspectiveCamera(28, width / height, 0.1, 20);
+    modalPreviewCamera.position.set(0, 0.68, 2.6);
+    modalPreviewCamera.lookAt(0, 0.58, 0);
+
+    // Studio Quality Multi-Point Lighting
+    const amb = new THREE.AmbientLight(0xffffff, 1.8);
+    const key = new THREE.DirectionalLight(0xffffff, 2.5);
+    key.position.set(2, 4, 3);
+    const fillFront = new THREE.DirectionalLight(0xfff5ea, 1.6);
+    fillFront.position.set(0, 2, 4);
+    const rim = new THREE.DirectionalLight(0x00f0ff, 2.0);
+    rim.position.set(-3, 3, -2);
+    const warmBounce = new THREE.PointLight(0xff8844, 1.2, 6);
+    warmBounce.position.set(0, 0.2, 1.8);
+
+    modalPreviewScene.add(amb, key, fillFront, rim, warmBounce);
+
+    // Ornate Pedestal
+    const plinthMat = new THREE.MeshStandardMaterial({ color: 0x242b35, roughness: 0.85 });
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.50, 0.08, 28), plinthMat);
+    plinth.position.y = 0.04;
+    modalPreviewScene.add(plinth);
+
+    const runeRingMat = new THREE.MeshStandardMaterial({ color: 0xcc092f, emissive: 0xcc092f, emissiveIntensity: 2.8 });
+    modalPreviewPlinth = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.016, 8, 36), runeRingMat);
+    modalPreviewPlinth.rotation.x = Math.PI / 2;
+    modalPreviewPlinth.position.y = 0.082;
+    modalPreviewScene.add(modalPreviewPlinth);
+
+    // Mouse & Touch Interactive 360° Drag Turntable
+    const wrap = document.getElementById('heroCanvasWrap') || canvas;
+    wrap.style.cursor = 'grab';
+
+    wrap.addEventListener('pointerdown', e => {
+      modalUserDragging = true;
+      modalDragStartX = e.clientX;
+      wrap.style.cursor = 'grabbing';
+      wrap.setPointerCapture?.(e.pointerId);
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (!modalUserDragging || !modalPreviewHero) return;
+      const deltaX = e.clientX - modalDragStartX;
+      modalDragStartX = e.clientX;
+      modalManualAngle += deltaX * 0.015;
+    });
+
+    const stopDrag = () => {
+      if (modalUserDragging) {
+        modalUserDragging = false;
+        if (wrap) wrap.style.cursor = 'grab';
+      }
+    };
+    window.addEventListener('pointerup', stopDrag);
+    window.addEventListener('pointercancel', stopDrag);
+  } else {
+    modalPreviewRenderer.setSize(width, height, false);
+    if (modalPreviewCamera) {
+      modalPreviewCamera.aspect = width / height;
+      modalPreviewCamera.updateProjectionMatrix();
+    }
+  }
+}
+
+function updateModalHeroPreview3D(avatarId) {
+  initModalHeroPreview3D();
+  if (!modalPreviewScene) return;
+
+  const preset = AVATAR_PRESETS.find(a => a.id === avatarId) || AVATAR_PRESETS[0];
+
+  // Swap 3D Model
+  if (modalPreviewHero) {
+    modalPreviewScene.remove(modalPreviewHero);
+    modalPreviewHero = null;
+  }
+
+  modalManualAngle = 0; // Reset angle to face forward
+
+  modalPreviewHero = createHeroModel(preset.id, preset.primaryColor || '#cc092f');
+  modalPreviewHero.position.set(0, 0.08, 0);
+  modalPreviewHero.rotation.y = 0;
+  modalPreviewScene.add(modalPreviewHero);
+
+  if (modalPreviewPlinth && modalPreviewPlinth.material) {
+    const col = new THREE.Color(preset.primaryColor || '#cc092f');
+    modalPreviewPlinth.material.color = col;
+    modalPreviewPlinth.material.emissive = col;
+  }
+
+  // Animation Loop with Interactive Drag + Front-Facing Heroic Sway
+  if (!modalPreviewAnimId) {
+    function animatePreview(time) {
+      const sec = time * 0.001;
+      if (modalPreviewHero) {
+        if (modalUserDragging) {
+          modalPreviewHero.rotation.y = modalManualAngle;
+        } else {
+          // Gentle heroic front-facing sway showcase
+          modalPreviewHero.rotation.y = modalManualAngle + Math.sin(sec * 1.0) * 0.35;
+        }
+        if (modalPreviewHero.userData && typeof modalPreviewHero.userData.update === 'function') {
+          modalPreviewHero.userData.update(sec, false);
+        }
+      }
+      if (modalPreviewPlinth) {
+        modalPreviewPlinth.rotation.z = -sec * 0.4;
+      }
+      if (modalPreviewRenderer && modalPreviewScene && modalPreviewCamera) {
+        modalPreviewRenderer.render(modalPreviewScene, modalPreviewCamera);
+      }
+      const modal = document.getElementById('heroSelectionModal');
+      if (modal && (modal.open || modal.hasAttribute('open'))) {
+        modalPreviewAnimId = requestAnimationFrame(animatePreview);
+      } else {
+        modalPreviewAnimId = null;
+      }
+    }
+    modalPreviewAnimId = requestAnimationFrame(animatePreview);
+  }
+}
+
+function renderModalHeroRoster() {
+  const container = document.getElementById('modalHeroRosterGrid');
+  if (!container) return;
+  container.innerHTML = AVATAR_PRESETS.map(preset => {
+    const isSelected = preset.id === selectedRegisterAvatar;
+    return `
+      <div class="hero-roster-card ${isSelected ? 'active' : ''}" onclick="window.selectModalHero('${preset.id}')" title="${preset.name}">
+        <span class="hero-roster-avatar">${preset.iconSvg || ''}</span>
+        <span class="hero-roster-name">${preset.name}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+window.openHeroSelectionModal = function() {
+  const modal = document.getElementById('heroSelectionModal');
+  if (!modal) return;
+  renderModalHeroRoster();
+  if (typeof modal.showModal === 'function') {
+    modal.showModal();
+  } else {
+    modal.setAttribute('open', '');
+  }
+  setTimeout(() => {
+    updateModalHeroPreview3D(selectedRegisterAvatar);
+    const inp = document.getElementById('modalHeroNameInput');
+    inp?.focus();
+  }, 60);
+};
+
+window.closeHeroSelectionModal = function() {
+  const modal = document.getElementById('heroSelectionModal');
+  if (modal) {
+    if (typeof modal.close === 'function') {
+      modal.close();
+    } else {
+      modal.removeAttribute('open');
+    }
+  }
+  if (modalPreviewAnimId) {
+    cancelAnimationFrame(modalPreviewAnimId);
+    modalPreviewAnimId = null;
+  }
+};
+
+window.selectModalHero = function(avatarId) {
+  selectedRegisterAvatar = avatarId;
+  renderModalHeroRoster();
+  updateModalHeroPreview3D(avatarId);
+  renderAvatarPickerGrid();
+};
+
+window.confirmHeroCreation = function() {
+  const inp = document.getElementById('modalHeroNameInput');
+  const val = (inp?.value || '').trim();
+  if (!val) {
+    alert('Por favor escribe el nombre de tu aventurero.');
+    inp?.focus();
+    return;
+  }
+  inp.value = '';
+  addParticipant(val, selectedRegisterAvatar);
+  window.closeHeroSelectionModal();
+};
+
+function addParticipant(name, avatarId = null) {
   const n = String(name || '').trim();
   if (!n) {
     alert('Por favor escribe el nombre de un participante.');
@@ -1840,11 +2170,13 @@ function addParticipant(name) {
   }
   const maxId = players.reduce((max, p) => Math.max(max, Number(p.id) || 0), 0);
   const id = maxId + 1;
+  const chosenAvatar = avatarId || selectedRegisterAvatar || (AVATAR_PRESETS[(id - 1) % AVATAR_PRESETS.length]?.id || 'ranger');
   const newP = {
     id,
     name: n,
     initials: initials(n),
     color: colors[(id - 1) % colors.length],
+    avatarId: chosenAvatar,
     points: 0,
     missionId: current
   };
@@ -1856,6 +2188,16 @@ function addParticipant(name) {
 }
 
 window.addParticipant = addParticipant;
+
+window.setPlayerAvatar = function(id, avatarId) {
+  const p = players.find(x => x.id === Number(id));
+  if (p && avatarId) {
+    p.avatarId = avatarId;
+    rebuildPlayers();
+    save();
+    renderUI();
+  }
+};
 
 window.modifyXp = function(id, delta) {
   const p = players.find(x => x.id === Number(id));
@@ -2197,15 +2539,171 @@ document.getElementById('grantNpsXpBtn')?.addEventListener('click', () => {
   npsDialog?.close();
 });
 
-function openCurrentMissionModal() {
-  if (current === 1) gearDialog?.showModal();
-  else if (current === 2) contractDialog?.showModal();
-  else if (current === 3) humandDialog?.showModal();
-  else if (current === 4) safetyDialog?.showModal();
-  else if (current === 5) cosmosDialog?.showModal();
-  else if (current === 6) companyDialog?.showModal();
-  else if (current === 7) npsDialog?.showModal();
+// ── Learning Center & Harmonious Media Hub (2-Panel Interactive Codex) ───────
+const mediaHubDialog = document.getElementById('mediaHubDialog');
+const closeMediaHubBtn = document.getElementById('closeMediaHubBtn');
+const mapOpenMediaBtn = document.getElementById('mapOpenMediaBtn');
+const mediaStageScreen = document.getElementById('mediaStageScreen');
+const mediaHubItemsList = document.getElementById('mediaHubItemsList');
+
+let activeStationMediaItem = null;
+
+function renderMediaStageItem(item) {
+  if (!mediaStageScreen) return;
+  activeStationMediaItem = item;
+
+  // Clear previous player/content cleanly and release video resources
+  const prevVid = mediaStageScreen.querySelector('video');
+  if (prevVid) {
+    prevVid.pause();
+    prevVid.removeAttribute('src');
+    prevVid.load();
+  }
+  mediaStageScreen.innerHTML = '';
+
+  if (item.type === 'video') {
+    const vid = document.createElement('video');
+    vid.className = 'media-video-element';
+    vid.src = item.file;
+    vid.controls = true;
+    vid.autoplay = true;
+    vid.playsInline = true;
+    vid.preload = 'auto';
+    vid.setAttribute('controlsList', 'nodownload');
+    mediaStageScreen.appendChild(vid);
+    vid.load();
+    const p = vid.play();
+    if (p !== undefined) {
+      p.catch(() => {
+        // Handled if browser restricts unmuted autoplay
+      });
+    }
+  } else if (item.type === 'image') {
+    const img = document.createElement('img');
+    img.className = 'media-img-element';
+    img.src = item.file;
+    img.alt = item.title;
+    mediaStageScreen.appendChild(img);
+  } else if (item.type === 'pdf') {
+    const iframe = document.createElement('iframe');
+    iframe.className = 'media-pdf-element';
+    iframe.src = `${item.file}#toolbar=0&navpanes=0`;
+    iframe.title = item.title;
+    mediaStageScreen.appendChild(iframe);
+  }
 }
+
+async function openStationMediaHub(stationId) {
+  try {
+    const res = await fetch('/api/media', { cache: 'no-store' });
+    if (res.ok) {
+      STATION_MEDIA = await res.json();
+      updateStationMediaTrigger();
+    }
+  } catch (err) {}
+
+  const items = (typeof STATION_MEDIA !== 'undefined' && STATION_MEDIA[stationId]) ? STATION_MEDIA[stationId] : [];
+  if (!items.length) return;
+  const q = getMission(stationId);
+
+  const eyebrowEl = document.getElementById('mediaHubStationEyebrow');
+  const titleEl = document.getElementById('mediaHubStationTitle');
+  const countBadge = document.getElementById('playlistSectionBadge');
+
+  if (eyebrowEl) eyebrowEl.textContent = `MISIÓN ${String(stationId).padStart(2, '0')} · ${q ? q.region.toUpperCase() : ''}`;
+  if (titleEl) titleEl.textContent = q ? `Cápsulas: ${q.name}` : 'Centro de Aprendizaje';
+  if (countBadge) countBadge.textContent = `${items.length} ${items.length === 1 ? 'cápsula' : 'cápsulas'}`;
+
+  if (mediaHubItemsList) {
+    mediaHubItemsList.innerHTML = '';
+    const sorted = [...items].sort((a, b) => a.order - b.order);
+    sorted.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = `media-playlist-item ${idx === 0 ? 'active' : ''}`;
+      let iconSvg = '';
+      let typeLabel = 'Cápsula de Video';
+
+      if (item.type === 'video') {
+        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="16" rx="3"></rect><path d="m16 9 6-4v14l-6-4"></path></svg>`;
+        typeLabel = 'Cápsula de Video';
+      } else if (item.type === 'image') {
+        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
+        typeLabel = 'Infografía';
+      } else if (item.type === 'pdf') {
+        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
+        typeLabel = 'Documento PDF';
+      } else {
+        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>`;
+        typeLabel = 'Material de Apoyo';
+      }
+
+      // Clean title without any emojis
+      const cleanTitle = (item.title || '').replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+      const numStr = String(item.order).padStart(2, '0');
+
+      card.innerHTML = `
+        <div class="media-item-icon-wrapper" title="${typeLabel}">
+          ${iconSvg}
+          <span class="media-item-order-badge">${numStr}</span>
+        </div>
+        <div class="media-playlist-info">
+          <span class="media-playlist-title">${cleanTitle}</span>
+          <span class="media-playlist-subtitle">${typeLabel}</span>
+        </div>
+        <span class="media-playlist-status-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+        </span>
+      `;
+
+      card.onclick = () => {
+        mediaHubItemsList.querySelectorAll('.media-playlist-item').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        renderMediaStageItem(item);
+      };
+
+      mediaHubItemsList.appendChild(card);
+    });
+
+    // Auto-select and immediately render/play first item (01)
+    renderMediaStageItem(sorted[0]);
+  }
+
+  mediaHubDialog?.showModal();
+}
+
+function closeStationMediaHub() {
+  if (mediaStageScreen) {
+    const vid = mediaStageScreen.querySelector('video');
+    if (vid) {
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+    }
+    mediaStageScreen.innerHTML = '';
+  }
+  mediaHubDialog?.close();
+}
+
+mapOpenMediaBtn?.addEventListener('click', () => openStationMediaHub(current));
+closeMediaHubBtn?.addEventListener('click', closeStationMediaHub);
+
+mediaHubDialog?.addEventListener('close', () => {
+  if (mediaStageScreen) {
+    const vid = mediaStageScreen.querySelector('video');
+    if (vid) {
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+    }
+    mediaStageScreen.innerHTML = '';
+  }
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mediaHubDialog?.open) {
+    closeStationMediaHub();
+  }
+});
 
 function resize() {
   const s = document.getElementById('stage');
@@ -2219,8 +2717,7 @@ resize();
 rebuildPlayers();
 applyStates();
 
-setTimeout(hideBoot, 300);
-worldReady.then(hideBoot).catch(hideBoot);
+
 
 // ── Render Loop ───────────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
@@ -2279,22 +2776,26 @@ function loop() {
     }
   });
 
-  // Idle breathing, cape flutter, plume & rotating magic plinth ring
+  // Idle skeletal animation, rotating magic plinth ring & smooth spawn entrance pop
   anim.players.forEach(a => {
     const u = a.userData;
     if (!u) return;
 
-    // Organic breathing bob
-    if (u.bodyBob) {
-      u.bodyBob.position.y = 0.88 + Math.sin(t * 2.8 + (u.phase || 0)) * 0.025;
+    // Smooth spawn entrance transition
+    if (u.spawnProgress !== undefined && u.spawnProgress < 1) {
+      u.spawnProgress = Math.min(1, u.spawnProgress + dt * 2.8);
+      const tP = u.spawnProgress;
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      const s = 1 + c3 * Math.pow(tP - 1, 3) + c1 * Math.pow(tP - 1, 2);
+      const clampedS = Math.max(0.001, s);
+      a.scale.set(clampedS, clampedS, clampedS);
     }
-    // Cape gentle sway
-    if (u.capeGroup) {
-      u.capeGroup.rotation.x = -0.14 + Math.sin(t * 3.2 + (u.phase || 0)) * 0.06;
-    }
-    // Feather plume flutter
-    if (u.plumeGroup) {
-      u.plumeGroup.rotation.z = Math.sin(t * 4.0 + (u.phase || 0)) * 0.08;
+
+    // Dynamic hero model update (breathing, spinning cogs, wizard crystals, pulse)
+    if (u.heroModel && u.heroModel.userData && typeof u.heroModel.userData.update === 'function') {
+      const isWalking = (u.walkProgress !== undefined && u.walkProgress < 1);
+      u.heroModel.userData.update(t + (u.phase || 0), isWalking);
     }
     // Rotating magic team rune ring on plinth
     if (u.runeRing) {
@@ -2303,7 +2804,7 @@ function loop() {
     // Floating team gem rotation & pulse
     if (u.gem) {
       u.gem.rotation.y += dt * 1.6;
-      u.gem.position.y = 1.30 + Math.sin(t * 3.0 + (u.phase || 0)) * 0.03;
+      u.gem.position.y = 1.48 + Math.sin(t * 3.0 + (u.phase || 0)) * 0.03;
     }
   });
 
@@ -2368,6 +2869,8 @@ function loop() {
 
       travel = null;
       cinematicUI(false);
+      updateStationMediaTrigger();
+      rebuildPlayers(); // Los personajes aparecen en la locación una vez concluyen los efectos de cámara
     }
   } else if (firstPerson) {
     // 2. First-Person Explorer Ground Walking Mode (1.75m Eye Level)

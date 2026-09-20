@@ -9,16 +9,53 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=151.0.0">
+  <link rel="stylesheet" href="styles.css?v=167.0.0">
   <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
 <body>
-  <!-- Pantalla de Carga Inicial (Fixed Overlay) -->
-  <div id="boot" class="boot"><div class="crest large">A</div><h1>NEXT GEN ONBOARDING</h1><p>Preparando la expedición...</p><div class="boot-line"><i></i></div></div>
+  <!-- Pantalla de Bienvenida y Carga Oficial Bradesco México -->
+  <div id="boot" class="boot">
+    <div class="boot-map-backdrop"></div>
+    <div class="boot-container">
+      <div class="boot-logo-wrap">
+        <img src="assets/branding/BRADESCO_SIMBOLO_2D_fdo_transparente.png" alt="Bradesco" class="boot-symbol-only">
+      </div>
+      <h1 class="boot-title"><span class="boot-var-word">¡Bienvenido</span> a Bradesco México!</h1>
+      <p class="boot-subtitle">Aquí comienza tu aventura</p>
+
+      <!-- Caja de Progreso mientras descarga el mapa 3D -->
+      <div class="boot-loader-box" id="bootLoaderBox">
+        <div class="boot-status-row">
+          <span class="boot-status-text" id="bootStatusText">Cargando...</span>
+          <span class="boot-pct" id="bootPct">0%</span>
+        </div>
+        <div class="boot-track">
+          <div class="boot-fill" id="bootProgressBar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Botón Compacto de Inicio (Visible al terminar de cargar) -->
+      <div class="boot-actions" id="bootActions" style="display:none;">
+        <button id="bootStartBtn" type="button" class="boot-compact-btn" title="Comenzar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <main id="screen" class="screen">
     <aside class="sidebar">
       <div class="sidebar-scroll">
-        <header class="brand"><div class="crest">A</div><div><span class="eyebrow">NEXT GEN ONBOARDING</span><h1 class="display">Misión actual</h1></div></header>
+        <header class="brand">
+          <div class="crest bradesco-crest">
+            <img src="assets/branding/BRADESCO_SIMBOLO_2D_fdo_transparente.png" alt="Bradesco" class="crest-img">
+          </div>
+          <div>
+            <span class="eyebrow">BRADESCO MÉXICO</span>
+            <h1 class="display">Misión actual</h1>
+          </div>
+        </header>
         
         <section class="mission-card">
           <span id="missionEyebrow" class="eyebrow">Checkpoint en curso</span>
@@ -65,14 +102,12 @@
           <div id="adminDrawer" class="admin open">
             <div class="admin-content">
               <!-- 1. GESTIÓN Y REGISTRO DE PARTICIPANTES -->
-              <span class="eyebrow" style="color:var(--teal);font-size:0.75rem">👥 Registro y Gestión de Aventureros</span>
+              <span class="eyebrow" style="color:var(--teal);font-size:0.75rem">Registro y Gestión de Aventureros</span>
 
-              <!-- Registrar nuevo participante -->
-              <span class="eyebrow" style="margin-top:2px">Registrar nuevo aventurero</span>
-              <div class="add-player-row" style="display:flex;gap:6px;margin-top:2px">
-                <input id="quickPlayerName" placeholder="Escribe un nombre (ej. Pedro)..." maxlength="24" style="flex:1" onkeydown="if(event.key==='Enter')window.addParticipantFromUI()">
-                <button id="quickAddPlayerBtn" class="primary" type="button" onclick="window.addParticipantFromUI()">+ Añadir</button>
-              </div>
+              <!-- Botón Único para Añadir Aventurero mediante Ventana Emergente -->
+              <button type="button" class="primary wide" onclick="window.openHeroSelectionModal()" style="font-weight:700;padding:11px 14px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;font-size:0.85rem">
+                <span>Añadir Nuevo Aventurero</span>
+              </button>
 
               <!-- Lista Rápida de Aventureros con Asignación de Puntos Directa -->
               <span class="eyebrow" style="margin-top:4px">Aventureros Registrados (Dar / Quitar Puntos)</span>
@@ -102,13 +137,6 @@
                 <button id="grantTeamXpBtn" class="gold wide" type="button" onclick="window.grantTeamXp(10)" title="Otorgar 10 XP a cada integrante">✨ +10 XP a todo el equipo</button>
                 <button id="syncAllBtn" class="soft wide" type="button" onclick="window.syncAllPlayersToCurrent()" title="Mover a todos los personajes 3D al checkpoint activo">🚶‍♂️ Agrupar a todos los participantes aquí</button>
               </div>
-
-              <hr>
-
-              <!-- 2. NAVEGACIÓN GLOBAL -->
-              <span class="eyebrow">Saltar a Checkpoint</span>
-              <select id="sessionSelect"></select>
-
               <hr>
 
               <!-- 3. EDITOR DE CONTENIDO DE MISIONES -->
@@ -165,6 +193,21 @@
         <button id="firstPersonBtn" class="map-icon-btn" type="button" title="Modo Explorador (1ra Persona): Caminar por el suelo a pie a escala humana">🚶‍♂️</button>
         <button id="weatherBtn" class="map-icon-btn" type="button" title="Clima: Día claro (Clic para cambiar)">☀️</button>
         <button id="fullscreenBtn" class="map-icon-btn" type="button" title="Pantalla Completa">⛶</button>
+      </div>
+
+      <!-- Botón Flotante Directo DENTRO DEL MAPA 3D para Abrir Cápsulas -->
+      <div id="mapStationMediaTrigger" class="map-station-media-trigger" style="display:none;">
+        <button id="mapOpenMediaBtn" type="button" class="map-media-bubble-btn" title="Abrir centro de aprendizaje y reproducir contenidos">
+          <div class="media-bubble-glow-ring"></div>
+          <span class="media-bubble-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"></polygon></svg>
+          </span>
+          <div class="media-bubble-text-group">
+            <span class="media-bubble-tag" id="mapMediaStationTag">MISIÓN 01 · CÁPSULAS</span>
+            <span class="media-bubble-title" id="mapMediaBubbleTitle">Ver Video y Material ▶</span>
+          </div>
+          <span class="media-bubble-count" id="mapMediaCountBadge">4</span>
+        </button>
       </div>
 
       <!-- Cartel Elevado en el Cielo con Tipografía Épica Blanca (Activación por proximidad) -->
@@ -431,7 +474,87 @@
     <button id="grantNpsXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">✨ Dominar Metodología NPS y Otorgar +25 XP</button>
   </dialog>
 
-  <script type="module" src="main.js?v=154.0.0"></script>
+  <!-- Modal Centro de Aprendizaje / Consola de Cápsulas Multimedia Armonizada -->
+  <dialog id="mediaHubDialog" class="media-hub-dialog cyber-codex">
+    <div class="media-hub-glow-ambient"></div>
+    <div class="media-hub-modal-header">
+      <div class="media-hub-modal-title-group">
+        <div class="media-header-top-row">
+          <span class="media-live-dot"></span>
+          <span class="eyebrow" id="mediaHubStationEyebrow">MISIÓN 01 · ARSENAL Y EQUIPOS</span>
+        </div>
+        <h2 class="display" id="mediaHubStationTitle">Cápsulas & Centro Multimedia</h2>
+      </div>
+      <button id="closeMediaHubBtn" class="close-cyber-btn" type="button" title="Cerrar reproductor">✕</button>
+    </div>
+
+    <div class="media-hub-modal-body">
+      <!-- Panel Principal: Pantalla de Gran Formato -->
+      <div class="media-hub-player-section">
+        <div class="media-hub-screen-container" id="mediaHubScreenContainer">
+          <div class="screen-corner-tl"></div>
+          <div class="screen-corner-br"></div>
+          <!-- Video, Image or PDF dynamically mounted here -->
+          <div id="mediaStageScreen" class="media-stage-screen"></div>
+        </div>
+      </div>
+
+      <!-- Panel Lateral: Lista Ordenada de Contenidos -->
+      <div class="media-hub-playlist-section">
+        <div class="playlist-section-header">
+          <div class="playlist-header-left">
+            <span class="playlist-icon-chip">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff8ca3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            </span>
+            <span class="playlist-section-title">Contenidos</span>
+          </div>
+          <span class="playlist-section-badge" id="playlistSectionBadge">4 cápsulas</span>
+        </div>
+        
+        <div id="mediaHubItemsList" class="media-hub-playlist-list">
+          <!-- Playlist items rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Modal de Selección de Personaje Directo -->
+  <dialog id="heroSelectionModal" class="hero-modal-dialog">
+    <div class="hero-modal-container">
+      <header class="hero-modal-header">
+        <h2 class="hero-modal-title">Selecciona tu Personaje</h2>
+        <button type="button" class="hero-modal-close" onclick="window.closeHeroSelectionModal()" title="Cerrar ventana">✕</button>
+      </header>
+
+      <div class="hero-modal-body">
+        <!-- Columna Izquierda: Rejilla de los 8 Arquetipos -->
+        <div class="hero-roster-column">
+          <div class="hero-roster-grid" id="modalHeroRosterGrid">
+            <!-- Dynamic 8 Avatar Cards -->
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Previsualización 3D y Nombre -->
+        <div class="hero-preview-column">
+          <div class="hero-preview-box">
+            <div class="hero-preview-canvas-wrap" id="heroCanvasWrap">
+              <canvas id="heroPreviewCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Formulario de Registro -->
+          <div class="hero-creation-form">
+            <input type="text" id="modalHeroNameInput" class="hero-name-input" placeholder="Nombre de tu Aventurero..." maxlength="24" autocomplete="off" onkeydown="if(event.key==='Enter')window.confirmHeroCreation()">
+            <button type="button" id="modalConfirmHeroBtn" class="hero-confirm-btn" onclick="window.confirmHeroCreation()">
+              <span>Elegir Personaje</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="main.js?v=167.0.0"></script>
 </body>
 </html>
 
