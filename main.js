@@ -2,7 +2,7 @@ import * as THREE from 'three';
 window.THREE = THREE;
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=167.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=175.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -437,6 +437,7 @@ if (saved.evaluations && typeof saved.evaluations === 'object') {
   }
 }
 let evaluationsStatus = (saved.evaluationsStatus && typeof saved.evaluationsStatus === 'object') ? saved.evaluationsStatus : {};
+let completedCapsules = (saved.completedCapsules && typeof saved.completedCapsules === 'object') ? saved.completedCapsules : {};
 
 const save = () => {
   try {
@@ -452,7 +453,8 @@ const save = () => {
       companyChecklist,
       npsChecklist,
       evaluations,
-      evaluationsStatus
+      evaluationsStatus,
+      completedCapsules
     }));
   } catch (err) {
     console.error('Error saving state to localStorage:', err);
@@ -1427,19 +1429,11 @@ function rebuildPlayers(startMission = null, targetMission = null) {
   anim.players.forEach(x => scene.remove(x));
   anim.players = [];
 
-  // Si la cámara está en pleno vuelo cinematográfico, los personajes esperan hasta la llegada
-  if (travel) {
-    return;
-  }
-
   players.forEach((p, i) => {
     const targetStationId = (p.missionId !== undefined && p.missionId !== null) ? p.missionId : current;
     const q = getMission(targetStationId);
     p.totalInStation = players.filter(o => ((o.missionId !== undefined && o.missionId !== null) ? o.missionId : current) === targetStationId).length;
     const char = createHumanoidCharacter(p, i, q, getTerrainY, targetMission, startMission);
-    // Entrada animada suave al aparecer en la locación
-    char.scale.set(0.001, 0.001, 0.001);
-    char.userData.spawnProgress = 0;
     scene.add(char);
     anim.players.push(char);
   });
@@ -2895,6 +2889,91 @@ const mediaHubItemsList = document.getElementById('mediaHubItemsList');
 
 let activeStationMediaItem = null;
 
+function isCapsuleCompleted(stationId, itemIndex, item) {
+  if (!item) return false;
+  const sId = Number(stationId) || current || 1;
+  if (item.isEval) {
+    return !!evaluationsStatus[`${sId}_${item.evalType}`] || !!completedCapsules[`${sId}_${itemIndex}`];
+  }
+  return !!completedCapsules[`${sId}_${itemIndex}`];
+}
+
+function isCapsuleUnlocked(stationId, itemIndex, playlist) {
+  if (itemIndex === 0) return true;
+  const sId = Number(stationId) || current || 1;
+  if (!playlist || !playlist[itemIndex]) return true;
+  if (isCapsuleCompleted(sId, itemIndex, playlist[itemIndex])) return true;
+  const prevItem = playlist[itemIndex - 1];
+  return isCapsuleCompleted(sId, itemIndex - 1, prevItem);
+}
+
+function markCapsuleCompleted(stationId, itemIndex, playlist) {
+  const sId = Number(stationId) || current || 1;
+  const key = `${sId}_${itemIndex}`;
+  completedCapsules[key] = true;
+
+  const item = playlist && playlist[itemIndex];
+  if (item && item.isEval) {
+    evaluationsStatus[`${sId}_${item.evalType}`] = true;
+  }
+
+  save();
+  updatePlaylistDOM(sId, playlist);
+}
+
+window.toggleManualCapsuleViewed = function(stationId, itemIndex) {
+  const sId = Number(stationId) || current || 1;
+  const currentPlaylist = activeEvalContext.playlist || [];
+  const key = `${sId}_${itemIndex}`;
+  if (completedCapsules[key]) {
+    // If already done, let it stay done or toggle
+    completedCapsules[key] = true;
+  } else {
+    completedCapsules[key] = true;
+  }
+  markCapsuleCompleted(sId, itemIndex, currentPlaylist);
+};
+
+function updatePlaylistDOM(stationId, playlist) {
+  if (!mediaHubItemsList || !playlist) return;
+  const cards = mediaHubItemsList.querySelectorAll('.media-playlist-item');
+  cards.forEach((card, idx) => {
+    const item = playlist[idx];
+    if (!item) return;
+
+    const unlocked = isCapsuleUnlocked(stationId, idx, playlist);
+    const completed = isCapsuleCompleted(stationId, idx, item);
+
+    card.classList.toggle('locked', !unlocked);
+    card.classList.toggle('completed', completed);
+
+    // Update check circle
+    const checkBtn = card.querySelector('.capsule-check-btn');
+    const checkCircle = card.querySelector('.capsule-check-circle');
+    if (checkBtn && checkCircle) {
+      checkBtn.className = `capsule-check-btn ${completed ? 'done' : ''}`;
+      checkBtn.title = completed ? 'Completado' : 'Marcar como visto';
+      checkCircle.className = `capsule-check-circle ${completed ? 'done' : ''}`;
+      checkCircle.innerHTML = completed ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>` : '';
+    }
+
+    // Update evaluation badge
+    const badgeEl = card.querySelector('.eval-playlist-badge');
+    if (badgeEl && item.isEval) {
+      if (completed) {
+        badgeEl.className = 'eval-playlist-badge done';
+        badgeEl.textContent = '✓ Completada';
+      } else if (!unlocked) {
+        badgeEl.className = 'eval-playlist-badge locked';
+        badgeEl.textContent = 'Bloqueada';
+      } else {
+        badgeEl.className = `eval-playlist-badge ${item.evalType === 'mid' ? '' : 'final'}`;
+        badgeEl.textContent = `+${item.xp} XP`;
+      }
+    }
+  });
+}
+
 function renderMediaStageItem(item, stationId, itemIndex, playlist) {
   if (!mediaStageScreen || !item) return;
   activeStationMediaItem = item;
@@ -2908,12 +2987,23 @@ function renderMediaStageItem(item, stationId, itemIndex, playlist) {
   }
   mediaStageScreen.innerHTML = '';
 
+  const sId = Number(stationId) || current || 1;
+  const currentIdx = typeof itemIndex === 'number' ? itemIndex : 0;
+  const currentList = playlist || activeEvalContext.playlist || [];
+
+  activeEvalContext.stationId = sId;
+  activeEvalContext.itemIndex = currentIdx;
+  activeEvalContext.playlist = currentList;
+
   if (item.isEval) {
-    renderStageEvaluation(item, stationId, itemIndex, playlist);
+    renderStageEvaluation(item, sId, currentIdx, currentList);
     return;
   }
 
   const encodedUrl = encodeURI(item.file);
+
+  const mediaContentWrap = document.createElement('div');
+  mediaContentWrap.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;';
 
   if (item.type === 'video') {
     const vid = document.createElement('video');
@@ -2924,26 +3014,35 @@ function renderMediaStageItem(item, stationId, itemIndex, playlist) {
     vid.playsInline = true;
     vid.preload = 'auto';
     vid.setAttribute('controlsList', 'nodownload');
-    mediaStageScreen.appendChild(vid);
+
+    // Auto-complete triggers
+    vid.addEventListener('ended', () => {
+      markCapsuleCompleted(sId, currentIdx, currentList);
+    });
+    vid.addEventListener('timeupdate', () => {
+      if (vid.duration > 0 && (vid.currentTime / vid.duration) >= 0.88) {
+        markCapsuleCompleted(sId, currentIdx, currentList);
+      }
+    });
+
+    mediaContentWrap.appendChild(vid);
     vid.load();
     const p = vid.play();
     if (p !== undefined) {
-      p.catch(() => {
-        // Handled if browser restricts unmuted autoplay
-      });
+      p.catch(() => {});
     }
   } else if (item.type === 'image') {
     const img = document.createElement('img');
     img.className = 'media-img-element';
     img.src = encodedUrl;
     img.alt = item.title;
-    mediaStageScreen.appendChild(img);
+    mediaContentWrap.appendChild(img);
   } else if (item.type === 'pdf') {
     const iframe = document.createElement('iframe');
     iframe.className = 'media-pdf-element';
     iframe.src = `${encodedUrl}#toolbar=0&navpanes=0`;
     iframe.title = item.title;
-    mediaStageScreen.appendChild(iframe);
+    mediaContentWrap.appendChild(iframe);
   } else {
     // Document or downloadable file (e.g. .pptx, .docx, .zip)
     const fileCard = document.createElement('div');
@@ -2966,8 +3065,10 @@ function renderMediaStageItem(item, stationId, itemIndex, playlist) {
         </a>
       </div>
     `;
-    mediaStageScreen.appendChild(fileCard);
+    mediaContentWrap.appendChild(fileCard);
   }
+
+  mediaStageScreen.appendChild(mediaContentWrap);
 }
 
 async function openStationMediaHub(stationId) {
@@ -2978,7 +3079,6 @@ async function openStationMediaHub(stationId) {
 
   const eyebrowEl = document.getElementById('mediaHubStationEyebrow');
   const titleEl = document.getElementById('mediaHubStationTitle');
-  const countBadge = document.getElementById('playlistSectionBadge');
 
   if (eyebrowEl) eyebrowEl.textContent = `MISIÓN ${String(sId).padStart(2, '0')} · ${q ? q.region.toUpperCase() : ''}`;
   if (titleEl) titleEl.textContent = q ? `Cápsulas: ${q.name}` : 'Centro de Aprendizaje';
@@ -3042,7 +3142,8 @@ async function openStationMediaHub(stationId) {
     });
   }
 
-  if (countBadge) countBadge.textContent = `${playlist.length} ${playlist.length === 1 ? 'cápsula' : 'cápsulas'}`;
+  activeEvalContext.stationId = sId;
+  activeEvalContext.playlist = playlist;
 
   if (mediaHubItemsList) {
     mediaHubItemsList.innerHTML = '';
@@ -3050,11 +3151,12 @@ async function openStationMediaHub(stationId) {
       const orderNum = idx + 1;
       const numStr = String(orderNum).padStart(2, '0');
       const card = document.createElement('div');
+      const unlocked = isCapsuleUnlocked(sId, idx, playlist);
+      const completed = isCapsuleCompleted(sId, idx, item);
 
       if (item.isEval) {
         const isMid = item.evalType === 'mid';
-        const isDone = !!evaluationsStatus[`${sId}_${item.evalType}`];
-        card.className = `media-playlist-item eval-item ${isMid ? 'mid' : 'final'} ${idx === 0 ? 'active' : ''}`;
+        card.className = `media-playlist-item eval-item ${isMid ? 'mid' : 'final'} ${idx === 0 ? 'active' : ''} ${unlocked ? '' : 'locked'} ${completed ? 'completed' : ''}`;
 
         const evalSvg = isMid
           ? `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="m9 15 2 2 4-4"></path></svg>`
@@ -3062,6 +3164,16 @@ async function openStationMediaHub(stationId) {
 
         const typeLabel = isMid ? 'Evaluación Intermedia' : 'Reto Final de Cierre';
         const cleanTitle = (item.title || '').replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+
+        let badgeText = `+${item.xp} XP`;
+        let badgeClass = `eval-playlist-badge ${isMid ? '' : 'final'}`;
+        if (completed) {
+          badgeText = '✓ Completada';
+          badgeClass = 'eval-playlist-badge done';
+        } else if (!unlocked) {
+          badgeText = 'Bloqueada';
+          badgeClass = 'eval-playlist-badge locked';
+        }
 
         card.innerHTML = `
           <div class="media-item-icon-wrapper" title="${typeLabel}">
@@ -3072,12 +3184,17 @@ async function openStationMediaHub(stationId) {
             <span class="media-playlist-title">${cleanTitle}</span>
             <span class="media-playlist-subtitle">${typeLabel}</span>
           </div>
-          <span class="eval-playlist-badge ${isMid ? '' : 'final'} ${isDone ? 'done' : ''}">
-            ${isDone ? '✓ Completada' : `+${item.xp} XP`}
+          <span class="${badgeClass}">
+            ${badgeText}
           </span>
+          <button type="button" class="capsule-check-btn ${completed ? 'done' : ''}" title="${completed ? 'Completado' : 'Marcar visto'}" onclick="event.stopPropagation(); window.toggleManualCapsuleViewed(${sId}, ${idx});">
+            <span class="capsule-check-circle ${completed ? 'done' : ''}">
+              ${completed ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+            </span>
+          </button>
         `;
       } else {
-        card.className = `media-playlist-item ${idx === 0 ? 'active' : ''}`;
+        card.className = `media-playlist-item ${idx === 0 ? 'active' : ''} ${unlocked ? '' : 'locked'} ${completed ? 'completed' : ''}`;
         let iconSvg = '';
         let typeLabel = 'Cápsula de Video';
 
@@ -3106,13 +3223,20 @@ async function openStationMediaHub(stationId) {
             <span class="media-playlist-title">${cleanTitle}</span>
             <span class="media-playlist-subtitle">${typeLabel}</span>
           </div>
-          <span class="media-playlist-status-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-          </span>
+          <button type="button" class="capsule-check-btn ${completed ? 'done' : ''}" title="${completed ? 'Completado' : 'Marcar visto'}" onclick="event.stopPropagation(); window.toggleManualCapsuleViewed(${sId}, ${idx});">
+            <span class="capsule-check-circle ${completed ? 'done' : ''}">
+              ${completed ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+            </span>
+          </button>
         `;
       }
 
       card.onclick = () => {
+        if (!isCapsuleUnlocked(sId, idx, playlist)) {
+          card.classList.add('shake-lock');
+          setTimeout(() => card.classList.remove('shake-lock'), 400);
+          return;
+        }
         mediaHubItemsList.querySelectorAll('.media-playlist-item').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         renderMediaStageItem(item, sId, idx, playlist);
@@ -3121,8 +3245,20 @@ async function openStationMediaHub(stationId) {
       mediaHubItemsList.appendChild(card);
     });
 
-    // Auto-select and immediately render/play first item
-    renderMediaStageItem(playlist[0], sId, 0, playlist);
+    // Auto-select first unlocked non-completed item or 0
+    let targetIdx = 0;
+    for (let i = 0; i < playlist.length; i++) {
+      if (isCapsuleUnlocked(sId, i, playlist) && !isCapsuleCompleted(sId, i, playlist[i])) {
+        targetIdx = i;
+        break;
+      }
+    }
+    const cards = mediaHubItemsList.querySelectorAll('.media-playlist-item');
+    if (cards[targetIdx]) {
+      cards.forEach(c => c.classList.remove('active'));
+      cards[targetIdx].classList.add('active');
+    }
+    renderMediaStageItem(playlist[targetIdx], sId, targetIdx, playlist);
   }
 
   mediaHubDialog?.showModal();
@@ -3173,31 +3309,13 @@ let activeEvalContext = {
   playlist: []
 };
 
-function renderStageEvaluation(item, stationId, itemIndex, playlist) {
-  if (!mediaStageScreen || !item) return;
-
-  const sId = Number(stationId) || current || 1;
-  const evalData = item.evalData || (evaluations[sId] ? evaluations[sId][item.evalType] : null) || (DEFAULT_EVALUATIONS[sId] ? DEFAULT_EVALUATIONS[sId][item.evalType] : null);
-  if (!evalData) return;
-
-  activeEvalContext = {
-    stationId: sId,
-    type: item.evalType,
-    evalData,
-    selectedOption: null,
-    selectedPlayers: new Set(),
-    itemIndex: typeof itemIndex === 'number' ? itemIndex : 0,
-    playlist: playlist || []
-  };
-
-  const isMid = item.evalType === 'mid';
-
+function renderStageEvaluationQuestionUI(evalData) {
+  if (!mediaStageScreen || !evalData) return;
   mediaStageScreen.innerHTML = `
     <div class="stage-eval-wrapper">
       <!-- Step 1: Question -->
       <div id="stageEvalQuestionStep" style="display:flex;flex-direction:column;gap:16px;height:100%">
-        <div class="stage-eval-header">
-          <span class="stage-eval-tag">${isMid ? 'EVALUACIÓN INTERMEDIA' : 'RETO FINAL DE CIERRE'} · MISIÓN ${String(sId).padStart(2, '0')}</span>
+        <div class="stage-eval-header" style="justify-content:flex-end;">
           <span class="stage-eval-xp-chip">+${evalData.xp || 50} XP</span>
         </div>
 
@@ -3214,16 +3332,14 @@ function renderStageEvaluation(item, stationId, itemIndex, playlist) {
           `).join('')}
         </div>
 
-        <div class="stage-eval-facilitator-bar">
-          <span class="stage-eval-facilitator-hint">Guía de sala: Escucha las respuestas de los participantes y selecciona la opción elegida.</span>
-          <button type="button" class="stage-eval-nobody-btn" onclick="window.handleStageEvalOptionSelect('NONE')">Nadie acertó en la sala</button>
+        <div class="stage-eval-facilitator-bar" style="justify-content:flex-end">
+          <button type="button" class="stage-eval-nobody-btn" onclick="window.handleStageEvalOptionSelect('NONE')">Ningún participante acertó</button>
         </div>
       </div>
 
       <!-- Step 2: Feedback & Reveal -->
       <div id="stageEvalFeedbackStep" style="display:none;flex-direction:column;gap:16px;height:100%">
-        <div class="stage-eval-header">
-          <span class="stage-eval-tag">RETROALIMENTACIÓN DE SALA · MISIÓN ${String(sId).padStart(2, '0')}</span>
+        <div class="stage-eval-header" style="justify-content:flex-end;">
           <span class="stage-eval-xp-chip">+${evalData.xp || 50} XP</span>
         </div>
 
@@ -3245,15 +3361,14 @@ function renderStageEvaluation(item, stationId, itemIndex, playlist) {
           <p id="stageEvalExplanationDisplay" class="stage-eval-explanation-text"></p>
         </div>
 
-        <button type="button" class="primary wide" style="margin-top:auto;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.proceedToStageEvalAwardStep()">
-          Continuar a Asignación de XP ▶
-        </button>
+        <div id="stageEvalFeedbackActionWrap" style="margin-top:auto">
+          <!-- Button rendered dynamically based on correctness -->
+        </div>
       </div>
 
       <!-- Step 3: XP Award to Players -->
       <div id="stageEvalAwardStep" style="display:none;flex-direction:column;gap:16px;height:100%">
-        <div class="stage-eval-header">
-          <span class="stage-eval-tag">ASIGNAR PUNTOS DE EXPERIENCIA (XP)</span>
+        <div class="stage-eval-header" style="justify-content:flex-end;">
           <span class="stage-eval-xp-chip">+${evalData.xp || 50} XP</span>
         </div>
 
@@ -3283,24 +3398,82 @@ function renderStageEvaluation(item, stationId, itemIndex, playlist) {
         </button>
       </div>
 
-      <!-- Step 4: Complete & Next -->
+      <!-- Step 4: Complete & Next (Celebration if Final Station Reto) -->
       <div id="stageEvalCompleteStep" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;height:100%;text-align:center;padding:24px">
-        <div style="width:64px;height:64px;border-radius:50%;background:#10b981;display:grid;place-items:center;color:#ffffff;font-size:2rem;font-weight:800;box-shadow:0 0 30px rgba(16,185,129,0.5)">
-          ✓
-        </div>
-        <div>
-          <h3 style="margin:0;font-size:1.4rem;font-weight:800;color:#ffffff">¡Evaluación Registrada con Éxito!</h3>
-          <p id="stageEvalCompleteSummary" style="margin:8px 0 0;font-size:0.92rem;color:rgba(255,255,255,0.8);max-width:480px">
-            Se han acreditado los puntos y actualizado la tabla de posiciones.
-          </p>
-        </div>
-        <button type="button" class="primary wide" style="max-width:320px;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.advanceToNextPlaylistStageItem()">
-          Continuar a la siguiente cápsula ▶
-        </button>
       </div>
     </div>
   `;
 }
+
+function renderStageEvaluation(item, stationId, itemIndex, playlist) {
+  if (!mediaStageScreen || !item) return;
+
+  const sId = Number(stationId) || current || 1;
+  const evalData = item.evalData || (evaluations[sId] ? evaluations[sId][item.evalType] : null) || (DEFAULT_EVALUATIONS[sId] ? DEFAULT_EVALUATIONS[sId][item.evalType] : null);
+  if (!evalData) return;
+
+  const currentIdx = typeof itemIndex === 'number' ? itemIndex : 0;
+  const currentList = playlist || activeEvalContext.playlist || [];
+
+  activeEvalContext = {
+    stationId: sId,
+    type: item.evalType,
+    evalData,
+    selectedOption: null,
+    selectedPlayers: new Set(),
+    itemIndex: currentIdx,
+    playlist: currentList
+  };
+
+  const isAlreadyDone = isCapsuleCompleted(sId, currentIdx, item);
+
+  if (isAlreadyDone) {
+    mediaStageScreen.innerHTML = `
+      <div class="stage-eval-wrapper" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:32px;gap:20px;">
+        <div style="width:72px;height:72px;border-radius:50%;background:rgba(16,185,129,0.18);border:2px solid #10b981;display:grid;place-items:center;color:#10b981;font-size:2rem;font-weight:800;box-shadow:0 0 25px rgba(16,185,129,0.3)">
+          ✓
+        </div>
+
+        <div style="max-width:540px;">
+          <span class="eyebrow" style="color:#10b981;margin-bottom:6px;display:inline-block">EVALUACIÓN YA REGISTRADA</span>
+          <h3 style="margin:0;font-size:1.45rem;font-weight:800;color:#ffffff">${evalData.title || (item.evalType === 'mid' ? 'Evaluación Intermedia' : 'Reto Final')}</h3>
+          <p style="margin:10px 0 0;font-size:0.92rem;color:rgba(255,255,255,0.85);line-height:1.5">
+            Esta evaluación ya ha sido aplicada a la sala y sus resultados están guardados en la expedición.
+          </p>
+        </div>
+
+        <div style="background:rgba(204,9,47,0.15);border:1px solid rgba(204,9,47,0.4);border-radius:12px;padding:14px 18px;max-width:520px;text-align:left;display:flex;gap:12px;align-items:center;">
+          <span style="font-size:1.4rem;">⚠️</span>
+          <p style="margin:0;font-size:0.83rem;color:rgba(255,255,255,0.92);line-height:1.45">
+            <strong>Advertencia Facilitador:</strong> Si decides volver a realizarla, se iniciará una nueva ronda para los participantes y <em>se reescribirán los datos y la asignación de XP</em> para esta pregunta.
+          </p>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:12px;">
+          <button type="button" class="primary" style="padding:14px 24px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.advanceToNextPlaylistStageItem()">
+            Continuar con la siguiente cápsula ▶
+          </button>
+          <button type="button" style="padding:14px 20px;font-size:0.88rem;font-weight:700;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.25);color:#ffccd3;cursor:pointer" onclick="window.confirmRedoStageEvaluation()">
+            🔄 Volver a realizar (Reescribir datos)
+          </button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  renderStageEvaluationQuestionUI(evalData);
+}
+
+window.confirmRedoStageEvaluation = function() {
+  const proceed = confirm("¿Estás seguro de volver a aplicar esta evaluación?\n\nAdvertencia: Se reiniciará la pregunta para la sala y se reescribirán los resultados y la asignación de XP previamente guardados.");
+  if (proceed) {
+    const evalData = activeEvalContext.evalData;
+    if (evalData) {
+      renderStageEvaluationQuestionUI(evalData);
+    }
+  }
+};
 
 window.handleStageEvalOptionSelect = function(selectedOptionId) {
   const evalData = activeEvalContext.evalData;
@@ -3342,6 +3515,24 @@ window.handleStageEvalOptionSelect = function(selectedOptionId) {
   const xpInput = document.getElementById('stageEvalAwardXpInput');
   if (xpInput) xpInput.value = evalData.xp || 50;
 
+  // Render appropriate action button on feedback step
+  const actionWrap = document.getElementById('stageEvalFeedbackActionWrap');
+  if (actionWrap) {
+    if (isCorrect) {
+      actionWrap.innerHTML = `
+        <button type="button" class="primary wide" style="width:100%;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.proceedToStageEvalAwardStep()">
+          Asignar XP a los participantes ▶
+        </button>
+      `;
+    } else {
+      actionWrap.innerHTML = `
+        <button type="button" class="primary wide" style="width:100%;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;background:linear-gradient(135deg,#374151,#1f2937);border-color:#4b5563;cursor:pointer" onclick="window.skipStageEvalWithoutXp()">
+          Continuar sin asignar XP ▶
+        </button>
+      `;
+    }
+  }
+
   const qStep = document.getElementById('stageEvalQuestionStep');
   const fStep = document.getElementById('stageEvalFeedbackStep');
   const aStep = document.getElementById('stageEvalAwardStep');
@@ -3359,6 +3550,80 @@ window.proceedToStageEvalAwardStep = function() {
   if (aStep) aStep.style.display = 'flex';
 
   renderStageEvalPlayersRoster();
+};
+
+window.skipStageEvalWithoutXp = function() {
+  const sId = activeEvalContext.stationId;
+  // Mark evaluation & capsule as completed so navigation is unlocked, with 0 XP awarded
+  markCapsuleCompleted(sId, activeEvalContext.itemIndex, activeEvalContext.playlist);
+  renderUI();
+  rebuildPlayers();
+
+  const qStep = document.getElementById('stageEvalQuestionStep');
+  const fStep = document.getElementById('stageEvalFeedbackStep');
+  const aStep = document.getElementById('stageEvalAwardStep');
+  const cStep = document.getElementById('stageEvalCompleteStep');
+
+  if (qStep) qStep.style.display = 'none';
+  if (fStep) fStep.style.display = 'none';
+  if (aStep) aStep.style.display = 'none';
+  if (!cStep) return;
+  cStep.style.display = 'flex';
+
+  const isFinalStationEval = (activeEvalContext.type === 'final' || activeEvalContext.itemIndex === (activeEvalContext.playlist.length - 1));
+
+  if (isFinalStationEval) {
+    if (sId < 9) {
+      const nextM = getMission(sId + 1);
+      cStep.innerHTML = `
+        <div class="stage-celebration-wrapper">
+          <div class="stage-celebration-trophy">★</div>
+          <h3 class="stage-celebration-title">¡Misión ${String(sId).padStart(2, '0')} Finalizada!</h3>
+          <p class="stage-celebration-desc">
+            Han concluido todos los contenidos de esta estación. ¡A seguir aprendiendo en la próxima misión!
+          </p>
+
+          <div class="stage-celebration-next-card">
+            <span class="stage-celebration-next-tag">Siguiente Estación:</span>
+            <span class="stage-celebration-next-name">Misión ${String(sId + 1).padStart(2, '0')}: ${nextM.name}</span>
+            <span class="stage-celebration-next-region">${nextM.region}</span>
+          </div>
+
+          <button type="button" class="stage-celebration-travel-btn" onclick="window.finishStationAndTravelNext(${sId + 1})">
+            Partir hacia la Misión ${String(sId + 1).padStart(2, '0')} ➔
+          </button>
+        </div>
+      `;
+    } else {
+      cStep.innerHTML = `
+        <div class="stage-celebration-wrapper">
+          <div class="stage-celebration-trophy">👑</div>
+          <h3 class="stage-celebration-title">¡Expedición de Onboarding Culminada!</h3>
+          <p class="stage-celebration-desc">
+            ¡Felicidades por completar el recorrido de las 9 misiones de Bradesco México!
+          </p>
+          <button type="button" class="stage-celebration-travel-btn" onclick="window.closeStationMediaHub()">
+            Finalizar y Regresar al Mapa ➔
+          </button>
+        </div>
+      `;
+    }
+  } else {
+    cStep.innerHTML = `
+      <div style="width:64px;height:64px;border-radius:50%;background:#4b5563;display:grid;place-items:center;color:#ffffff;font-size:2rem;font-weight:800;box-shadow:0 0 20px rgba(75,85,99,0.5)">
+        ✓
+      </div>
+      <div>
+        <h3 style="margin:0;font-size:1.3rem;font-weight:800;color:#ffffff">Evaluación Concluida</h3>
+        <p style="margin:8px 0 0;font-size:0.90rem;color:rgba(255,255,255,0.75);max-width:460px">
+          No se asignaron puntos en esta ronda. El concepto ha quedado explicado para el equipo.
+        </p>
+      </div>
+      <button type="button" class="primary wide" style="max-width:320px;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.advanceToNextPlaylistStageItem()">
+        Continuar con la siguiente cápsula ▶
+      </button>
+    `;
+  }
 };
 
 function renderStageEvalPlayersRoster() {
@@ -3427,6 +3692,7 @@ function updateStageEvalSelectedCount() {
 }
 
 window.confirmStageAwardXp = function() {
+  const sId = activeEvalContext.stationId;
   const xpInput = document.getElementById('stageEvalAwardXpInput');
   const pts = Math.max(0, parseInt(xpInput?.value, 10) || activeEvalContext.evalData?.xp || 50);
   const awardCount = activeEvalContext.selectedPlayers.size;
@@ -3439,38 +3705,82 @@ window.confirmStageAwardXp = function() {
     });
   }
 
-  // Mark this evaluation as completed in session
-  const statusKey = `${activeEvalContext.stationId}_${activeEvalContext.type}`;
-  evaluationsStatus[statusKey] = true;
+  // Mark this evaluation & capsule as completed
+  markCapsuleCompleted(sId, activeEvalContext.itemIndex, activeEvalContext.playlist);
 
-  save();
   renderUI();
   rebuildPlayers();
 
-  // Update playlist badges in UI
-  if (mediaHubItemsList) {
-    const activeItemEl = mediaHubItemsList.querySelector('.media-playlist-item.active');
-    if (activeItemEl) {
-      const badge = activeItemEl.querySelector('.eval-playlist-badge');
-      if (badge) {
-        badge.classList.add('done');
-        badge.textContent = '✓ Completada';
-      }
-    }
-  }
-
-  // Transition to Complete Screen
+  // Transition to Complete / Celebration Screen
   const aStep = document.getElementById('stageEvalAwardStep');
   const cStep = document.getElementById('stageEvalCompleteStep');
-  const summaryEl = document.getElementById('stageEvalCompleteSummary');
-
   if (aStep) aStep.style.display = 'none';
-  if (cStep) cStep.style.display = 'flex';
-  if (summaryEl) {
-    summaryEl.textContent = awardCount > 0
-      ? `Se acreditaron +${pts} XP a ${awardCount} ${awardCount === 1 ? 'aventurero' : 'aventureros'}. Tabla de clasificación actualizada.`
-      : 'Evaluación finalizada y registrada. No se asignaron puntos en esta ronda.';
+  if (!cStep) return;
+  cStep.style.display = 'flex';
+
+  const isFinalStationEval = (activeEvalContext.type === 'final' || activeEvalContext.itemIndex === (activeEvalContext.playlist.length - 1));
+
+  if (isFinalStationEval) {
+    if (sId < 9) {
+      const nextM = getMission(sId + 1);
+      cStep.innerHTML = `
+        <div class="stage-celebration-wrapper">
+          <div class="stage-celebration-trophy">★</div>
+          <h3 class="stage-celebration-title">¡Misión ${String(sId).padStart(2, '0')} Completada!</h3>
+          <p class="stage-celebration-desc">
+            ¡Excelente trabajo de todo el equipo! Han finalizado todos los contenidos y evaluaciones de esta estación con ${awardCount > 0 ? `+${pts} XP acreditados` : 'éxito'}.
+          </p>
+
+          <div class="stage-celebration-next-card">
+            <span class="stage-celebration-next-tag">Prepárense para la Siguiente Estación:</span>
+            <span class="stage-celebration-next-name">Misión ${String(sId + 1).padStart(2, '0')}: ${nextM.name}</span>
+            <span class="stage-celebration-next-region">${nextM.region}</span>
+          </div>
+
+          <button type="button" class="stage-celebration-travel-btn" onclick="window.finishStationAndTravelNext(${sId + 1})">
+            Partir hacia la Misión ${String(sId + 1).padStart(2, '0')} ➔
+          </button>
+        </div>
+      `;
+    } else {
+      cStep.innerHTML = `
+        <div class="stage-celebration-wrapper">
+          <div class="stage-celebration-trophy">👑</div>
+          <h3 class="stage-celebration-title">¡Expedición de Onboarding Culminada!</h3>
+          <p class="stage-celebration-desc">
+            ¡Felicidades a todos los aventureros por completar las 9 misiones del reino de Bradesco México!
+          </p>
+          <button type="button" class="stage-celebration-travel-btn" onclick="window.closeStationMediaHub()">
+            Finalizar y Regresar al Mapa ➔
+          </button>
+        </div>
+      `;
+    }
+  } else {
+    cStep.innerHTML = `
+      <div style="width:64px;height:64px;border-radius:50%;background:#10b981;display:grid;place-items:center;color:#ffffff;font-size:2rem;font-weight:800;box-shadow:0 0 30px rgba(16,185,129,0.5)">
+        ✓
+      </div>
+      <div>
+        <h3 style="margin:0;font-size:1.4rem;font-weight:800;color:#ffffff">¡Evaluación Registrada con Éxito!</h3>
+        <p style="margin:8px 0 0;font-size:0.92rem;color:rgba(255,255,255,0.8);max-width:480px">
+          ${awardCount > 0 ? `Se acreditaron +${pts} XP a ${awardCount} ${awardCount === 1 ? 'aventurero' : 'aventureros'}. Tabla de posiciones actualizada.` : 'Evaluación concluida correctamente.'}
+        </p>
+      </div>
+      <button type="button" class="primary wide" style="max-width:320px;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.advanceToNextPlaylistStageItem()">
+        Continuar con la siguiente cápsula ▶
+      </button>
+    `;
   }
+};
+
+window.finishStationAndTravelNext = function(nextStationId) {
+  closeStationMediaHub();
+  setTimeout(() => {
+    if (typeof window.selectMission === 'function') {
+      window.selectMission(nextStationId);
+    }
+  }, 140);
 };
 
 window.advanceToNextPlaylistStageItem = function() {
@@ -3483,10 +3793,6 @@ window.advanceToNextPlaylistStageItem = function() {
     playlistItems[0].click();
   }
 };
-
-function updateStationEvaluationsUI() {
-  // Safe helper kept for state refreshes
-}
 
 // ── Admin Evaluation Question Editor ─────────────────────────────────────────
 function initAdminEvalEditor() {
@@ -3652,26 +3958,22 @@ function loop() {
     }
   });
 
-  // Idle skeletal animation, rotating magic plinth ring & smooth spawn entrance pop
+  // Idle organic animation, rotating plinth ring & crystals
   anim.players.forEach(a => {
     const u = a.userData;
     if (!u) return;
 
-    // Smooth spawn entrance transition
-    if (u.spawnProgress !== undefined && u.spawnProgress < 1) {
-      u.spawnProgress = Math.min(1, u.spawnProgress + dt * 2.8);
-      const tP = u.spawnProgress;
-      const c1 = 1.70158;
-      const c3 = c1 + 1;
-      const s = 1 + c3 * Math.pow(tP - 1, 3) + c1 * Math.pow(tP - 1, 2);
-      const clampedS = Math.max(0.001, s);
-      a.scale.set(clampedS, clampedS, clampedS);
+    // Organic breathing bob
+    if (u.bodyBob) {
+      u.bodyBob.position.y = 0.88 + Math.sin(t * 2.8 + (u.phase || 0)) * 0.025;
     }
-
-    // Dynamic hero model update (breathing, spinning cogs, wizard crystals, pulse)
-    if (u.heroModel && u.heroModel.userData && typeof u.heroModel.userData.update === 'function') {
-      const isWalking = (u.walkProgress !== undefined && u.walkProgress < 1);
-      u.heroModel.userData.update(t + (u.phase || 0), isWalking);
+    // Cape gentle sway
+    if (u.capeGroup) {
+      u.capeGroup.rotation.x = -0.14 + Math.sin(t * 3.2 + (u.phase || 0)) * 0.06;
+    }
+    // Feather plume flutter
+    if (u.plumeGroup) {
+      u.plumeGroup.rotation.z = Math.sin(t * 4.0 + (u.phase || 0)) * 0.08;
     }
     // Rotating magic team rune ring on plinth
     if (u.runeRing) {
@@ -3680,7 +3982,7 @@ function loop() {
     // Floating team gem rotation & pulse
     if (u.gem) {
       u.gem.rotation.y += dt * 1.6;
-      u.gem.position.y = 1.48 + Math.sin(t * 3.0 + (u.phase || 0)) * 0.03;
+      u.gem.position.y = 1.30 + Math.sin(t * 3.0 + (u.phase || 0)) * 0.03;
     }
   });
 
@@ -3832,24 +4134,29 @@ function loop() {
   }
 
   // Projected 3D Character Nameplates
-  const labelSig = players.map(p => p.id + ':' + p.name + ':' + p.points).join('|');
-  if (labelLayer && labelLayer.dataset.sig !== labelSig) {
-    labelLayer.dataset.sig = labelSig;
-    labelLayer.innerHTML = players.map(p => `<div class="character-tag">${p.name}<small>${p.points} XP</small></div>`).join('');
-  }
   if (labelLayer) {
-    anim.players.forEach((a, i) => {
-      const v = a.position.clone();
-      v.y += 1.35;
-      v.project(camera);
-      const tag = labelLayer.children[i];
-      if (tag) {
-        const vis = v.z < 1 && Math.abs(v.x) < 1.15 && Math.abs(v.y) < 1.15;
-        tag.style.display = vis ? 'block' : 'none';
-        tag.style.left = ((v.x * 0.5 + 0.5) * renderer.domElement.clientWidth) + 'px';
-        tag.style.top = ((-v.y * 0.5 + 0.5) * renderer.domElement.clientHeight) + 'px';
+    if (travel) {
+      labelLayer.style.display = 'none';
+    } else {
+      labelLayer.style.display = 'block';
+      const labelSig = players.map(p => p.id + ':' + p.name + ':' + p.points).join('|');
+      if (labelLayer.dataset.sig !== labelSig) {
+        labelLayer.dataset.sig = labelSig;
+        labelLayer.innerHTML = players.map(p => `<div class="character-tag">${p.name}<small>${p.points} XP</small></div>`).join('');
       }
-    });
+      anim.players.forEach((a, i) => {
+        const v = a.position.clone();
+        v.y += 1.35;
+        v.project(camera);
+        const tag = labelLayer.children[i];
+        if (tag) {
+          const vis = v.z < 1 && Math.abs(v.x) < 1.15 && Math.abs(v.y) < 1.15;
+          tag.style.display = vis ? 'block' : 'none';
+          tag.style.left = ((v.x * 0.5 + 0.5) * renderer.domElement.clientWidth) + 'px';
+          tag.style.top = ((-v.y * 0.5 + 0.5) * renderer.domElement.clientHeight) + 'px';
+        }
+      });
+    }
   }
 
   // Update directional sun shadow camera to follow active focus area with cinematic angle

@@ -1687,6 +1687,28 @@ dialog button.primary.wide:hover {
   box-shadow: 0 4px 22px rgba(204, 9, 47, 0.4), inset 3px 0 0 #ff3b64 !important;
 }
 
+.media-playlist-item.locked {
+  opacity: 0.42 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.65);
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.media-playlist-item.locked:hover {
+  transform: none !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.media-playlist-item.completed:not(.active) {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+
+.media-playlist-item.completed .media-playlist-status-icon {
+  color: #10b981 !important;
+}
+
 .eval-playlist-badge {
   font-family: var(--body);
   font-size: 0.72rem;
@@ -1710,6 +1732,169 @@ dialog button.primary.wide:hover {
   background: #10b981 !important;
   color: #ffffff !important;
   border-color: #059669 !important;
+}
+
+.eval-playlist-badge.locked {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ── Círculo / Botón Elegante de Completitud en la Playlist ─────────────── */
+.capsule-check-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  outline: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 3;
+  flex-shrink: 0;
+}
+
+.capsule-check-btn:hover {
+  transform: scale(1.18);
+}
+
+.capsule-check-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.capsule-check-btn:hover .capsule-check-circle {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+}
+
+.capsule-check-circle.done {
+  border-color: #10b981 !important;
+  background: #10b981 !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.55);
+}
+
+.media-playlist-item.locked .capsule-check-btn {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* ── Pantalla de Celebración y Finalización de Misión ───────────────────── */
+.stage-celebration-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 28px 20px;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  gap: 16px;
+}
+
+.stage-celebration-trophy {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd700 0%, #d69c39 100%);
+  display: grid;
+  place-items: center;
+  color: #1a0f00;
+  font-size: 2.2rem;
+  font-weight: 800;
+  box-shadow: 0 0 35px rgba(255, 215, 0, 0.55), 0 0 70px rgba(214, 156, 57, 0.3);
+  animation: pulseGlow 2.5s infinite alternate;
+}
+
+.stage-celebration-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.stage-celebration-desc {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 520px;
+}
+
+.stage-celebration-next-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 215, 0, 0.35);
+  border-radius: 16px;
+  box-sizing: border-box;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stage-celebration-next-tag {
+  font-size: 0.70rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffd780;
+}
+
+.stage-celebration-next-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.stage-celebration-next-region {
+  font-size: 0.80rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.stage-celebration-travel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 480px;
+  padding: 15px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 1.5px solid #34d399;
+  border-radius: 14px;
+  color: #ffffff;
+  font-family: var(--body);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.45);
+}
+
+.stage-celebration-travel-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.65);
 }
 
 /* ── Contenedor de Evaluación dentro de la Pantalla Principal (Stage) ───── */

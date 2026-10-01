@@ -4005,39 +4005,140 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
   root.name = `Player_${player.name}`;
 
   const teamColor = new THREE.Color(player.color || '#cc092f');
-  const avatarId = player.avatarId || (AVATAR_PRESETS[Math.abs(index) % AVATAR_PRESETS.length]?.id || 'ranger');
 
   // 1. Ornate Stone Plinth Base with Glowing Team Rune Ring
-  const plinthMat = new THREE.MeshStandardMaterial({ color: 0x3d444f, roughness: 0.90 });
+  const plinthMat = new THREE.MeshStandardMaterial({ color: 0x7a7469, roughness: 0.90 });
   const ringMat = new THREE.MeshStandardMaterial({ color: teamColor, emissive: teamColor, emissiveIntensity: 2.8, roughness: 0.25 });
 
-  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.35, 0.05, 16), plinthMat);
+  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.05, 16), plinthMat);
   plinth.position.y = 0.025;
   plinth.receiveShadow = true;
   root.add(plinth);
 
-  const runeRing = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.015, 8, 24), ringMat);
+  const runeRing = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.014, 8, 20), ringMat);
   runeRing.rotation.x = Math.PI / 2;
   runeRing.position.y = 0.052;
   root.add(runeRing);
 
-  // 2. Full 3D Smooth Stylized Adventurer Character Model
-  const heroModel = createHeroModel(avatarId, player.color || '#cc092f');
-  heroModel.position.y = 0.05;
-  root.add(heroModel);
+  // 2. Stylized Organic Hero Character (Scale 55% for harmonious human proportions)
+  const heroGroup = new THREE.Group();
+  heroGroup.position.y = 0.05;
+  heroGroup.scale.set(0.55, 0.55, 0.55);
+  root.add(heroGroup);
 
-  // 3. Overhead Floating Team Crystal
+  const clothMat = new THREE.MeshStandardMaterial({ color: teamColor, roughness: 0.72, metalness: 0.06 });
+  const darkClothMat = new THREE.MeshStandardMaterial({ color: 0x242832, roughness: 0.82 });
+  const skinMat = new THREE.MeshStandardMaterial({ color: 0xf5c6a5, roughness: 0.85 });
+  const leatherMat = new THREE.MeshStandardMaterial({ color: 0x4e321e, roughness: 0.90 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f, roughness: 0.32, metalness: 0.80 });
+  const eyeMat = new THREE.MeshBasicMaterial({ color: 0x181c24 });
+  const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+  // Body Group (Bobbing / Breathing)
+  const bodyBob = new THREE.Group();
+  bodyBob.position.y = 0.88;
+  heroGroup.add(bodyBob);
+
+  // Smooth Organic Capsule Torso
+  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.25, 0.44, 8, 16), clothMat);
+  torso.castShadow = true;
+  bodyBob.add(torso);
+
+  // Leather Belt with Gold Buckle
+  const belt = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.038, 8, 24), leatherMat);
+  belt.rotation.x = Math.PI / 2;
+  belt.position.y = -0.06;
+  bodyBob.add(belt);
+
+  const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.05), goldMat);
+  buckle.position.set(0, -0.06, 0.26);
+  bodyBob.add(buckle);
+
+  // Flowing Curved Cape Behind
+  const capeGroup = new THREE.Group();
+  capeGroup.position.set(0, 0.22, -0.16);
+  const cape = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.40, 0.82, 10, 1, true, -Math.PI * 0.45, Math.PI * 0.90), clothMat);
+  cape.position.set(0, -0.38, 0.02);
+  cape.rotation.x = -0.14;
+  capeGroup.add(cape);
+  bodyBob.add(capeGroup);
+
+  // Head & Adventurer Cowl
+  const headGroup = new THREE.Group();
+  headGroup.position.y = 0.52;
+  bodyBob.add(headGroup);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.23, 18, 16), skinMat);
+  head.castShadow = true;
+  headGroup.add(head);
+
+  // Stylized Expressive Eyes
+  [-0.072, 0.072].forEach(eyeX => {
+    const eye = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.015, 8), eyeMat);
+    eye.rotation.x = Math.PI / 2;
+    eye.position.set(eyeX, 0.02, 0.21);
+    headGroup.add(eye);
+
+    const glint = new THREE.Mesh(new THREE.SphereGeometry(0.010, 6, 6), eyeWhiteMat);
+    glint.position.set(eyeX + 0.009, 0.030, 0.22);
+    headGroup.add(glint);
+  });
+
+  // Cowl Hood & Feather Plume
+  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.65), darkClothMat);
+  hood.position.y = 0.04;
+  headGroup.add(hood);
+
+  const circlet = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.018, 8, 20), goldMat);
+  circlet.rotation.x = Math.PI / 2;
+  circlet.position.y = 0.08;
+  headGroup.add(circlet);
+
+  const plumeGroup = new THREE.Group();
+  plumeGroup.position.set(0, 0.24, -0.04);
+  const plume = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.34, 7), clothMat);
+  plume.position.set(0, 0.14, -0.07);
+  plume.rotation.x = -0.42;
+  plumeGroup.add(plume);
+  headGroup.add(plumeGroup);
+
+  // Smooth Rounded Capsule Arms
+  const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, 0.30, 6, 12), clothMat);
+  leftArm.position.set(-0.33, 0.02, 0.04);
+  leftArm.rotation.z = 0.22;
+  leftArm.rotation.x = -0.15;
+  bodyBob.add(leftArm);
+
+  const rightArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, 0.30, 6, 12), clothMat);
+  rightArm.position.set(0.33, 0.02, 0.04);
+  rightArm.rotation.z = -0.22;
+  rightArm.rotation.x = -0.15;
+  bodyBob.add(rightArm);
+
+  // Smooth Rounded Capsule Legs & Traveler Boots
+  [-0.13, 0.13].forEach(sideX => {
+    const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.28, 6, 12), darkClothMat);
+    leg.position.set(sideX, 0.36, 0);
+    heroGroup.add(leg);
+
+    const boot = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.16, 6, 12), leatherMat);
+    boot.rotation.x = Math.PI / 2;
+    boot.position.set(sideX, 0.12, 0.06);
+    heroGroup.add(boot);
+  });
+
+  // 3. Overhead Floating Team Crystal / Badge in Team Color
   const gemMat = new THREE.MeshStandardMaterial({
     color: teamColor,
     emissive: teamColor,
-    emissiveIntensity: 2.4,
+    emissiveIntensity: 2.2,
     roughness: 0.2
   });
   const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.08, 0), gemMat);
-  gem.position.y = 1.45;
+  gem.position.y = 1.30;
   root.add(gem);
 
-  // 4. Station Placement Slot Calculation (100% Collision-Free Front Plaza Arc)
+  // 4. Station Courtyard Slot Placement (Proportional & 100% Collision-Free Matrix)
   function calcStationSlot(m, idx) {
     const totalInGroup = Math.max(1, (player.totalInStation || 4));
     const isCastle = m.type === 'castle';
@@ -4046,12 +4147,10 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
     const row = Math.floor(idx / maxPerRow);
     const col = idx % maxPerRow;
     const inThisRow = row === 0 ? Math.min(totalInGroup, maxPerRow) : Math.max(1, totalInGroup - maxPerRow);
-    const spacingX = 1.35;
+    const spacingX = isCastle ? 1.35 : 0.95;
     const offsetX = (col - (inThisRow - 1) / 2) * spacingX;
-
-    // Guaranteed clearance from all buildings, campfires, tables and props
-    const baseZ = isCastle ? 5.2 : (isCamp ? 4.8 : 3.8);
-    const offsetZ = baseZ + row * 1.30 + Math.abs(offsetX) * 0.18; // gentle welcoming arc!
+    const baseZ = isCastle ? 4.0 : (isCamp ? 3.4 : 2.5);
+    const offsetZ = baseZ + row * (isCastle ? 1.3 : 1.05);
 
     const posX = m.x + offsetX;
     const posZ = m.z + offsetZ;
@@ -4073,10 +4172,12 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
 
   root.userData = {
     player,
-    heroModel,
+    phase: Math.random() * 6,
+    bodyBob,
+    capeGroup,
+    plumeGroup,
     runeRing,
     gem,
-    phase: Math.random() * 6,
     endPos: slot.pos.clone(),
     endRot: slot.rotY,
     walkProgress: 1
