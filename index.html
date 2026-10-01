@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=169.0.0">
+  <link rel="stylesheet" href="styles.css?v=170.0.0">
   <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
 <body>
   <!-- Pantalla de Bienvenida y Carga Oficial Bradesco México -->
@@ -65,28 +65,6 @@
           <div class="mission-nav-bar" id="standardMissionNav">
             <button id="cardBackBtn" class="nav-arrow-btn" type="button">◀ Anterior</button>
             <button id="cardNextBtn" class="nav-arrow-btn primary" type="button">Avanzar Misión ▶</button>
-          </div>
-
-          <!-- Centro de Desafíos y Evaluaciones de la Misión (2 Evaluaciones por Estación) -->
-          <div id="stationEvaluationsContainer" class="station-evaluations-box" style="display:none;">
-            <span class="eyebrow" style="color:var(--teal);margin-bottom:6px;display:block">Desafíos y Evaluaciones de Sala</span>
-            <div class="eval-buttons-grid">
-              <button id="startMidEvalBtn" type="button" class="eval-trigger-btn" onclick="window.launchStationEvaluation('mid')">
-                <div class="eval-btn-info">
-                  <span class="eval-btn-label">1. Mitad de Misión</span>
-                  <span class="eval-btn-title" id="midEvalBtnTitle">Evaluación Intermedia</span>
-                </div>
-                <span class="eval-badge" id="midEvalBadge">+50 XP</span>
-              </button>
-
-              <button id="startFinalEvalBtn" type="button" class="eval-trigger-btn final" onclick="window.launchStationEvaluation('final')">
-                <div class="eval-btn-info">
-                  <span class="eval-btn-label">2. Cierre de Misión</span>
-                  <span class="eval-btn-title" id="finalEvalBtnTitle">Reto Final</span>
-                </div>
-                <span class="eval-badge final" id="finalEvalBadge">+75 XP</span>
-              </button>
-            </div>
           </div>
 
           <div id="lobbyCtaContainer" style="display:none;margin-top:.85rem">
@@ -289,24 +267,9 @@
           </span>
           <div class="media-bubble-text-group">
             <span class="media-bubble-tag" id="mapMediaStationTag">MISIÓN 01 · CÁPSULAS</span>
-            <span class="media-bubble-title" id="mapMediaBubbleTitle">Ver Video y Material ▶</span>
+            <span class="media-bubble-title" id="mapMediaBubbleTitle">Ver Cápsulas y Evaluación ▶</span>
           </div>
           <span class="media-bubble-count" id="mapMediaCountBadge">4</span>
-        </button>
-      </div>
-
-      <!-- Botón Flotante DENTRO DEL MAPA 3D para Lanzar Evaluaciones de Sala -->
-      <div id="mapStationEvalTrigger" class="map-station-eval-trigger" style="display:none;">
-        <button id="mapOpenEvalBtn" type="button" class="map-eval-bubble-btn" onclick="window.openNextStationEvaluation()" title="Lanzar desafío o evaluación de la estación">
-          <div class="eval-bubble-glow-ring"></div>
-          <span class="eval-bubble-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
-          </span>
-          <div class="media-bubble-text-group">
-            <span class="media-bubble-tag" id="mapEvalStationTag" style="color:#ffd780">MISIÓN 01 · RETO</span>
-            <span class="media-bubble-title" id="mapEvalBubbleTitle">Iniciar Evaluación 🎯</span>
-          </div>
-          <span class="media-bubble-count" id="mapEvalXpBadge" style="background:#d69c39">+50 XP</span>
         </button>
       </div>
 
@@ -618,104 +581,6 @@
     </div>
   </dialog>
 
-  <!-- Modal de Evaluaciones Interactivas y Desafíos de Sala (Gamificación Facilitada) -->
-  <dialog id="evaluationDialog" class="evaluation-dialog cyber-codex">
-    <div class="eval-glow-ambient"></div>
-    <div class="eval-modal-header">
-      <div class="eval-header-title-group">
-        <div class="eval-header-top-row">
-          <span class="eval-live-dot"></span>
-          <span class="eyebrow" id="evalModalStationEyebrow">MISIÓN 01 · EVALUACIÓN INTERMEDIA</span>
-        </div>
-        <h2 class="display" id="evalModalTitle">Desafío de Conocimiento</h2>
-      </div>
-      <div class="eval-header-right">
-        <span class="eval-xp-chip" id="evalModalXpBadge">+50 XP</span>
-        <button id="closeEvalDialogBtn" class="close-cyber-btn" type="button" onclick="window.closeStationEvaluation()" title="Cerrar evaluación">✕</button>
-      </div>
-    </div>
-
-    <div class="eval-modal-body">
-      <!-- PASO 1: PREGUNTA Y OPCIONES PARA EL DEBATE EN SALA -->
-      <div id="evalQuestionStep" class="eval-step-panel active">
-        <div class="eval-question-box">
-          <span class="eval-step-tag">Pregunta de Misión</span>
-          <h3 id="evalQuestionText" class="eval-question-title">¿Cuál es la acción requerida al recibir tu equipo?</h3>
-        </div>
-
-        <div id="evalOptionsGrid" class="eval-options-grid">
-          <!-- Opciones A, B, C, D inyectadas dinámicamente -->
-        </div>
-
-        <div class="eval-facilitator-bar">
-          <span class="eval-facilitator-hint">💡 El guía escucha las opciones de la sala y selecciona la respuesta dada por los participantes.</span>
-          <button id="evalNobodyAnsweredBtn" type="button" class="eval-nobody-btn" onclick="window.handleEvalOptionSelect('NONE')">
-            <span>Nadie acertó en la sala (Revelar solución)</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- PASO 2: REVELACIÓN Y RETROALIMENTACIÓN EDUCATIVA -->
-      <div id="evalFeedbackStep" class="eval-step-panel" style="display:none;">
-        <div id="evalResultBanner" class="eval-result-banner correct">
-          <span id="evalResultIcon" class="eval-result-icon">✓</span>
-          <div class="eval-result-text-group">
-            <h4 id="evalResultHeadline">¡Respuesta Correcta!</h4>
-            <p id="evalResultSubline">Excelente aporte de la sala.</p>
-          </div>
-        </div>
-
-        <div class="eval-feedback-card">
-          <span class="eyebrow" style="color:var(--teal)">Respuesta Correcta Oficial</span>
-          <div id="evalCorrectAnswerDisplay" class="eval-correct-answer-text"></div>
-        </div>
-
-        <div class="eval-explanation-box">
-          <span class="eyebrow" style="color:#ffd780">Explicación y Concepto Clave</span>
-          <p id="evalExplanationDisplay" class="eval-explanation-text"></p>
-        </div>
-
-        <div class="eval-feedback-actions">
-          <button id="evalProceedToAwardBtn" type="button" class="primary wide" onclick="window.proceedToEvalAwardStep()" style="font-size:1rem;padding:14px">
-            <span>Continuar a Asignación de XP ▶</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- PASO 3: ASIGNACIÓN DE XP A PARTICIPANTES -->
-      <div id="evalAwardStep" class="eval-step-panel" style="display:none;">
-        <div class="eval-award-header">
-          <div>
-            <h3 class="display" style="font-size:1.35rem;margin:0 0 4px">Asignación de Puntos (XP)</h3>
-            <p style="margin:0;color:rgba(255,255,255,0.75);font-size:0.85rem">Selecciona a quién o quiénes respondieron correctamente en la sala:</p>
-          </div>
-          <div class="eval-xp-control">
-            <label style="color:var(--teal);font-size:0.75rem;font-weight:700">Puntos a Otorgar
-              <input id="evalAwardXpInput" type="number" value="50" min="5" step="5" style="width:80px;text-align:center;font-weight:800;color:#ffd780;background:rgba(0,0,0,0.5);border:1.5px solid var(--teal);border-radius:8px;padding:6px">
-            </label>
-          </div>
-        </div>
-
-        <div class="eval-award-quick-actions">
-          <button type="button" class="eval-quick-btn" onclick="window.toggleAllEvalPlayers(true)">✓ Seleccionar Todos</button>
-          <button type="button" class="eval-quick-btn" onclick="window.toggleAllEvalPlayers(false)">✕ Desmarcar Todos</button>
-          <span id="evalSelectedCountText" style="margin-left:auto;font-size:0.8rem;color:#ffd780;font-weight:700">0 participantes seleccionados</span>
-        </div>
-
-        <div id="evalAwardPlayersGrid" class="eval-award-players-grid">
-          <!-- Roster of players with toggle checkboxes -->
-        </div>
-
-        <div class="eval-award-footer">
-          <button type="button" class="eval-skip-btn" onclick="window.closeStationEvaluation()">Omitir (No sumar puntos)</button>
-          <button id="evalConfirmAwardBtn" type="button" class="primary" onclick="window.confirmAwardXp()" style="padding:12px 24px;font-size:0.95rem;font-weight:700">
-            <span>✨ Otorgar XP a Seleccionados</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </dialog>
-
   <!-- Modal de Selección de Personaje Directo -->
   <dialog id="heroSelectionModal" class="hero-modal-dialog">
     <div class="hero-modal-container">
@@ -752,7 +617,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="main.js?v=169.0.0"></script>
+  <script type="module" src="main.js?v=170.0.0"></script>
 </body>
 </html>
 

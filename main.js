@@ -1560,108 +1560,22 @@ syncStationMediaFromAPI();
 function updateStationMediaTrigger() {
   const mapMediaTrigger = document.getElementById('mapStationMediaTrigger');
   if (!mapMediaTrigger) return;
-  // If camera is currently in flight / travel, keep hidden until landing
-  if (travel) {
+  // If camera is currently in flight / travel or in base camp, keep hidden
+  if (travel || current === 0) {
     mapMediaTrigger.style.display = 'none';
     return;
   }
-  const stationMediaItems = (STATION_MEDIA && STATION_MEDIA[current]) ? STATION_MEDIA[current] : [];
-  if (stationMediaItems.length > 0) {
-    mapMediaTrigger.style.display = 'block';
-    const badge = document.getElementById('mapMediaCountBadge');
-    if (badge) badge.textContent = stationMediaItems.length;
-    const tag = document.getElementById('mapMediaStationTag');
-    if (tag) tag.textContent = `MISIÓN ${String(current).padStart(2, '0')} · CÁPSULAS`;
-  } else {
-    mapMediaTrigger.style.display = 'none';
-  }
-}
-
-function updateStationEvaluationsUI() {
-  const container = document.getElementById('stationEvaluationsContainer');
-  const mapEvalTrigger = document.getElementById('mapStationEvalTrigger');
-
-  if (current === 0) {
-    if (container) container.style.display = 'none';
-    if (mapEvalTrigger) mapEvalTrigger.style.display = 'none';
-    return;
-  }
-
-  // Update Sidebar Buttons
-  if (container) {
-    container.style.display = 'block';
-    const stationEvals = evaluations[current] || DEFAULT_EVALUATIONS[current] || DEFAULT_EVALUATIONS[1];
-    const midDone = !!evaluationsStatus[`${current}_mid`];
-    const finalDone = !!evaluationsStatus[`${current}_final`];
-
-    const midBtnTitle = document.getElementById('midEvalBtnTitle');
-    const midBadge = document.getElementById('midEvalBadge');
-    const startMidBtn = document.getElementById('startMidEvalBtn');
-
-    if (midBtnTitle) midBtnTitle.textContent = stationEvals?.mid?.title || 'Evaluación Intermedia';
-    if (midBadge) {
-      midBadge.textContent = midDone ? '✓ Completada' : `+${stationEvals?.mid?.xp || 50} XP`;
-      midBadge.className = `eval-badge ${midDone ? 'done' : ''}`;
-    }
-    if (startMidBtn) {
-      startMidBtn.classList.toggle('completed', midDone);
-    }
-
-    const finalBtnTitle = document.getElementById('finalEvalBtnTitle');
-    const finalBadge = document.getElementById('finalEvalBadge');
-    const startFinalBtn = document.getElementById('startFinalEvalBtn');
-
-    if (finalBtnTitle) finalBtnTitle.textContent = stationEvals?.final?.title || 'Reto Final de Misión';
-    if (finalBadge) {
-      finalBadge.textContent = finalDone ? '✓ Completada' : `+${stationEvals?.final?.xp || 75} XP`;
-      finalBadge.className = `eval-badge final ${finalDone ? 'done' : ''}`;
-    }
-    if (startFinalBtn) {
-      startFinalBtn.classList.toggle('completed', finalDone);
-    }
-  }
-
-  // Update In-Map Floating Trigger
-  if (mapEvalTrigger) {
-    if (travel) {
-      mapEvalTrigger.style.display = 'none';
-    } else {
-      mapEvalTrigger.style.display = 'block';
-      const midDone = !!evaluationsStatus[`${current}_mid`];
-      const finalDone = !!evaluationsStatus[`${current}_final`];
-      const stationEvals = evaluations[current] || DEFAULT_EVALUATIONS[current] || DEFAULT_EVALUATIONS[1];
-
-      const tag = document.getElementById('mapEvalStationTag');
-      const title = document.getElementById('mapEvalBubbleTitle');
-      const xpBadge = document.getElementById('mapEvalXpBadge');
-
-      if (tag) tag.textContent = `MISIÓN ${String(current).padStart(2, '0')} · EVALUACIÓN`;
-      if (!midDone) {
-        if (title) title.textContent = '1. Evaluación Intermedia 🎯';
-        if (xpBadge) {
-          xpBadge.textContent = `+${stationEvals?.mid?.xp || 50} XP`;
-          xpBadge.style.background = '#d69c39';
-        }
-      } else if (!finalDone) {
-        if (title) title.textContent = '2. Reto Final de Cierre 🏆';
-        if (xpBadge) {
-          xpBadge.textContent = `+${stationEvals?.final?.xp || 75} XP`;
-          xpBadge.style.background = '#CC092F';
-        }
-      } else {
-        if (title) title.textContent = 'Evaluaciones Completadas ✓';
-        if (xpBadge) {
-          xpBadge.textContent = 'Completada';
-          xpBadge.style.background = '#10b981';
-        }
-      }
-    }
-  }
+  const stationMediaItems = (STATION_MEDIA && STATION_MEDIA[current]) ? STATION_MEDIA[current] : (DEFAULT_STATION_MEDIA[current] || []);
+  const totalCapsules = stationMediaItems.length + 2; // Media items + 2 integrated evaluations
+  mapMediaTrigger.style.display = 'block';
+  const badge = document.getElementById('mapMediaCountBadge');
+  if (badge) badge.textContent = totalCapsules;
+  const tag = document.getElementById('mapMediaStationTag');
+  if (tag) tag.textContent = `MISIÓN ${String(current).padStart(2, '0')} · CÁPSULAS`;
 }
 
 function applyStates() {
   renderUI();
-  updateStationEvaluationsUI();
 }
 
 function renderUI() {
@@ -1712,9 +1626,8 @@ function renderUI() {
   const regEl = document.getElementById('skyMissionRegion');
   if (regEl) regEl.textContent = q.region;
 
-  // Update In-Map Media Hub Trigger and Evaluation Trigger visibility
+  // Update In-Map Media Hub Trigger visibility
   updateStationMediaTrigger();
-  updateStationEvaluationsUI();
 
   // Navigation button states
   updateNavButtons();
@@ -2982,7 +2895,7 @@ const mediaHubItemsList = document.getElementById('mediaHubItemsList');
 
 let activeStationMediaItem = null;
 
-function renderMediaStageItem(item) {
+function renderMediaStageItem(item, stationId, itemIndex, playlist) {
   if (!mediaStageScreen || !item) return;
   activeStationMediaItem = item;
 
@@ -2994,6 +2907,11 @@ function renderMediaStageItem(item) {
     prevVid.load();
   }
   mediaStageScreen.innerHTML = '';
+
+  if (item.isEval) {
+    renderStageEvaluation(item, stationId, itemIndex, playlist);
+    return;
+  }
 
   const encodedUrl = encodeURI(item.file);
 
@@ -3054,8 +2972,8 @@ function renderMediaStageItem(item) {
 
 async function openStationMediaHub(stationId) {
   const sId = Number(stationId) || current || 1;
-  const items = (STATION_MEDIA && STATION_MEDIA[sId]) ? STATION_MEDIA[sId] : (DEFAULT_STATION_MEDIA[sId] || DEFAULT_STATION_MEDIA[1] || []);
-  if (!items.length) return;
+  const rawItems = (STATION_MEDIA && STATION_MEDIA[sId]) ? STATION_MEDIA[sId] : (DEFAULT_STATION_MEDIA[sId] || DEFAULT_STATION_MEDIA[1] || []);
+  const stationEvals = evaluations[sId] || DEFAULT_EVALUATIONS[sId] || DEFAULT_EVALUATIONS[1] || {};
   const q = getMission(sId);
 
   const eyebrowEl = document.getElementById('mediaHubStationEyebrow');
@@ -3064,60 +2982,147 @@ async function openStationMediaHub(stationId) {
 
   if (eyebrowEl) eyebrowEl.textContent = `MISIÓN ${String(sId).padStart(2, '0')} · ${q ? q.region.toUpperCase() : ''}`;
   if (titleEl) titleEl.textContent = q ? `Cápsulas: ${q.name}` : 'Centro de Aprendizaje';
-  if (countBadge) countBadge.textContent = `${items.length} ${items.length === 1 ? 'cápsula' : 'cápsulas'}`;
+
+  const sortedRaw = [...rawItems].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  // Build interleaved playlist with mid & final evaluations
+  const evalMid = stationEvals.mid || DEFAULT_EVALUATIONS[sId]?.mid || { title: 'Evaluación Intermedia', xp: 50 };
+  const evalFinal = stationEvals.final || DEFAULT_EVALUATIONS[sId]?.final || { title: 'Reto Final de Cierre', xp: 75 };
+
+  const playlist = [];
+  if (sortedRaw.length >= 2) {
+    playlist.push(sortedRaw[0], sortedRaw[1]);
+    playlist.push({
+      isEval: true,
+      evalType: 'mid',
+      evalData: evalMid,
+      title: evalMid.title,
+      xp: evalMid.xp || 50
+    });
+    for (let i = 2; i < sortedRaw.length; i++) {
+      playlist.push(sortedRaw[i]);
+    }
+    playlist.push({
+      isEval: true,
+      evalType: 'final',
+      evalData: evalFinal,
+      title: evalFinal.title,
+      xp: evalFinal.xp || 75
+    });
+  } else if (sortedRaw.length === 1) {
+    playlist.push(sortedRaw[0]);
+    playlist.push({
+      isEval: true,
+      evalType: 'mid',
+      evalData: evalMid,
+      title: evalMid.title,
+      xp: evalMid.xp || 50
+    });
+    playlist.push({
+      isEval: true,
+      evalType: 'final',
+      evalData: evalFinal,
+      title: evalFinal.title,
+      xp: evalFinal.xp || 75
+    });
+  } else {
+    playlist.push({
+      isEval: true,
+      evalType: 'mid',
+      evalData: evalMid,
+      title: evalMid.title,
+      xp: evalMid.xp || 50
+    });
+    playlist.push({
+      isEval: true,
+      evalType: 'final',
+      evalData: evalFinal,
+      title: evalFinal.title,
+      xp: evalFinal.xp || 75
+    });
+  }
+
+  if (countBadge) countBadge.textContent = `${playlist.length} ${playlist.length === 1 ? 'cápsula' : 'cápsulas'}`;
 
   if (mediaHubItemsList) {
     mediaHubItemsList.innerHTML = '';
-    const sorted = [...items].sort((a, b) => a.order - b.order);
-    sorted.forEach((item, idx) => {
+    playlist.forEach((item, idx) => {
+      const orderNum = idx + 1;
+      const numStr = String(orderNum).padStart(2, '0');
       const card = document.createElement('div');
-      card.className = `media-playlist-item ${idx === 0 ? 'active' : ''}`;
-      let iconSvg = '';
-      let typeLabel = 'Cápsula de Video';
 
-      if (item.type === 'video') {
-        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="16" rx="3"></rect><path d="m16 9 6-4v14l-6-4"></path></svg>`;
-        typeLabel = 'Cápsula de Video';
-      } else if (item.type === 'image') {
-        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
-        typeLabel = 'Infografía';
-      } else if (item.type === 'pdf') {
-        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
-        typeLabel = 'Documento PDF';
+      if (item.isEval) {
+        const isMid = item.evalType === 'mid';
+        const isDone = !!evaluationsStatus[`${sId}_${item.evalType}`];
+        card.className = `media-playlist-item eval-item ${isMid ? 'mid' : 'final'} ${idx === 0 ? 'active' : ''}`;
+
+        const evalSvg = isMid
+          ? `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="m9 15 2 2 4-4"></path></svg>`
+          : `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`;
+
+        const typeLabel = isMid ? 'Evaluación Intermedia' : 'Reto Final de Cierre';
+        const cleanTitle = (item.title || '').replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+
+        card.innerHTML = `
+          <div class="media-item-icon-wrapper" title="${typeLabel}">
+            ${evalSvg}
+            <span class="media-item-order-badge">${numStr}</span>
+          </div>
+          <div class="media-playlist-info">
+            <span class="media-playlist-title">${cleanTitle}</span>
+            <span class="media-playlist-subtitle">${typeLabel}</span>
+          </div>
+          <span class="eval-playlist-badge ${isMid ? '' : 'final'} ${isDone ? 'done' : ''}">
+            ${isDone ? '✓ Completada' : `+${item.xp} XP`}
+          </span>
+        `;
       } else {
-        iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>`;
-        typeLabel = 'Material de Apoyo';
+        card.className = `media-playlist-item ${idx === 0 ? 'active' : ''}`;
+        let iconSvg = '';
+        let typeLabel = 'Cápsula de Video';
+
+        if (item.type === 'video') {
+          iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="16" rx="3"></rect><path d="m16 9 6-4v14l-6-4"></path></svg>`;
+          typeLabel = 'Cápsula de Video';
+        } else if (item.type === 'image') {
+          iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
+          typeLabel = 'Infografía';
+        } else if (item.type === 'pdf') {
+          iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
+          typeLabel = 'Documento PDF';
+        } else {
+          iconSvg = `<svg class="media-type-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>`;
+          typeLabel = 'Material de Apoyo';
+        }
+
+        const cleanTitle = (item.title || '').replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+
+        card.innerHTML = `
+          <div class="media-item-icon-wrapper" title="${typeLabel}">
+            ${iconSvg}
+            <span class="media-item-order-badge">${numStr}</span>
+          </div>
+          <div class="media-playlist-info">
+            <span class="media-playlist-title">${cleanTitle}</span>
+            <span class="media-playlist-subtitle">${typeLabel}</span>
+          </div>
+          <span class="media-playlist-status-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+          </span>
+        `;
       }
-
-      // Clean title without any emojis
-      const cleanTitle = (item.title || '').replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
-      const numStr = String(item.order).padStart(2, '0');
-
-      card.innerHTML = `
-        <div class="media-item-icon-wrapper" title="${typeLabel}">
-          ${iconSvg}
-          <span class="media-item-order-badge">${numStr}</span>
-        </div>
-        <div class="media-playlist-info">
-          <span class="media-playlist-title">${cleanTitle}</span>
-          <span class="media-playlist-subtitle">${typeLabel}</span>
-        </div>
-        <span class="media-playlist-status-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-        </span>
-      `;
 
       card.onclick = () => {
         mediaHubItemsList.querySelectorAll('.media-playlist-item').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
-        renderMediaStageItem(item);
+        renderMediaStageItem(item, sId, idx, playlist);
       };
 
       mediaHubItemsList.appendChild(card);
     });
 
-    // Auto-select and immediately render/play first item (01)
-    renderMediaStageItem(sorted[0]);
+    // Auto-select and immediately render/play first item
+    renderMediaStageItem(playlist[0], sId, 0, playlist);
   }
 
   mediaHubDialog?.showModal();
@@ -3157,157 +3162,207 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// ── Sistema de Evaluaciones Interactivas y Desafíos de Sala (Gamificación Facilitada) ──
+// ── Sistema de Evaluaciones Integradas en Cápsulas (Gamificación Facilitada) ──
 let activeEvalContext = {
   stationId: 1,
   type: 'mid', // 'mid' or 'final'
   evalData: null,
   selectedOption: null,
-  selectedPlayers: new Set()
+  selectedPlayers: new Set(),
+  itemIndex: 0,
+  playlist: []
 };
 
-const evaluationDialog = document.getElementById('evaluationDialog');
+function renderStageEvaluation(item, stationId, itemIndex, playlist) {
+  if (!mediaStageScreen || !item) return;
 
-window.launchStationEvaluation = function(type = 'mid', stationId = null) {
-  const sId = stationId !== null ? Number(stationId) : current;
-  if (sId === 0) return;
-
-  const stationEvals = evaluations[sId] || DEFAULT_EVALUATIONS[sId] || DEFAULT_EVALUATIONS[1];
-  const evalData = (type === 'final') ? stationEvals.final : stationEvals.mid;
+  const sId = Number(stationId) || current || 1;
+  const evalData = item.evalData || (evaluations[sId] ? evaluations[sId][item.evalType] : null) || (DEFAULT_EVALUATIONS[sId] ? DEFAULT_EVALUATIONS[sId][item.evalType] : null);
   if (!evalData) return;
 
-  const mission = getMission(sId);
   activeEvalContext = {
     stationId: sId,
-    type,
+    type: item.evalType,
     evalData,
     selectedOption: null,
-    selectedPlayers: new Set()
+    selectedPlayers: new Set(),
+    itemIndex: typeof itemIndex === 'number' ? itemIndex : 0,
+    playlist: playlist || []
   };
 
-  // Header
-  const eyebrow = document.getElementById('evalModalStationEyebrow');
-  const title = document.getElementById('evalModalTitle');
-  const xpBadge = document.getElementById('evalModalXpBadge');
+  const isMid = item.evalType === 'mid';
 
-  if (eyebrow) eyebrow.textContent = `MISIÓN ${String(sId).padStart(2, '0')} · ${type === 'mid' ? 'EVALUACIÓN INTERMEDIA' : 'RETO FINAL DE CIERRE'} · ${mission.region.toUpperCase()}`;
-  if (title) title.textContent = evalData.title;
-  if (xpBadge) xpBadge.textContent = `+${evalData.xp || 50} XP`;
+  mediaStageScreen.innerHTML = `
+    <div class="stage-eval-wrapper">
+      <!-- Step 1: Question -->
+      <div id="stageEvalQuestionStep" style="display:flex;flex-direction:column;gap:16px;height:100%">
+        <div class="stage-eval-header">
+          <span class="stage-eval-tag">${isMid ? 'EVALUACIÓN INTERMEDIA' : 'RETO FINAL DE CIERRE'} · MISIÓN ${String(sId).padStart(2, '0')}</span>
+          <span class="stage-eval-xp-chip">+${evalData.xp || 50} XP</span>
+        </div>
 
-  // Step 1: Render Question & Options
-  const qText = document.getElementById('evalQuestionText');
-  if (qText) qText.textContent = evalData.question;
+        <div class="stage-eval-question-box">
+          <h3 class="stage-eval-question-title">${evalData.question}</h3>
+        </div>
 
-  const optionsGrid = document.getElementById('evalOptionsGrid');
-  if (optionsGrid) {
-    optionsGrid.innerHTML = '';
-    (evalData.options || []).forEach(opt => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'eval-opt-card';
-      btn.innerHTML = `
-        <span class="eval-opt-letter">${opt.id}</span>
-        <span class="eval-opt-text">${opt.text}</span>
-      `;
-      btn.onclick = () => window.handleEvalOptionSelect(opt.id);
-      optionsGrid.appendChild(btn);
-    });
-  }
+        <div class="stage-eval-options-grid">
+          ${(evalData.options || []).map(opt => `
+            <button type="button" class="stage-eval-opt-card" onclick="window.handleStageEvalOptionSelect('${opt.id}')">
+              <span class="stage-eval-opt-letter">${opt.id}</span>
+              <span class="stage-eval-opt-text">${opt.text}</span>
+            </button>
+          `).join('')}
+        </div>
 
-  // Switch to Step 1
-  const qStep = document.getElementById('evalQuestionStep');
-  const fStep = document.getElementById('evalFeedbackStep');
-  const aStep = document.getElementById('evalAwardStep');
-  if (qStep) qStep.style.display = 'flex';
-  if (fStep) fStep.style.display = 'none';
-  if (aStep) aStep.style.display = 'none';
+        <div class="stage-eval-facilitator-bar">
+          <span class="stage-eval-facilitator-hint">Guía de sala: Escucha las respuestas de los participantes y selecciona la opción elegida.</span>
+          <button type="button" class="stage-eval-nobody-btn" onclick="window.handleStageEvalOptionSelect('NONE')">Nadie acertó en la sala</button>
+        </div>
+      </div>
 
-  evaluationDialog?.showModal();
-};
+      <!-- Step 2: Feedback & Reveal -->
+      <div id="stageEvalFeedbackStep" style="display:none;flex-direction:column;gap:16px;height:100%">
+        <div class="stage-eval-header">
+          <span class="stage-eval-tag">RETROALIMENTACIÓN DE SALA · MISIÓN ${String(sId).padStart(2, '0')}</span>
+          <span class="stage-eval-xp-chip">+${evalData.xp || 50} XP</span>
+        </div>
 
-window.openNextStationEvaluation = function() {
-  if (current === 0) return;
-  const midDone = !!evaluationsStatus[`${current}_mid`];
-  const finalDone = !!evaluationsStatus[`${current}_final`];
-  if (!midDone) {
-    window.launchStationEvaluation('mid', current);
-  } else if (!finalDone) {
-    window.launchStationEvaluation('final', current);
-  } else {
-    window.launchStationEvaluation('mid', current);
-  }
-};
+        <div id="stageEvalResultBanner" class="stage-eval-banner correct">
+          <div id="stageEvalResultIcon" class="stage-eval-banner-icon">✓</div>
+          <div class="stage-eval-banner-text">
+            <h4 id="stageEvalResultHeadline">¡Respuesta Correcta!</h4>
+            <p id="stageEvalResultSubline">Excelente participación de la sala. ¡Muy bien razonado!</p>
+          </div>
+        </div>
 
-window.closeStationEvaluation = function() {
-  evaluationDialog?.close();
-};
+        <div class="stage-eval-answer-box">
+          <span class="eyebrow" style="color:#5eead4">RESPUESTA OFICIAL</span>
+          <div id="stageEvalCorrectDisplay" class="stage-eval-answer-text"></div>
+        </div>
 
-window.handleEvalOptionSelect = function(selectedOptionId) {
+        <div class="stage-eval-explanation-box">
+          <span class="eyebrow" style="color:#ffd780">EXPLICACIÓN & CONTEXTO</span>
+          <p id="stageEvalExplanationDisplay" class="stage-eval-explanation-text"></p>
+        </div>
+
+        <button type="button" class="primary wide" style="margin-top:auto;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.proceedToStageEvalAwardStep()">
+          Continuar a Asignación de XP ▶
+        </button>
+      </div>
+
+      <!-- Step 3: XP Award to Players -->
+      <div id="stageEvalAwardStep" style="display:none;flex-direction:column;gap:16px;height:100%">
+        <div class="stage-eval-header">
+          <span class="stage-eval-tag">ASIGNAR PUNTOS DE EXPERIENCIA (XP)</span>
+          <span class="stage-eval-xp-chip">+${evalData.xp || 50} XP</span>
+        </div>
+
+        <div class="stage-eval-award-header">
+          <div>
+            <h4 style="margin:0;font-size:1.05rem;font-weight:700">Aventureros en Sala</h4>
+            <p style="margin:2px 0 0;font-size:0.78rem;color:rgba(255,255,255,0.65)">Selecciona quiénes recibirán los puntos por esta evaluación:</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="font-size:0.80rem;color:#ffd780;font-weight:700">XP:</label>
+            <input type="number" id="stageEvalAwardXpInput" value="${evalData.xp || 50}" min="0" max="500" style="width:75px;padding:6px 10px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.4);border-radius:8px;color:#ffffff;font-weight:800;text-align:center">
+          </div>
+        </div>
+
+        <div class="stage-eval-quick-actions">
+          <button type="button" class="eval-quick-btn" onclick="window.toggleAllStageEvalPlayers(true)">Seleccionar Todos</button>
+          <button type="button" class="eval-quick-btn" onclick="window.toggleAllStageEvalPlayers(false)">Deseleccionar Todos</button>
+          <span style="margin-left:auto;font-size:0.78rem;color:rgba(255,255,255,0.7);font-weight:600" id="stageEvalSelectedCountText">0 seleccionados</span>
+        </div>
+
+        <div class="stage-eval-players-grid" id="stageEvalAwardPlayersGrid">
+          <!-- Dynamic Player cards -->
+        </div>
+
+        <button type="button" class="primary wide" style="margin-top:auto;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;background:linear-gradient(135deg,#10b981,#059669);border-color:#34d399;cursor:pointer" onclick="window.confirmStageAwardXp()">
+          Otorgar XP a Seleccionados
+        </button>
+      </div>
+
+      <!-- Step 4: Complete & Next -->
+      <div id="stageEvalCompleteStep" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;height:100%;text-align:center;padding:24px">
+        <div style="width:64px;height:64px;border-radius:50%;background:#10b981;display:grid;place-items:center;color:#ffffff;font-size:2rem;font-weight:800;box-shadow:0 0 30px rgba(16,185,129,0.5)">
+          ✓
+        </div>
+        <div>
+          <h3 style="margin:0;font-size:1.4rem;font-weight:800;color:#ffffff">¡Evaluación Registrada con Éxito!</h3>
+          <p id="stageEvalCompleteSummary" style="margin:8px 0 0;font-size:0.92rem;color:rgba(255,255,255,0.8);max-width:480px">
+            Se han acreditado los puntos y actualizado la tabla de posiciones.
+          </p>
+        </div>
+        <button type="button" class="primary wide" style="max-width:320px;padding:14px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer" onclick="window.advanceToNextPlaylistStageItem()">
+          Continuar a la siguiente cápsula ▶
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+window.handleStageEvalOptionSelect = function(selectedOptionId) {
   const evalData = activeEvalContext.evalData;
   if (!evalData) return;
 
   activeEvalContext.selectedOption = selectedOptionId;
   const isCorrect = (selectedOptionId === evalData.correctOption);
 
-  // Update Result Banner
-  const banner = document.getElementById('evalResultBanner');
-  const icon = document.getElementById('evalResultIcon');
-  const headline = document.getElementById('evalResultHeadline');
-  const subline = document.getElementById('evalResultSubline');
+  const banner = document.getElementById('stageEvalResultBanner');
+  const icon = document.getElementById('stageEvalResultIcon');
+  const headline = document.getElementById('stageEvalResultHeadline');
+  const subline = document.getElementById('stageEvalResultSubline');
 
   if (banner && icon && headline && subline) {
     if (isCorrect) {
-      banner.className = 'eval-result-banner correct';
+      banner.className = 'stage-eval-banner correct';
       icon.textContent = '✓';
       headline.textContent = '¡Respuesta Correcta!';
       subline.textContent = 'Excelente participación de la sala. ¡Muy bien razonado!';
     } else {
-      banner.className = 'eval-result-banner miss';
+      banner.className = 'stage-eval-banner miss';
       icon.textContent = '✕';
       headline.textContent = selectedOptionId === 'NONE' ? 'Ningún participante acertó la respuesta' : 'Opción seleccionada no acertada';
-      subline.textContent = 'Veamos la respuesta correcta y la explicación oficial:';
+      subline.textContent = 'Veamos la respuesta oficial y la explicación correspondiente:';
     }
   }
 
-  // Correct answer text
   const correctOptObj = (evalData.options || []).find(o => o.id === evalData.correctOption);
-  const correctDisplay = document.getElementById('evalCorrectAnswerDisplay');
+  const correctDisplay = document.getElementById('stageEvalCorrectDisplay');
   if (correctDisplay) {
     correctDisplay.textContent = correctOptObj ? `Opción ${correctOptObj.id}: ${correctOptObj.text}` : 'Respuesta oficial';
   }
 
-  // Explanation text
-  const expDisplay = document.getElementById('evalExplanationDisplay');
+  const expDisplay = document.getElementById('stageEvalExplanationDisplay');
   if (expDisplay) {
     expDisplay.textContent = evalData.explanation || 'El entendimiento de este concepto es fundamental para la excelencia operativa.';
   }
 
-  // Pre-fill award XP input
-  const xpInput = document.getElementById('evalAwardXpInput');
+  const xpInput = document.getElementById('stageEvalAwardXpInput');
   if (xpInput) xpInput.value = evalData.xp || 50;
 
-  // Transition from Step 1 to Step 2
-  const qStep = document.getElementById('evalQuestionStep');
-  const fStep = document.getElementById('evalFeedbackStep');
-  const aStep = document.getElementById('evalAwardStep');
+  const qStep = document.getElementById('stageEvalQuestionStep');
+  const fStep = document.getElementById('stageEvalFeedbackStep');
+  const aStep = document.getElementById('stageEvalAwardStep');
   if (qStep) qStep.style.display = 'none';
   if (fStep) fStep.style.display = 'flex';
   if (aStep) aStep.style.display = 'none';
 };
 
-window.proceedToEvalAwardStep = function() {
-  const qStep = document.getElementById('evalQuestionStep');
-  const fStep = document.getElementById('evalFeedbackStep');
-  const aStep = document.getElementById('evalAwardStep');
+window.proceedToStageEvalAwardStep = function() {
+  const qStep = document.getElementById('stageEvalQuestionStep');
+  const fStep = document.getElementById('stageEvalFeedbackStep');
+  const aStep = document.getElementById('stageEvalAwardStep');
   if (qStep) qStep.style.display = 'none';
   if (fStep) fStep.style.display = 'none';
   if (aStep) aStep.style.display = 'flex';
 
-  renderEvalPlayersAwardRoster();
+  renderStageEvalPlayersRoster();
 };
 
-function renderEvalPlayersAwardRoster() {
-  const grid = document.getElementById('evalAwardPlayersGrid');
+function renderStageEvalPlayersRoster() {
+  const grid = document.getElementById('stageEvalAwardPlayersGrid');
   if (!grid) return;
 
   grid.innerHTML = '';
@@ -3317,7 +3372,7 @@ function renderEvalPlayersAwardRoster() {
         No hay aventureros registrados en la sesión todavía. Añade participantes en el Panel de Ajustes.
       </div>
     `;
-    updateEvalSelectedCount();
+    updateStageEvalSelectedCount();
     return;
   }
 
@@ -3326,56 +3381,57 @@ function renderEvalPlayersAwardRoster() {
     const preset = AVATAR_PRESETS.find(a => a.id === p.avatarId) || AVATAR_PRESETS[0];
 
     const card = document.createElement('div');
-    card.className = `eval-player-card ${isSelected ? 'selected' : ''}`;
+    card.className = `stage-eval-player-card ${isSelected ? 'selected' : ''}`;
     card.innerHTML = `
-      <div class="eval-player-avatar-badge" style="background:${p.color}">
+      <div class="stage-eval-player-avatar" style="background:${p.color}">
         ${preset.iconSvg || initials(p.name)}
       </div>
-      <div class="eval-player-info">
-        <span class="eval-player-name">${p.name}</span>
-        <span class="eval-player-xp">${p.points} XP · ${preset.name}</span>
+      <div class="stage-eval-player-info">
+        <span class="stage-eval-player-name">${p.name}</span>
+        <span class="stage-eval-player-xp">${p.points} XP · ${preset.name}</span>
       </div>
-      <div class="eval-player-check">✓</div>
+      <div class="stage-eval-player-check">✓</div>
     `;
 
-    card.onclick = () => window.toggleEvalPlayer(p.id);
+    card.onclick = () => window.toggleStageEvalPlayer(p.id);
     grid.appendChild(card);
   });
 
-  updateEvalSelectedCount();
+  updateStageEvalSelectedCount();
 }
 
-window.toggleEvalPlayer = function(playerId) {
+window.toggleStageEvalPlayer = function(playerId) {
   if (activeEvalContext.selectedPlayers.has(playerId)) {
     activeEvalContext.selectedPlayers.delete(playerId);
   } else {
     activeEvalContext.selectedPlayers.add(playerId);
   }
-  renderEvalPlayersAwardRoster();
+  renderStageEvalPlayersRoster();
 };
 
-window.toggleAllEvalPlayers = function(selectAll) {
+window.toggleAllStageEvalPlayers = function(selectAll) {
   if (selectAll) {
     players.forEach(p => activeEvalContext.selectedPlayers.add(p.id));
   } else {
     activeEvalContext.selectedPlayers.clear();
   }
-  renderEvalPlayersAwardRoster();
+  renderStageEvalPlayersRoster();
 };
 
-function updateEvalSelectedCount() {
-  const countText = document.getElementById('evalSelectedCountText');
+function updateStageEvalSelectedCount() {
+  const countText = document.getElementById('stageEvalSelectedCountText');
   const count = activeEvalContext.selectedPlayers.size;
   if (countText) {
     countText.textContent = `${count} ${count === 1 ? 'participante seleccionado' : 'participantes seleccionados'}`;
   }
 }
 
-window.confirmAwardXp = function() {
-  const xpInput = document.getElementById('evalAwardXpInput');
+window.confirmStageAwardXp = function() {
+  const xpInput = document.getElementById('stageEvalAwardXpInput');
   const pts = Math.max(0, parseInt(xpInput?.value, 10) || activeEvalContext.evalData?.xp || 50);
+  const awardCount = activeEvalContext.selectedPlayers.size;
 
-  if (activeEvalContext.selectedPlayers.size > 0 && pts > 0) {
+  if (awardCount > 0 && pts > 0) {
     players.forEach(p => {
       if (activeEvalContext.selectedPlayers.has(p.id)) {
         p.points = (p.points || 0) + pts;
@@ -3389,10 +3445,48 @@ window.confirmAwardXp = function() {
 
   save();
   renderUI();
-  updateStationEvaluationsUI();
   rebuildPlayers();
-  evaluationDialog?.close();
+
+  // Update playlist badges in UI
+  if (mediaHubItemsList) {
+    const activeItemEl = mediaHubItemsList.querySelector('.media-playlist-item.active');
+    if (activeItemEl) {
+      const badge = activeItemEl.querySelector('.eval-playlist-badge');
+      if (badge) {
+        badge.classList.add('done');
+        badge.textContent = '✓ Completada';
+      }
+    }
+  }
+
+  // Transition to Complete Screen
+  const aStep = document.getElementById('stageEvalAwardStep');
+  const cStep = document.getElementById('stageEvalCompleteStep');
+  const summaryEl = document.getElementById('stageEvalCompleteSummary');
+
+  if (aStep) aStep.style.display = 'none';
+  if (cStep) cStep.style.display = 'flex';
+  if (summaryEl) {
+    summaryEl.textContent = awardCount > 0
+      ? `Se acreditaron +${pts} XP a ${awardCount} ${awardCount === 1 ? 'aventurero' : 'aventureros'}. Tabla de clasificación actualizada.`
+      : 'Evaluación finalizada y registrada. No se asignaron puntos en esta ronda.';
+  }
 };
+
+window.advanceToNextPlaylistStageItem = function() {
+  if (!activeEvalContext.playlist || typeof activeEvalContext.itemIndex !== 'number') return;
+  const nextIdx = activeEvalContext.itemIndex + 1;
+  const playlistItems = mediaHubItemsList?.querySelectorAll('.media-playlist-item');
+  if (playlistItems && playlistItems[nextIdx]) {
+    playlistItems[nextIdx].click();
+  } else if (playlistItems && playlistItems[0]) {
+    playlistItems[0].click();
+  }
+};
+
+function updateStationEvaluationsUI() {
+  // Safe helper kept for state refreshes
+}
 
 // ── Admin Evaluation Question Editor ─────────────────────────────────────────
 function initAdminEvalEditor() {
@@ -3478,7 +3572,6 @@ window.saveEvaluationFromAdmin = function() {
   };
 
   save();
-  updateStationEvaluationsUI();
 
   const fb = document.getElementById('evalSaveFeedback');
   if (fb) {
@@ -3486,12 +3579,6 @@ window.saveEvaluationFromAdmin = function() {
     setTimeout(() => { fb.style.display = 'none'; }, 2200);
   }
 };
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && evaluationDialog?.open) {
-    window.closeStationEvaluation();
-  }
-});
 
 function resize() {
   const s = document.getElementById('stage');
