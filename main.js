@@ -153,6 +153,291 @@ let cosmosChecklist = saved.cosmosChecklist || { cosmosApp: false, cosmosPerks: 
 let companyChecklist = saved.companyChecklist || { companyOrigins: false, companyMission: false, companyValues: false, companyFuture: false };
 let npsChecklist = saved.npsChecklist || { npsGoldenQuestion: false, npsCustomerSegments: false, npsFormulaScore: false, npsClosedLoop: false };
 
+const DEFAULT_EVALUATIONS = {
+  1: {
+    mid: {
+      id: "s1_mid",
+      title: "Evaluación Intermedia: Kit Tecnológico y Laptop",
+      question: "¿Cuál es la primera recomendación al recibir tu laptop y kit corporativo de bienvenida?",
+      options: [
+        { id: "A", text: "Verificar el encendido, reportar la recepción al área de TI y cambiar la contraseña temporal." },
+        { id: "B", text: "Descargar videojuegos y aplicaciones personales no autorizadas." },
+        { id: "C", text: "Compartir la contraseña inicial con personas externas a la empresa." },
+        { id: "D", text: "No encender el equipo hasta el mes siguiente." }
+      ],
+      correctOption: "A",
+      explanation: "La validación inicial del equipo y el cambio inmediato de contraseña garantizan la seguridad de la información corporativa y el correcto funcionamiento de tus herramientas de trabajo.",
+      xp: 50
+    },
+    final: {
+      id: "s1_final",
+      title: "Reto de Cierre: Tarjeta de Acceso y Periféricos",
+      question: "¿Qué procedimiento debes seguir con tu tarjeta de acceso y credencial corporativa?",
+      options: [
+        { id: "A", text: "Prestar la tarjeta de acceso a cualquier visitante que lo solicite." },
+        { id: "B", text: "Portarla visiblemente en las instalaciones y reportar de inmediato en caso de extravío." },
+        { id: "C", text: "Dejar la tarjeta en el escritorio al salir del edificio." },
+        { id: "D", text: "Duplicar la tarjeta en un cerrajero externo." }
+      ],
+      correctOption: "B",
+      explanation: "La tarjeta de acceso es personal e intransferible; portarla visible asegura el control de seguridad física dentro de todos los edificios corporativos.",
+      xp: 75
+    }
+  },
+  2: {
+    mid: {
+      id: "s2_mid",
+      title: "Evaluación Intermedia: Formalización Contractual",
+      question: "¿Por qué es fundamental revisar y formalizar tu contrato laboral durante la primera semana?",
+      options: [
+        { id: "A", text: "Para asegurar la afiliación a la seguridad social, definir funciones claras y gozar de todas las prestaciones de ley." },
+        { id: "B", text: "Solo para tener un documento archivado sin valor legal." },
+        { id: "C", text: "Para renunciar a los días de descanso obligatorio." },
+        { id: "D", text: "No es necesario revisar el contrato antes de firmar." }
+      ],
+      correctOption: "A",
+      explanation: "El contrato formaliza los acuerdos laborales, garantizando tus derechos, prestaciones, esquema de compensación y respaldo institucional.",
+      xp: 50
+    },
+    final: {
+      id: "s2_final",
+      title: "Reto de Cierre: Catálogo de Beneficios y Salud",
+      question: "¿Qué beneficios adicionales complementan la propuesta de valor para colaboradores de Bradesco México?",
+      options: [
+        { id: "A", text: "Únicamente el salario base sin ningún tipo de apoyo adicional." },
+        { id: "B", text: "Pólizas de seguro médico, vales de despensa, días de descanso adicionales y convenios institucionales." },
+        { id: "C", text: "Descuentos en multas de tránsito de la ciudad." },
+        { id: "D", text: "Cursos obligatorios en días festivos." }
+      ],
+      correctOption: "B",
+      explanation: "El paquete integral de beneficios está diseñado para impulsar el bienestar integral, salud y balance de vida de cada colaborador.",
+      xp: 75
+    }
+  },
+  3: {
+    mid: {
+      id: "s3_mid",
+      title: "Evaluación Intermedia: Plataforma Humand",
+      question: "¿Para qué sirve principalmente la plataforma y app Humand en tu día a día?",
+      options: [
+        { id: "A", text: "Para consultar comunicaciones oficiales, registrar incidencias, consultar recibos y estar conectado con la comunidad." },
+        { id: "B", text: "Para pedir comida a domicilio particular." },
+        { id: "C", text: "Para ver series de televisión durante el horario laboral." },
+        { id: "D", text: "Para jugar partidas multijugador externas." }
+      ],
+      correctOption: "A",
+      explanation: "Humand es nuestro canal digital centralizado de comunicación interna, gestión de recursos humanos y conexión con la cultura corporativa.",
+      xp: 50
+    },
+    final: {
+      id: "s3_final",
+      title: "Reto de Cierre: Normas de Convivencia en el Comedor",
+      question: "¿Cuál es la regla de oro para el uso de las áreas comunes y comedor corporativo?",
+      options: [
+        { id: "A", text: "Dejar los platos y residuos sobre las mesas para que alguien más los limpie." },
+        { id: "B", text: "Mantener limpios los espacios, separar residuos en sus contenedores y respetar los turnos asignados." },
+        { id: "C", text: "Apartar mesas vacías durante varias horas con objetos personales." },
+        { id: "D", text: "Usar aparatos de audio a máximo volumen sin audífonos." }
+      ],
+      correctOption: "B",
+      explanation: "El respeto y cuidado de las áreas comunes fomenta un entorno armonioso, limpio y agradable para todos los compañeros de trabajo.",
+      xp: 75
+    }
+  },
+  4: {
+    mid: {
+      id: "s4_mid",
+      title: "Evaluación Intermedia: Rutas de Evacuación y Brigadas",
+      question: "Ante una alerta sísmica o de emergencia en el edificio, ¿cuál es la conducta correcta?",
+      options: [
+        { id: "A", text: "Correr apresuradamente, gritar y empujar a los demás en las escaleras." },
+        { id: "B", text: "Evacuar con calma por las rutas señalizadas, no usar elevadores y seguir las instrucciones de los brigadistas." },
+        { id: "C", text: "Regresar por objetos personales al puesto de trabajo." },
+        { id: "D", text: "Ignorar la alarma y continuar trabajando." }
+      ],
+      correctOption: "B",
+      explanation: "Seguir los protocolos de protección civil, mantener la calma y atender a los brigadistas salva vidas en cualquier eventualidad.",
+      xp: 50
+    },
+    final: {
+      id: "s4_final",
+      title: "Reto de Cierre: Uso del Estacionamiento Corporativo",
+      question: "¿Cuál es el requisito indispensable para utilizar el estacionamiento de la empresa?",
+      options: [
+        { id: "A", text: "Registrar previamente el vehículo, respetar los límites de velocidad y estacionar en cajones autorizados." },
+        { id: "B", text: "Bloquear rampas de emergencia si se tiene prisa." },
+        { id: "C", text: "Estacionarse en lugares para personas con movilidad reducida sin contar con el gafete correspondiente." },
+        { id: "D", text: "Prestar el pase de estacionamiento a personas externas sin registro." }
+      ],
+      correctOption: "A",
+      explanation: "El registro vehicular y el respeto a la señalización garantizan el orden, la fluidez y la seguridad en los estacionamientos corporativos.",
+      xp: 75
+    }
+  },
+  5: {
+    mid: {
+      id: "s5_mid",
+      title: "Evaluación Intermedia: Propósito de la Tarjeta Cosmos",
+      question: "¿Qué representa la Tarjeta Cosmos para los integrantes del equipo?",
+      options: [
+        { id: "A", text: "Una tarjeta de identificación de beneficios exclusivos, descuentos en comercios afiliados y promociones institucionales." },
+        { id: "B", text: "Un pase para salir antes de tiempo todos los días." },
+        { id: "C", text: "Un boleto para rifas gubernamentales." },
+        { id: "D", text: "Una tarjeta de crédito con cobro de comisión obligatorio." }
+      ],
+      correctOption: "A",
+      explanation: "La Tarjeta Cosmos brinda acceso a convenios comerciales, descuentos y promociones preferenciales para el colaborador y su familia.",
+      xp: 50
+    },
+    final: {
+      id: "s5_final",
+      title: "Reto de Cierre: Alianzas y Descuentos Cosmos",
+      question: "¿Dónde puedes consultar el catálogo actualizado de convenios y comercios afiliados a Tarjeta Cosmos?",
+      options: [
+        { id: "A", text: "En el portal interno de beneficios y canales de comunicación oficial de Bradesco." },
+        { id: "B", text: "En anuncios publicitarios en la calle." },
+        { id: "C", text: "En periódicos locales no relacionados." },
+        { id: "D", text: "No se puede consultar en ningún lugar." }
+      ],
+      correctOption: "A",
+      explanation: "Los canales oficiales internos mantienen el directorio actualizado de beneficios y promociones activas de Tarjeta Cosmos.",
+      xp: 75
+    }
+  },
+  6: {
+    mid: {
+      id: "s6_mid",
+      title: "Evaluación Intermedia: Origen y Evolución",
+      question: "¿Cuál es el pilar fundamental que guía el propósito histórico de Bradesco?",
+      options: [
+        { id: "A", text: "Estar presente al lado de las personas y empresas, impulsando su desarrollo financiero y cumplimiento de metas." },
+        { id: "B", text: "Operar únicamente como entidad teórica sin relación con los clientes." },
+        { id: "C", text: "Enfocarse solo en trámites burocráticos." },
+        { id: "D", text: "Limitar la inclusión financiera." }
+      ],
+      correctOption: "A",
+      explanation: "El propósito de Bradesco se fundamenta en la cercanía con las personas, la inclusión financiera y el impulso al progreso económico sostenible.",
+      xp: 50
+    },
+    final: {
+      id: "s6_final",
+      title: "Reto de Cierre: Valores y Cultura Institucional",
+      question: "¿Qué valores definen el comportamiento y la ética de trabajo en nuestro equipo?",
+      options: [
+        { id: "A", text: "Transparencia, ética, innovación, compromiso con el cliente y trabajo colaborativo." },
+        { id: "B", text: "Individualismo y falta de comunicación." },
+        { id: "C", text: "Resistencia al cambio y procesos obsoletos." },
+        { id: "D", text: "Improvisación en las metas operativas." }
+      ],
+      correctOption: "A",
+      explanation: "La cultura Bradesco promueve la ética intachable, el trabajo en equipo, la constante innovación y la satisfacción de nuestros clientes.",
+      xp: 75
+    }
+  },
+  7: {
+    mid: {
+      id: "s7_mid",
+      title: "Evaluación Intermedia: La Pregunta de Oro NPS",
+      question: "¿En qué escala se mide la recomendación del cliente según la metodología Net Promoter Score (NPS)?",
+      options: [
+        { id: "A", text: "Escala de 0 a 10, donde 9-10 son Promotores, 7-8 Pasivos y 0-6 Detractores." },
+        { id: "B", text: "Escala de 1 a 3 (Malo, Regular, Bueno)." },
+        { id: "C", text: "Porcentaje al azar sin clasificación." },
+        { id: "D", text: "Escala de letras de la A a la Z." }
+      ],
+      correctOption: "A",
+      explanation: "El NPS divide a los clientes en Promotores (9-10), Pasivos (7-8) y Detractores (0-6) para calcular el índice neto: % Promotores - % Detractores.",
+      xp: 50
+    },
+    final: {
+      id: "s7_final",
+      title: "Reto de Cierre: Cierre de Ciclo (Closed Loop)",
+      question: "¿Qué significa aplicar un proceso de 'Closed Loop' (Cierre de Ciclo) en la retroalimentación de NPS?",
+      options: [
+        { id: "A", text: "Contactar oportunamente al cliente insatisfecho, entender su causa raíz y tomar acciones de mejora concretas." },
+        { id: "B", text: "Eliminar las encuestas negativas para que no afecten el promedio." },
+        { id: "C", text: "Discutir con el cliente por haber calificado con baja puntuación." },
+        { id: "D", text: "Ignorar las sugerencias recibidas." }
+      ],
+      correctOption: "A",
+      explanation: "El Closed Loop transforma las críticas de los clientes en oportunidades reales de aprendizaje, fidelización y optimización de nuestros servicios.",
+      xp: 75
+    }
+  },
+  8: {
+    mid: {
+      id: "s8_mid",
+      title: "Evaluación Intermedia: Accesos y Canales de Operación",
+      question: "¿Qué debes hacer si detectas una falla en una herramienta o sistema operativo en tu jornada?",
+      options: [
+        { id: "A", text: "Levantar un ticket formal en la Mesa de Ayuda (Service Desk) con el detalle y capturas del error." },
+        { id: "B", text: "Intentar reparar el software sin autorización técnica." },
+        { id: "C", text: "Suspender labores sin avisar al líder del equipo." },
+        { id: "D", text: "Publicar el error en redes sociales personales." }
+      ],
+      correctOption: "A",
+      explanation: "El canal formal de Service Desk asegura el seguimiento, la trazabilidad y la pronta resolución técnica de cualquier incidencia.",
+      xp: 50
+    },
+    final: {
+      id: "s8_final",
+      title: "Reto de Cierre: Seguridad de la Información y Operación",
+      question: "¿Cuál es una práctica indispensable de ciberseguridad en el manejo de datos de clientes?",
+      options: [
+        { id: "A", text: "Bloquear tu equipo (Win+L) al levantarte y nunca compartir contraseñas ni datos sensibles." },
+        { id: "B", text: "Escribir las contraseñas en notas adhesivas pegadas al monitor." },
+        { id: "C", text: "Enviar bases de datos a correos electrónicos personales." },
+        { id: "D", text: "Usar contraseñas simples como '123456'." }
+      ],
+      correctOption: "A",
+      explanation: "El resguardo de contraseñas y el bloqueo de pantalla protegen la confidencialidad de la información institucional y la privacidad de nuestros clientes.",
+      xp: 75
+    }
+  },
+  9: {
+    mid: {
+      id: "s9_mid",
+      title: "Evaluación Intermedia: Integración y Trabajo en Equipo",
+      question: "¿Cuál es el factor clave para el éxito en proyectos colaborativos y multidisciplinarios?",
+      options: [
+        { id: "A", text: "Comunicación asertiva, objetivos compartidos, empatía y apoyo mutuo entre áreas." },
+        { id: "B", text: "Trabajar en silos aislados sin compartir información." },
+        { id: "C", text: "Competir negativamente con los compañeros de equipo." },
+        { id: "D", text: "Evitar la retroalimentación constructiva." }
+      ],
+      correctOption: "A",
+      explanation: "La sinergia entre diferentes áreas multiplica la capacidad de innovación y asegura resultados extraordinarios para la organización.",
+      xp: 50
+    },
+    final: {
+      id: "s9_final",
+      title: "Reto Final Épico: Compromiso y Graduación Onboarding",
+      question: "¿Qué representa concluir exitosamente la Expedición de Onboarding de Bradesco México?",
+      options: [
+        { id: "A", text: "Estar completamente preparado, equipado y alineado con los valores y metas para triunfar en tu nueva aventura profesional." },
+        { id: "B", text: "Solo un trámite sin aplicación en tu vida laboral." },
+        { id: "C", text: "El final de todo aprendizaje dentro de la empresa." },
+        { id: "D", text: "Una certificación decorativa." }
+      ],
+      correctOption: "A",
+      explanation: "¡Felicidades! La graduación de Onboarding marca el inicio de una trayectoria llena de retos, crecimiento, liderazgo y éxitos compartidos.",
+      xp: 100
+    }
+  }
+};
+
+let evaluations = structuredClone(DEFAULT_EVALUATIONS);
+if (saved.evaluations && typeof saved.evaluations === 'object') {
+  for (const st in saved.evaluations) {
+    if (evaluations[st]) {
+      evaluations[st] = { ...evaluations[st], ...saved.evaluations[st] };
+    } else {
+      evaluations[st] = saved.evaluations[st];
+    }
+  }
+}
+let evaluationsStatus = (saved.evaluationsStatus && typeof saved.evaluationsStatus === 'object') ? saved.evaluationsStatus : {};
+
 const save = () => {
   try {
     localStorage.setItem(KEY, JSON.stringify({
@@ -165,7 +450,9 @@ const save = () => {
       safetyChecklist,
       cosmosChecklist,
       companyChecklist,
-      npsChecklist
+      npsChecklist,
+      evaluations,
+      evaluationsStatus
     }));
   } catch (err) {
     console.error('Error saving state to localStorage:', err);
@@ -1290,8 +1577,91 @@ function updateStationMediaTrigger() {
   }
 }
 
+function updateStationEvaluationsUI() {
+  const container = document.getElementById('stationEvaluationsContainer');
+  const mapEvalTrigger = document.getElementById('mapStationEvalTrigger');
+
+  if (current === 0) {
+    if (container) container.style.display = 'none';
+    if (mapEvalTrigger) mapEvalTrigger.style.display = 'none';
+    return;
+  }
+
+  // Update Sidebar Buttons
+  if (container) {
+    container.style.display = 'block';
+    const stationEvals = evaluations[current] || DEFAULT_EVALUATIONS[current] || DEFAULT_EVALUATIONS[1];
+    const midDone = !!evaluationsStatus[`${current}_mid`];
+    const finalDone = !!evaluationsStatus[`${current}_final`];
+
+    const midBtnTitle = document.getElementById('midEvalBtnTitle');
+    const midBadge = document.getElementById('midEvalBadge');
+    const startMidBtn = document.getElementById('startMidEvalBtn');
+
+    if (midBtnTitle) midBtnTitle.textContent = stationEvals?.mid?.title || 'Evaluación Intermedia';
+    if (midBadge) {
+      midBadge.textContent = midDone ? '✓ Completada' : `+${stationEvals?.mid?.xp || 50} XP`;
+      midBadge.className = `eval-badge ${midDone ? 'done' : ''}`;
+    }
+    if (startMidBtn) {
+      startMidBtn.classList.toggle('completed', midDone);
+    }
+
+    const finalBtnTitle = document.getElementById('finalEvalBtnTitle');
+    const finalBadge = document.getElementById('finalEvalBadge');
+    const startFinalBtn = document.getElementById('startFinalEvalBtn');
+
+    if (finalBtnTitle) finalBtnTitle.textContent = stationEvals?.final?.title || 'Reto Final de Misión';
+    if (finalBadge) {
+      finalBadge.textContent = finalDone ? '✓ Completada' : `+${stationEvals?.final?.xp || 75} XP`;
+      finalBadge.className = `eval-badge final ${finalDone ? 'done' : ''}`;
+    }
+    if (startFinalBtn) {
+      startFinalBtn.classList.toggle('completed', finalDone);
+    }
+  }
+
+  // Update In-Map Floating Trigger
+  if (mapEvalTrigger) {
+    if (travel) {
+      mapEvalTrigger.style.display = 'none';
+    } else {
+      mapEvalTrigger.style.display = 'block';
+      const midDone = !!evaluationsStatus[`${current}_mid`];
+      const finalDone = !!evaluationsStatus[`${current}_final`];
+      const stationEvals = evaluations[current] || DEFAULT_EVALUATIONS[current] || DEFAULT_EVALUATIONS[1];
+
+      const tag = document.getElementById('mapEvalStationTag');
+      const title = document.getElementById('mapEvalBubbleTitle');
+      const xpBadge = document.getElementById('mapEvalXpBadge');
+
+      if (tag) tag.textContent = `MISIÓN ${String(current).padStart(2, '0')} · EVALUACIÓN`;
+      if (!midDone) {
+        if (title) title.textContent = '1. Evaluación Intermedia 🎯';
+        if (xpBadge) {
+          xpBadge.textContent = `+${stationEvals?.mid?.xp || 50} XP`;
+          xpBadge.style.background = '#d69c39';
+        }
+      } else if (!finalDone) {
+        if (title) title.textContent = '2. Reto Final de Cierre 🏆';
+        if (xpBadge) {
+          xpBadge.textContent = `+${stationEvals?.final?.xp || 75} XP`;
+          xpBadge.style.background = '#CC092F';
+        }
+      } else {
+        if (title) title.textContent = 'Evaluaciones Completadas ✓';
+        if (xpBadge) {
+          xpBadge.textContent = 'Completada';
+          xpBadge.style.background = '#10b981';
+        }
+      }
+    }
+  }
+}
+
 function applyStates() {
   renderUI();
+  updateStationEvaluationsUI();
 }
 
 function renderUI() {
@@ -1342,8 +1712,9 @@ function renderUI() {
   const regEl = document.getElementById('skyMissionRegion');
   if (regEl) regEl.textContent = q.region;
 
-  // Update In-Map Media Hub Trigger visibility (only after arrival)
+  // Update In-Map Media Hub Trigger and Evaluation Trigger visibility
   updateStationMediaTrigger();
+  updateStationEvaluationsUI();
 
   // Navigation button states
   updateNavButtons();
@@ -1508,6 +1879,8 @@ function startTravel(id, show = true) {
   if (freeCamera) setFreeCamera(false);
   const mapMediaTrigger = document.getElementById('mapStationMediaTrigger');
   if (mapMediaTrigger) mapMediaTrigger.style.display = 'none';
+  const mapEvalTrigger = document.getElementById('mapStationEvalTrigger');
+  if (mapEvalTrigger) mapEvalTrigger.style.display = 'none';
 
   if (Number(id) === 0) {
     // Station 0 Lobby: completely peaceful, zero camera flight!
@@ -1521,6 +1894,7 @@ function startTravel(id, show = true) {
     travel = null;
     rebuildPlayers();
     updateStationMediaTrigger();
+    updateStationEvaluationsUI();
     return;
   }
   const destination = getMission(id);
@@ -2783,6 +3157,342 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// ── Sistema de Evaluaciones Interactivas y Desafíos de Sala (Gamificación Facilitada) ──
+let activeEvalContext = {
+  stationId: 1,
+  type: 'mid', // 'mid' or 'final'
+  evalData: null,
+  selectedOption: null,
+  selectedPlayers: new Set()
+};
+
+const evaluationDialog = document.getElementById('evaluationDialog');
+
+window.launchStationEvaluation = function(type = 'mid', stationId = null) {
+  const sId = stationId !== null ? Number(stationId) : current;
+  if (sId === 0) return;
+
+  const stationEvals = evaluations[sId] || DEFAULT_EVALUATIONS[sId] || DEFAULT_EVALUATIONS[1];
+  const evalData = (type === 'final') ? stationEvals.final : stationEvals.mid;
+  if (!evalData) return;
+
+  const mission = getMission(sId);
+  activeEvalContext = {
+    stationId: sId,
+    type,
+    evalData,
+    selectedOption: null,
+    selectedPlayers: new Set()
+  };
+
+  // Header
+  const eyebrow = document.getElementById('evalModalStationEyebrow');
+  const title = document.getElementById('evalModalTitle');
+  const xpBadge = document.getElementById('evalModalXpBadge');
+
+  if (eyebrow) eyebrow.textContent = `MISIÓN ${String(sId).padStart(2, '0')} · ${type === 'mid' ? 'EVALUACIÓN INTERMEDIA' : 'RETO FINAL DE CIERRE'} · ${mission.region.toUpperCase()}`;
+  if (title) title.textContent = evalData.title;
+  if (xpBadge) xpBadge.textContent = `+${evalData.xp || 50} XP`;
+
+  // Step 1: Render Question & Options
+  const qText = document.getElementById('evalQuestionText');
+  if (qText) qText.textContent = evalData.question;
+
+  const optionsGrid = document.getElementById('evalOptionsGrid');
+  if (optionsGrid) {
+    optionsGrid.innerHTML = '';
+    (evalData.options || []).forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'eval-opt-card';
+      btn.innerHTML = `
+        <span class="eval-opt-letter">${opt.id}</span>
+        <span class="eval-opt-text">${opt.text}</span>
+      `;
+      btn.onclick = () => window.handleEvalOptionSelect(opt.id);
+      optionsGrid.appendChild(btn);
+    });
+  }
+
+  // Switch to Step 1
+  const qStep = document.getElementById('evalQuestionStep');
+  const fStep = document.getElementById('evalFeedbackStep');
+  const aStep = document.getElementById('evalAwardStep');
+  if (qStep) qStep.style.display = 'flex';
+  if (fStep) fStep.style.display = 'none';
+  if (aStep) aStep.style.display = 'none';
+
+  evaluationDialog?.showModal();
+};
+
+window.openNextStationEvaluation = function() {
+  if (current === 0) return;
+  const midDone = !!evaluationsStatus[`${current}_mid`];
+  const finalDone = !!evaluationsStatus[`${current}_final`];
+  if (!midDone) {
+    window.launchStationEvaluation('mid', current);
+  } else if (!finalDone) {
+    window.launchStationEvaluation('final', current);
+  } else {
+    window.launchStationEvaluation('mid', current);
+  }
+};
+
+window.closeStationEvaluation = function() {
+  evaluationDialog?.close();
+};
+
+window.handleEvalOptionSelect = function(selectedOptionId) {
+  const evalData = activeEvalContext.evalData;
+  if (!evalData) return;
+
+  activeEvalContext.selectedOption = selectedOptionId;
+  const isCorrect = (selectedOptionId === evalData.correctOption);
+
+  // Update Result Banner
+  const banner = document.getElementById('evalResultBanner');
+  const icon = document.getElementById('evalResultIcon');
+  const headline = document.getElementById('evalResultHeadline');
+  const subline = document.getElementById('evalResultSubline');
+
+  if (banner && icon && headline && subline) {
+    if (isCorrect) {
+      banner.className = 'eval-result-banner correct';
+      icon.textContent = '✓';
+      headline.textContent = '¡Respuesta Correcta!';
+      subline.textContent = 'Excelente participación de la sala. ¡Muy bien razonado!';
+    } else {
+      banner.className = 'eval-result-banner miss';
+      icon.textContent = '✕';
+      headline.textContent = selectedOptionId === 'NONE' ? 'Ningún participante acertó la respuesta' : 'Opción seleccionada no acertada';
+      subline.textContent = 'Veamos la respuesta correcta y la explicación oficial:';
+    }
+  }
+
+  // Correct answer text
+  const correctOptObj = (evalData.options || []).find(o => o.id === evalData.correctOption);
+  const correctDisplay = document.getElementById('evalCorrectAnswerDisplay');
+  if (correctDisplay) {
+    correctDisplay.textContent = correctOptObj ? `Opción ${correctOptObj.id}: ${correctOptObj.text}` : 'Respuesta oficial';
+  }
+
+  // Explanation text
+  const expDisplay = document.getElementById('evalExplanationDisplay');
+  if (expDisplay) {
+    expDisplay.textContent = evalData.explanation || 'El entendimiento de este concepto es fundamental para la excelencia operativa.';
+  }
+
+  // Pre-fill award XP input
+  const xpInput = document.getElementById('evalAwardXpInput');
+  if (xpInput) xpInput.value = evalData.xp || 50;
+
+  // Transition from Step 1 to Step 2
+  const qStep = document.getElementById('evalQuestionStep');
+  const fStep = document.getElementById('evalFeedbackStep');
+  const aStep = document.getElementById('evalAwardStep');
+  if (qStep) qStep.style.display = 'none';
+  if (fStep) fStep.style.display = 'flex';
+  if (aStep) aStep.style.display = 'none';
+};
+
+window.proceedToEvalAwardStep = function() {
+  const qStep = document.getElementById('evalQuestionStep');
+  const fStep = document.getElementById('evalFeedbackStep');
+  const aStep = document.getElementById('evalAwardStep');
+  if (qStep) qStep.style.display = 'none';
+  if (fStep) fStep.style.display = 'none';
+  if (aStep) aStep.style.display = 'flex';
+
+  renderEvalPlayersAwardRoster();
+};
+
+function renderEvalPlayersAwardRoster() {
+  const grid = document.getElementById('evalAwardPlayersGrid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+  if (players.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:24px;color:rgba(255,255,255,0.6);font-style:italic">
+        No hay aventureros registrados en la sesión todavía. Añade participantes en el Panel de Ajustes.
+      </div>
+    `;
+    updateEvalSelectedCount();
+    return;
+  }
+
+  players.forEach(p => {
+    const isSelected = activeEvalContext.selectedPlayers.has(p.id);
+    const preset = AVATAR_PRESETS.find(a => a.id === p.avatarId) || AVATAR_PRESETS[0];
+
+    const card = document.createElement('div');
+    card.className = `eval-player-card ${isSelected ? 'selected' : ''}`;
+    card.innerHTML = `
+      <div class="eval-player-avatar-badge" style="background:${p.color}">
+        ${preset.iconSvg || initials(p.name)}
+      </div>
+      <div class="eval-player-info">
+        <span class="eval-player-name">${p.name}</span>
+        <span class="eval-player-xp">${p.points} XP · ${preset.name}</span>
+      </div>
+      <div class="eval-player-check">✓</div>
+    `;
+
+    card.onclick = () => window.toggleEvalPlayer(p.id);
+    grid.appendChild(card);
+  });
+
+  updateEvalSelectedCount();
+}
+
+window.toggleEvalPlayer = function(playerId) {
+  if (activeEvalContext.selectedPlayers.has(playerId)) {
+    activeEvalContext.selectedPlayers.delete(playerId);
+  } else {
+    activeEvalContext.selectedPlayers.add(playerId);
+  }
+  renderEvalPlayersAwardRoster();
+};
+
+window.toggleAllEvalPlayers = function(selectAll) {
+  if (selectAll) {
+    players.forEach(p => activeEvalContext.selectedPlayers.add(p.id));
+  } else {
+    activeEvalContext.selectedPlayers.clear();
+  }
+  renderEvalPlayersAwardRoster();
+};
+
+function updateEvalSelectedCount() {
+  const countText = document.getElementById('evalSelectedCountText');
+  const count = activeEvalContext.selectedPlayers.size;
+  if (countText) {
+    countText.textContent = `${count} ${count === 1 ? 'participante seleccionado' : 'participantes seleccionados'}`;
+  }
+}
+
+window.confirmAwardXp = function() {
+  const xpInput = document.getElementById('evalAwardXpInput');
+  const pts = Math.max(0, parseInt(xpInput?.value, 10) || activeEvalContext.evalData?.xp || 50);
+
+  if (activeEvalContext.selectedPlayers.size > 0 && pts > 0) {
+    players.forEach(p => {
+      if (activeEvalContext.selectedPlayers.has(p.id)) {
+        p.points = (p.points || 0) + pts;
+      }
+    });
+  }
+
+  // Mark this evaluation as completed in session
+  const statusKey = `${activeEvalContext.stationId}_${activeEvalContext.type}`;
+  evaluationsStatus[statusKey] = true;
+
+  save();
+  renderUI();
+  updateStationEvaluationsUI();
+  rebuildPlayers();
+  evaluationDialog?.close();
+};
+
+// ── Admin Evaluation Question Editor ─────────────────────────────────────────
+function initAdminEvalEditor() {
+  const stationSelect = document.getElementById('evalAdminStationSelect');
+  const typeSelect = document.getElementById('evalAdminTypeSelect');
+  if (!stationSelect || !typeSelect) return;
+
+  stationSelect.innerHTML = '';
+  for (let i = 1; i <= 9; i++) {
+    const m = getMission(i);
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Misión ${String(i).padStart(2, '0')}: ${m.name}`;
+    stationSelect.appendChild(opt);
+  }
+
+  const loadCurrentToEditor = () => {
+    const sId = parseInt(stationSelect.value, 10) || 1;
+    const type = typeSelect.value || 'mid';
+    const stationEvals = evaluations[sId] || DEFAULT_EVALUATIONS[sId] || DEFAULT_EVALUATIONS[1];
+    const data = (type === 'final') ? stationEvals.final : stationEvals.mid;
+    if (!data) return;
+
+    const titleInput = document.getElementById('evalAdminTitle');
+    const qInput = document.getElementById('evalAdminQuestion');
+    const optA = document.getElementById('evalAdminOptA');
+    const optB = document.getElementById('evalAdminOptB');
+    const optC = document.getElementById('evalAdminOptC');
+    const optD = document.getElementById('evalAdminOptD');
+    const correctSelect = document.getElementById('evalAdminCorrectOpt');
+    const xpInput = document.getElementById('evalAdminXp');
+    const expInput = document.getElementById('evalAdminExplanation');
+
+    if (titleInput) titleInput.value = data.title || '';
+    if (qInput) qInput.value = data.question || '';
+    if (optA) optA.value = data.options?.[0]?.text || '';
+    if (optB) optB.value = data.options?.[1]?.text || '';
+    if (optC) optC.value = data.options?.[2]?.text || '';
+    if (optD) optD.value = data.options?.[3]?.text || '';
+    if (correctSelect) correctSelect.value = data.correctOption || 'A';
+    if (xpInput) xpInput.value = data.xp || 50;
+    if (expInput) expInput.value = data.explanation || '';
+  };
+
+  stationSelect.onchange = loadCurrentToEditor;
+  typeSelect.onchange = loadCurrentToEditor;
+  loadCurrentToEditor();
+}
+
+window.saveEvaluationFromAdmin = function() {
+  const stationSelect = document.getElementById('evalAdminStationSelect');
+  const typeSelect = document.getElementById('evalAdminTypeSelect');
+  const sId = parseInt(stationSelect?.value, 10) || 1;
+  const type = typeSelect?.value || 'mid';
+
+  const title = document.getElementById('evalAdminTitle')?.value?.trim();
+  const question = document.getElementById('evalAdminQuestion')?.value?.trim();
+  const optA = document.getElementById('evalAdminOptA')?.value?.trim();
+  const optB = document.getElementById('evalAdminOptB')?.value?.trim();
+  const optC = document.getElementById('evalAdminOptC')?.value?.trim();
+  const optD = document.getElementById('evalAdminOptD')?.value?.trim();
+  const correctOption = document.getElementById('evalAdminCorrectOpt')?.value || 'A';
+  const xp = parseInt(document.getElementById('evalAdminXp')?.value, 10) || 50;
+  const explanation = document.getElementById('evalAdminExplanation')?.value?.trim();
+
+  if (!evaluations[sId]) {
+    evaluations[sId] = structuredClone(DEFAULT_EVALUATIONS[sId] || DEFAULT_EVALUATIONS[1]);
+  }
+
+  evaluations[sId][type] = {
+    id: `s${sId}_${type}`,
+    title: title || (type === 'mid' ? 'Evaluación Intermedia' : 'Reto Final'),
+    question: question || 'Pregunta de la misión',
+    options: [
+      { id: 'A', text: optA || 'Opción A' },
+      { id: 'B', text: optB || 'Opción B' },
+      { id: 'C', text: optC || 'Opción C' },
+      { id: 'D', text: optD || 'Opción D' }
+    ],
+    correctOption,
+    explanation: explanation || 'Retroalimentación oficial de la misión.',
+    xp
+  };
+
+  save();
+  updateStationEvaluationsUI();
+
+  const fb = document.getElementById('evalSaveFeedback');
+  if (fb) {
+    fb.style.display = 'inline-block';
+    setTimeout(() => { fb.style.display = 'none'; }, 2200);
+  }
+};
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && evaluationDialog?.open) {
+    window.closeStationEvaluation();
+  }
+});
+
 function resize() {
   const s = document.getElementById('stage');
   if (!s) return;
@@ -2794,6 +3504,7 @@ new ResizeObserver(resize).observe(document.getElementById('stage'));
 resize();
 rebuildPlayers();
 applyStates();
+initAdminEvalEditor();
 
 
 
@@ -2948,6 +3659,7 @@ function loop() {
       travel = null;
       cinematicUI(false);
       updateStationMediaTrigger();
+      updateStationEvaluationsUI();
       rebuildPlayers(); // Los personajes aparecen en la locación una vez concluyen los efectos de cámara
     }
   } else if (firstPerson) {
