@@ -9,8 +9,33 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=175.0.0">
-  <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
+  <link rel="stylesheet" href="styles.css?v=192.0.0">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/build/three.module.js",
+      "three/": "./vendor/three/",
+      "three/addons/": "./vendor/three/examples/jsm/",
+      "three/examples/jsm/": "./vendor/three/examples/jsm/"
+    }
+  }
+  </script>
+  <script>
+    window.addEventListener('error', function(e) {
+      console.error('DIAGNOSTIC ERROR:', e.error || e.message, e.filename, e.lineno);
+      const st = document.getElementById('bootStatusText');
+      if (st) {
+        const file = e.filename ? e.filename.split('/').pop() : 'script';
+        st.textContent = (e.message || 'Error') + ' (' + file + ':' + e.lineno + ')';
+      }
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('DIAGNOSTIC REJECTION:', e.reason);
+      const st = document.getElementById('bootStatusText');
+      if (st) st.textContent = 'Rechazo: ' + (e.reason?.message || e.reason || 'error');
+    });
+  </script>
+</head>
 <body>
   <!-- Pantalla de Bienvenida y Carga Oficial Bradesco México -->
   <div id="boot" class="boot">
@@ -23,7 +48,7 @@
       <p class="boot-subtitle">Aquí comienza tu aventura</p>
 
       <!-- Caja de Progreso mientras descarga el mapa 3D -->
-      <div class="boot-loader-box" id="bootLoaderBox">
+      <div class="boot-loader-box" id="bootLoaderBox" onclick="window.dismissBoot && window.dismissBoot()" title="Haz clic para entrar">
         <div class="boot-status-row">
           <span class="boot-status-text" id="bootStatusText">Cargando...</span>
           <span class="boot-pct" id="bootPct">0%</span>
@@ -616,7 +641,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="main.js?v=175.0.0"></script>
+  <script type="module" src="main.js?v=198.0.0"></script>
 </body>
 </html>
 

@@ -1,7 +1,7 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
+import * as THREE from './vendor/three/build/three.module.js';
+import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from './vendor/three/examples/jsm/loaders/FBXLoader.js';
+import { clone as cloneSkeleton } from './vendor/three/examples/jsm/utils/SkeletonUtils.js';
 
 const loader = new GLTFLoader();
 const fbxLoader = new FBXLoader();
@@ -10,6 +10,13 @@ const modelCache = new Map();
 let cachedCharacterFBX = null;
 let cachedIdleClip = null;
 const skinTextures = [];
+
+export const BRAND_PALETTE = {
+  red: 0xcc092f,
+  darkRed: 0x8a0620,
+  silver: 0xe2e8f0,
+  white: 0xffffff
+};
 
 export async function loadCharacterModel() {
   if (cachedCharacterFBX && cachedIdleClip) return { model: cachedCharacterFBX, clip: cachedIdleClip };
@@ -54,6 +61,7 @@ export async function loadCharacterModel() {
 }
 
 export function loadModel(path) {
+  if (!path || typeof path !== 'string') return Promise.resolve(null);
   if (modelCache.has(path)) return modelCache.get(path);
   const p = new Promise(resolve => {
     let resolved = false;
@@ -113,6 +121,7 @@ function prepare(root, castShadow = true) {
 
 // Rock-solid grounded wrapper: guarantees bottom touches y = 0 and is centered in X/Z
 async function instantiate(path, targetHeight = 3.0, castShadow = true) {
+  if (!path || typeof path !== 'string') return null;
   try {
     const gltf = await loadModel(path);
     if (!gltf || !gltf.scene) return null;
@@ -207,6 +216,57 @@ const ASSETS = {
     barrel: './assets/stylized/props/barrel_large.gltf',
     signingTable: './assets/stylized/props/table_long_tablecloth_decorated_A.gltf',
     banner: './assets/stylized/props/banner_shield_blue.gltf'
+  },
+  polyfork: {
+    // Estación 0: Campamento Base & Bienvenida
+    villageTavern: './assets/polyfork/village-tavern-4e94e3.glb',
+    villageWell: './assets/polyfork/village-well-f8e361.glb',
+    timberTable: './assets/polyfork/heavy-timber-picnic-table-1ac060.glb',
+    campNoticeBoard: './assets/polyfork/camp-notice-board-c0be42.glb',
+    fourWheelWagon: './assets/polyfork/four-wheel-wagon-adb946.glb',
+    woodenCrate: './assets/polyfork/wooden-crate-b9c96a.glb',
+    woodenFence: './assets/polyfork/wooden-fence-3d8ee7.glb',
+    lampPost: './assets/polyfork/lamp-post-c9e409.glb',
+    grainSack: './assets/polyfork/grain-sack-401d96.glb',
+    // Estación 1: Arsenal y Equipos
+    canvasWallTent: './assets/polyfork/canvas-wall-tent-de8a04.glb',
+    canvasRidgeTent: './assets/polyfork/canvas-ridge-tent-f0df0d.glb',
+    watchtower: './assets/polyfork/watchtower-140f78.glb',
+    blacksmithForge: './assets/polyfork/blacksmith-forge-09fa85.glb',
+    anvil: './assets/polyfork/anvil-1286cb.glb',
+    quenchBarrel: './assets/polyfork/quench-barrel-0c78fd.glb',
+    weaponRack: './assets/polyfork/weapon-rack-082d7f.glb',
+    armourStand: './assets/polyfork/armour-stand-3d77c4.glb',
+    woodenCart: './assets/polyfork/wooden-cart-bf83d8.glb',
+    campfireCookTripod: './assets/polyfork/campfire-cook-tripod-d95a1e.glb',
+    stoneCampfire: './assets/polyfork/stone-ring-campfire-8a0c6f.glb',
+    firewoodStack: './assets/polyfork/firewood-stack-8a2899.glb',
+    // Estación 2: Santuario del Pacto (Firma de Contrato y Beneficios)
+    stoneChapel: './assets/polyfork/stone-chapel-03e774.glb',
+    stoneAltar: './assets/polyfork/stone-altar-8f3a0a.glb',
+    lowStoneWall: './assets/polyfork/low-stone-wall-8a8ea3.glb',
+    chainedBookLectern: './assets/polyfork/chained-book-lectern-381597.glb',
+    scrollRack: './assets/polyfork/scroll-rack-f465dd.glb',
+    standingKnightStatue: './assets/polyfork/standing-knight-statue-8bdcc9.glb',
+    ironStrongbox: './assets/polyfork/iron-banded-strongbox-698383.glb',
+    standingBrazier: './assets/polyfork/standing-brazier-c9e4ee.glb',
+    candleSpikeCluster: './assets/polyfork/candle-spike-cluster-d7c566.glb',
+    // Estación 3: Valle del Refectorio (Humand y Comedor)
+    timberBarn: './assets/polyfork/timber-barn-90b3ce.glb',
+    thatchedCottage: './assets/polyfork/thatched-cottage-0e63f5.glb',
+    splitLogBench: './assets/polyfork/split-log-bench-289780.glb',
+    clayBreadOven: './assets/polyfork/clay-bread-oven-860b06.glb',
+    marketStall: './assets/polyfork/market-stall-94937d.glb',
+    basketOfProduce: './assets/polyfork/basket-of-produce-7420cf.glb',
+    polyforkBarrel: './assets/polyfork/barrel-aadc94.glb',
+    flowerPlanter: './assets/polyfork/flower-planter-500ed2.glb',
+    // Alimentos y vajilla para el comedor y taberna
+    breadLoaf: './assets/polyfork/bread-loaf-0e0ab5.glb',
+    rusticPie: './assets/polyfork/pie-c27178.glb',
+    goblet: './assets/polyfork/goblet-87c3ba.glb',
+    wineJug: './assets/polyfork/clay-wine-jug-b4ebd3.glb',
+    roastMeat: './assets/polyfork/charred-meat-haunch-be1ea2.glb',
+    cazuelaPot: './assets/polyfork/cazuela-pot-79f0ee.glb'
   },
   animals: {
     deer: './assets/stylized/animals/Deer.gltf',
@@ -1004,475 +1064,410 @@ function createSteppingStones(positions) {
   return g;
 }
 
-function createCosmosGoldenTalisman() {
+// ── ESTACIÓN 05: TARJETA COSMOS (PABELLÓN DE BENEFICIOS & CONVENIOS VIP) ─────
+
+function createCosmosVIPPedestal() {
   const g = new THREE.Group();
-  const goldMat = new THREE.MeshStandardMaterial({
-    color: 0xffd700,
-    emissive: 0xd4af37,
-    emissiveIntensity: 0.5,
-    metalness: 0.95,
-    roughness: 0.18
+  
+  // Materiales elegantes: Mármol blanco, oro pulido, terciopelo azul noche y zafiro
+  const marbleMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, metalness: 0.05 });
+  const darkMarbleMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.18 });
+  const cardBodyMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.2 });
+  const cardChipMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.95, roughness: 0.12 });
+  const velvetNavyMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.65 });
+  const velvetRedMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.65 });
+  const cyanGlowMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 3.2, roughness: 0.1 });
+
+  // 1. Base escalonada de mármol pulido con bisel dorado
+  const basePlinth = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.40, 0.22, 24), darkMarbleMat);
+  basePlinth.position.y = 0.11;
+  basePlinth.receiveShadow = true;
+  g.add(basePlinth);
+
+  const goldPlinthRing = new THREE.Mesh(new THREE.TorusGeometry(1.26, 0.035, 8, 32), goldMat);
+  goldPlinthRing.rotation.x = Math.PI / 2;
+  goldPlinthRing.position.y = 0.22;
+  g.add(goldPlinthRing);
+
+  const topPlinth = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1.05, 0.42, 24), marbleMat);
+  topPlinth.position.y = 0.43;
+  topPlinth.castShadow = true;
+  topPlinth.receiveShadow = true;
+  g.add(topPlinth);
+
+  // Cojín circular de terciopelo azul marino sobre el pedestal
+  const cushion = new THREE.Mesh(new THREE.CylinderGeometry(0.80, 0.84, 0.12, 24), velvetNavyMat);
+  cushion.position.y = 0.70;
+  g.add(cushion);
+
+  const cushionGoldTrim = new THREE.Mesh(new THREE.TorusGeometry(0.82, 0.022, 6, 24), goldMat);
+  cushionGoldTrim.rotation.x = Math.PI / 2;
+  cushionGoldTrim.position.y = 0.76;
+  g.add(cushionGoldTrim);
+
+  // Postes de cordón VIP (Stanchions de latón pulido y cordón rojo)
+  const stanchionAngles = [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75];
+  const stanchionRadius = 1.25;
+  const polePositions = [];
+
+  stanchionAngles.forEach(ang => {
+    const px = Math.cos(ang) * stanchionRadius;
+    const pz = Math.sin(ang) * stanchionRadius;
+    polePositions.push([px, pz]);
+
+    const sBase = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 0.04, 12), goldMat);
+    sBase.position.set(px, 0.02, pz);
+    g.add(sBase);
+
+    const sPole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.90, 8), goldMat);
+    sPole.position.set(px, 0.47, pz);
+    sPole.castShadow = true;
+    g.add(sPole);
+
+    const sCap = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 10), goldMat);
+    sCap.position.set(px, 0.94, pz);
+    g.add(sCap);
   });
-  const darkStoneMat = new THREE.MeshStandardMaterial({
-    color: 0x616a6b,
-    roughness: 0.85
-  });
 
-  // Pedestal escalonado de piedra labrada
-  const baseStone = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.95, 0.25, 8), darkStoneMat);
-  baseStone.position.y = 0.125;
-  baseStone.receiveShadow = true;
-  g.add(baseStone);
+  // Cordones de terciopelo rojo entre postes
+  for (let i = 0; i < polePositions.length; i++) {
+    // Solo cordones en laterales y fondo, dejando el frente despejado
+    if (i === 0) continue; 
+    const p1 = polePositions[i];
+    const p2 = polePositions[(i + 1) % polePositions.length];
+    const mx = (p1[0] + p2[0]) / 2;
+    const mz = (p1[1] + p2[1]) / 2;
+    const dist = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
+    const ang = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]);
 
-  const midStone = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.35, 8), darkStoneMat);
-  midStone.position.y = 0.425;
-  midStone.receiveShadow = true;
-  g.add(midStone);
-
-  // Monedas de oro incrustadas / depositadas en el escalón del pedestal
-  const cGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.015, 8);
-  for (let i = 0; i < 14; i++) {
-    const coin = new THREE.Mesh(cGeo, goldMat);
-    const a = (i / 14) * Math.PI * 2;
-    coin.position.set(Math.cos(a) * 0.72, 0.26, Math.sin(a) * 0.72);
-    coin.rotation.y = a;
-    g.add(coin);
+    const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, dist * 0.96, 8), velvetRedMat);
+    rope.position.set(mx, 0.82, mz);
+    rope.rotation.z = Math.PI / 2;
+    rope.rotation.y = -ang;
+    g.add(rope);
   }
 
-  // Talismán Dorado de la Tarjeta Cosmos (Flotante y majestuoso)
-  const talisman = new THREE.Group();
-  talisman.position.y = 1.75;
+  // 2. Tarjeta Cosmos VIP Flotante (Emblema de Beneficios Corporativos)
+  const cardGroup = new THREE.Group();
+  cardGroup.position.y = 1.70;
 
-  // Placa de oro (1.4m x 0.88m)
-  const plate = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.88, 0.06), goldMat);
-  plate.castShadow = true;
-  talisman.add(plate);
+  // Tarjeta principal (proporción ID-1 85.6mm x 54mm -> 1.45 x 0.92)
+  const cardMesh = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.92, 0.04), cardBodyMat);
+  cardMesh.castShadow = true;
+  cardGroup.add(cardMesh);
 
-  // Esfera planetaria central 3D
-  const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), goldMat);
-  sphere.position.z = 0.04;
-  talisman.add(sphere);
+  // Borde perimetral en oro pulido
+  const cardGoldFrame = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.95, 0.032), goldMat);
+  cardGroup.add(cardGoldFrame);
 
-  // Anillo orbital inclinado 3D
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.44, 0.028, 8, 32), goldMat);
-  ring.rotation.x = Math.PI / 3;
-  ring.rotation.y = Math.PI / 6;
-  ring.position.z = 0.04;
-  talisman.add(ring);
+  // Chip EMV inteligente con micro-relieve dorado
+  const chip = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.22, 0.05), cardChipMat);
+  chip.position.set(-0.44, 0.12, 0.005);
+  cardGroup.add(chip);
 
-  // 4 Estrellas en los cuadrantes
-  const starGeo = new THREE.OctahedronGeometry(0.055, 0);
-  [[-0.5, 0.26], [0.5, 0.26], [-0.5, -0.26], [0.5, -0.26]].forEach(([sx, sy]) => {
-    const st = new THREE.Mesh(starGeo, goldMat);
-    st.position.set(sx, sy, 0.045);
-    talisman.add(st);
-  });
+  // Símbolo Cosmos: Estrella de 8 puntas dorada con núcleo de zafiro cian
+  const starCore = new THREE.Mesh(new THREE.OctahedronGeometry(0.18, 0), cyanGlowMat);
+  starCore.position.set(0.24, 0.14, 0.035);
+  cardGroup.add(starCore);
 
-  // Luz dorada cálida
-  const light = new THREE.PointLight(0xffb703, 2.0, 5.0);
-  light.position.set(0, 0, 0.35);
-  talisman.add(light);
+  const starRing = new THREE.Mesh(new THREE.TorusGeometry(0.30, 0.02, 6, 20), goldMat);
+  starRing.rotation.x = 0.75;
+  starRing.position.set(0.24, 0.14, 0.035);
+  cardGroup.add(starRing);
 
-  g.add(talisman);
-  g.userData.cardMesh = talisman;
+  // Banda de contactless / ondas Wi-Fi en oro
+  for (let w = 1; w <= 3; w++) {
+    const wave = new THREE.Mesh(new THREE.TorusGeometry(w * 0.06, 0.008, 4, 12, Math.PI * 0.6), goldMat);
+    wave.rotation.z = -Math.PI * 0.3;
+    wave.position.set(-0.16, 0.12, 0.025);
+    cardGroup.add(wave);
+  }
+
+  // Franja de nombre del colaborador y código de barras / bloques de números en relieve
+  for (let b = 0; b < 4; b++) {
+    const num = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.05, 0.05), goldMat);
+    num.position.set(-0.48 + b * 0.32, -0.22, 0.005);
+    cardGroup.add(num);
+  }
+
+  // QR Code VIP badge en la esquina
+  const qrBadge = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.05), goldMat);
+  qrBadge.position.set(0.52, 0.30, 0.005);
+  cardGroup.add(qrBadge);
+
+  // Luz dorada cálida envolvente
+  const light = new THREE.PointLight(0xf59e0b, 2.8, 5.5);
+  light.position.set(0, 0.2, 0.45);
+  cardGroup.add(light);
+
+  g.add(cardGroup);
+  g.userData.cardMesh = cardGroup;
 
   return g;
 }
 
-function createContractDesk() {
+// Flanco Izquierdo: Mostrador Noble de Convenios Comerciales (Restaurantes, Alimentos, Moda & Tiendas)
+function createCosmosMerchantsBooth() {
   const g = new THREE.Group();
-  const woodMat = new THREE.MeshStandardMaterial({ color: 0x4e342e, roughness: 0.8 });
-  const darkWoodMat = new THREE.MeshStandardMaterial({ color: 0x37251f, roughness: 0.85 });
-  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf5eedb, roughness: 0.75 });
-  const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.95, roughness: 0.15 });
-  const redWaxMat = new THREE.MeshStandardMaterial({ color: 0xa93226, roughness: 0.4 });
-  const runnerClothMat = new THREE.MeshStandardMaterial({ color: 0x78281f, roughness: 0.65 });
 
-  // 1. Mesa de roble macizo estilizada de banquero / escribano
-  const top = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 0.9), woodMat);
-  top.position.y = 0.82;
-  top.castShadow = true;
-  g.add(top);
+  const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a2c17, roughness: 0.72 });
+  const darkWoodMat = new THREE.MeshStandardMaterial({ color: 0x2b180d, roughness: 0.8 });
+  const navyClothMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.68 });
+  const goldClothMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.65 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xf3ba2f, metalness: 0.85, roughness: 0.25 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.85 });
+  const wickerMat = new THREE.MeshStandardMaterial({ color: 0xb4793f, roughness: 0.88 });
+  const appleMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 });
+  const grapeMat = new THREE.MeshStandardMaterial({ color: 0x7c3aed, roughness: 0.4 });
+  const breadMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.85 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.15, transparent: true, opacity: 0.85 });
 
-  // Mantel / Tapete central burdeos
-  const runner = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.015, 0.92), runnerClothMat);
-  runner.position.set(0, 0.875, 0);
+  // 1. Mostrador noble de madera oscura (sin techos/toldos para evitar saturación visual)
+  const table = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.09, 0.95), darkWoodMat);
+  table.position.y = 0.78;
+  table.castShadow = true;
+  g.add(table);
+
+  // Faldón de mesa con terciopelo azul marino
+  const runner = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.015, 0.90), navyClothMat);
+  runner.position.y = 0.83;
   g.add(runner);
 
-  // 4 Patas torneadas
-  [[-0.82, -0.34], [0.82, -0.34], [-0.82, 0.34], [0.82, 0.34]].forEach(([x, z]) => {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.82, 0.11), darkWoodMat);
-    leg.position.set(x, 0.41, z);
+  // 4 Patas robustas de madera torneada
+  [[-0.95, -0.36], [0.95, -0.36], [-0.95, 0.36], [0.95, 0.36]].forEach(([px, pz]) => {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.78, 8), woodMat);
+    leg.position.set(px, 0.39, pz);
     leg.castShadow = true;
     g.add(leg);
   });
 
-  // 2. Gran Pergamino de Contrato extendido
-  const doc = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.01, 0.48), parchmentMat);
-  doc.position.set(-0.1, 0.89, 0.02);
-  doc.rotation.y = 0.05;
-  g.add(doc);
+  // 2. Canasta de mimbre con alimentos gourmet (Restaurantes afiliados)
+  const basket = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.18, 0.15, 12), wickerMat);
+  basket.position.set(-0.68, 0.91, 0.05);
+  basket.castShadow = true;
+  g.add(basket);
 
-  // Sello de cera roja oficial
-  const seal = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.048, 0.018, 12), redWaxMat);
-  seal.position.set(0.02, 0.9, 0.14);
-  g.add(seal);
+  // Pan baguette artesanal
+  const bread = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.22, 4, 8), breadMat);
+  bread.rotation.z = 0.6;
+  bread.position.set(-0.70, 1.03, 0.05);
+  g.add(bread);
 
-  // 3. Balanza de latón para monedas
-  const scBase = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.03, 10), goldMat);
-  scBase.position.set(0.55, 0.89, 0);
-  g.add(scBase);
-
-  const scPole = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.015, 0.42, 8), goldMat);
-  scPole.position.set(0.55, 1.1, 0);
-  g.add(scPole);
-
-  const scBeam = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.36, 8), goldMat);
-  scBeam.rotation.z = Math.PI / 2;
-  scBeam.position.set(0.55, 1.28, 0);
-  g.add(scBeam);
-
-  [-0.15, 0.15].forEach(bx => {
-    const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.14, 4), goldMat);
-    cord.position.set(0.55 + bx, 1.2, 0);
-    g.add(cord);
-
-    const pan = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.045, 0.015, 8), goldMat);
-    pan.position.set(0.55 + bx, 1.12, 0);
-    g.add(pan);
+  // Frutas en la canasta (manzanas rojas y uvas)
+  [[-0.75, 1.00, -0.04], [-0.60, 1.00, 0.04], [-0.66, 1.02, 0.10]].forEach(([fx, fy, fz], idx) => {
+    const fruit = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), idx === 1 ? grapeMat : appleMat);
+    fruit.position.set(fx, fy, fz);
+    g.add(fruit);
   });
 
-  // 4. Pilas de monedas de oro en el escritorio
-  for (let c = 0; c < 3; c++) {
-    for (let h = 0; h < 4 + c; h++) {
-      const coin = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.014, 8), goldMat);
-      coin.position.set(0.35 + c * 0.08, 0.89 + h * 0.014, -0.15);
-      g.add(coin);
-    }
-  }
+  // Botella de vino / aceite gourmet
+  const bottle = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.25, 8), glassMat);
+  bottle.position.set(-0.38, 0.96, -0.15);
+  bottle.castShadow = true;
+  g.add(bottle);
 
-  // 5. Tintero de cerámica y pluma blanca
-  const ink = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.055, 8), darkWoodMat);
-  ink.position.set(-0.55, 0.9, -0.18);
-  g.add(ink);
+  // 3. Paquetes de regalo de boutiques y tiendas departamentales afiliadas
+  const giftBox1 = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.26, 0.26), navyClothMat);
+  giftBox1.position.set(0.18, 0.96, 0.05);
+  giftBox1.castShadow = true;
+  g.add(giftBox1);
 
-  const quill = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.012, 0.22, 6), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 }));
-  quill.rotation.z = -0.38;
-  quill.position.set(-0.52, 0.98, -0.18);
-  g.add(quill);
+  const ribbon1 = new THREE.Mesh(new THREE.BoxGeometry(0.33, 0.27, 0.05), goldMat);
+  ribbon1.position.set(0.18, 0.96, 0.05);
+  g.add(ribbon1);
 
-  // 6. Rollos de pergaminos de convenios
-  const rollGeo = new THREE.CylinderGeometry(0.032, 0.032, 0.3, 8);
-  const roll1 = new THREE.Mesh(rollGeo, parchmentMat);
-  roll1.rotation.z = Math.PI / 2;
-  roll1.position.set(-0.65, 0.91, 0.15);
-  g.add(roll1);
+  const giftBox2 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.22, 0.22), goldClothMat);
+  giftBox2.position.set(0.55, 0.94, -0.08);
+  giftBox2.rotation.y = 0.35;
+  giftBox2.castShadow = true;
+  g.add(giftBox2);
 
-  const roll2 = new THREE.Mesh(rollGeo, parchmentMat);
-  roll2.rotation.z = Math.PI / 2;
-  roll2.position.set(-0.65, 0.95, 0.15);
-  g.add(roll2);
+  // 4. Directorio / Catálogo de Convenios en atril
+  const brochureStand = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.03, 0.25), darkWoodMat);
+  brochureStand.rotation.x = -0.3;
+  brochureStand.position.set(0.82, 0.90, 0.12);
+  g.add(brochureStand);
+
+  const brochure = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.02, 0.22), parchmentMat);
+  brochure.rotation.x = -0.3;
+  brochure.position.set(0.82, 0.92, 0.12);
+  g.add(brochure);
+
+  // Placa frontal grabada: "CONVENIOS COMERCIALES"
+  const plaque = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.16, 0.04), goldMat);
+  plaque.position.set(0, 0.70, 0.46);
+  g.add(plaque);
 
   return g;
 }
 
-function createWealthTreasureDisplay() {
+// Flanco Derecho: Mostrador Noble de Salud, Deporte, Gimnasios y Puntos Cosmos
+function createCosmosWellnessRewardsBooth() {
   const g = new THREE.Group();
-  const goldMat = new THREE.MeshStandardMaterial({
-    color: 0xffd700,
-    emissive: 0xd4af37,
-    emissiveIntensity: 0.45,
-    metalness: 0.96,
-    roughness: 0.15
-  });
-  const burlapMat = new THREE.MeshStandardMaterial({ color: 0xa88962, roughness: 0.85 });
-  const darkRopeMat = new THREE.MeshStandardMaterial({ color: 0x4a3420, roughness: 0.9 });
-  const gemRubyMat = new THREE.MeshStandardMaterial({ color: 0xe74c3c, emissive: 0xc0392b, emissiveIntensity: 1.2, roughness: 0.1 });
-  const gemEmeraldMat = new THREE.MeshStandardMaterial({ color: 0x2ecc71, emissive: 0x27ae60, emissiveIntensity: 1.2, roughness: 0.1 });
-  const gemSapphireMat = new THREE.MeshStandardMaterial({ color: 0x3498db, emissive: 0x2980b9, emissiveIntensity: 1.2, roughness: 0.1 });
-  const woodPlankMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.8 });
 
-  // 1. Pirámide de Lingotes de Oro Puro 24K sobre bandeja de madera
-  const tray = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.04, 0.65), woodPlankMat);
-  tray.position.set(-0.6, 0.02, 0);
-  tray.receiveShadow = true;
+  const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a2c17, roughness: 0.72 });
+  const darkWoodMat = new THREE.MeshStandardMaterial({ color: 0x2b180d, roughness: 0.8 });
+  const goldClothMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.65 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xf3ba2f, metalness: 0.88, roughness: 0.22 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.8, roughness: 0.3 });
+  const towelMat = new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.95 });
+  const towelStripeMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.9 });
+  
+  const potionEmerald = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 1.8, roughness: 0.2 });
+  const potionRuby = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xb91c1c, emissiveIntensity: 1.8, roughness: 0.2 });
+  const potionSapphire = new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x1d4ed8, emissiveIntensity: 1.8, roughness: 0.2 });
+
+  // 1. Mostrador noble de madera oscura (sin techos/toldos)
+  const table = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.09, 0.95), darkWoodMat);
+  table.position.y = 0.78;
+  table.castShadow = true;
+  g.add(table);
+
+  // Faldón de mesa con terciopelo dorado
+  const runner = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.015, 0.90), goldClothMat);
+  runner.position.y = 0.83;
+  g.add(runner);
+
+  // 4 Patas robustas
+  [[-0.95, -0.36], [0.95, -0.36], [-0.95, 0.36], [0.95, 0.36]].forEach(([px, pz]) => {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.78, 8), woodMat);
+    leg.position.set(px, 0.39, pz);
+    leg.castShadow = true;
+    g.add(leg);
+  });
+
+  // 2. Frascos de salud, farmacia y botica preventiva (Membresías de Salud & Dental)
+  const potionRack = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.05, 0.26), darkWoodMat);
+  potionRack.position.set(-0.65, 0.87, -0.08);
+  g.add(potionRack);
+
+  [potionEmerald, potionRuby, potionSapphire].forEach((pMat, idx) => {
+    const flask = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.17, 8), pMat);
+    flask.position.set(-0.85 + idx * 0.20, 0.98, -0.08);
+    flask.castShadow = true;
+    g.add(flask);
+
+    const cork = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.045, 6), darkWoodMat);
+    cork.position.set(-0.85 + idx * 0.20, 1.09, -0.08);
+    g.add(cork);
+  });
+
+  // 3. Pesas de fitness y toalla deportiva enrollada
+  const towel = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.32, 12), towelMat);
+  towel.rotation.z = Math.PI / 2;
+  towel.position.set(-0.62, 0.90, 0.22);
+  towel.castShadow = true;
+  g.add(towel);
+
+  const tStripe = new THREE.Mesh(new THREE.TorusGeometry(0.081, 0.014, 6, 16), towelStripeMat);
+  tStripe.rotation.y = Math.PI / 2;
+  tStripe.position.set(-0.62, 0.90, 0.22);
+  g.add(tStripe);
+
+  // Mancuernas de fitness
+  [[-0.10, 0.05], [0.12, -0.10]].forEach(([dx, dz]) => {
+    const dGroup = new THREE.Group();
+    dGroup.position.set(dx, 0.88, dz);
+    dGroup.rotation.y = 0.4;
+
+    const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.24, 6), ironMat);
+    bar.rotation.z = Math.PI / 2;
+    dGroup.add(bar);
+
+    [-0.10, 0.10].forEach(hx => {
+      const head = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.045, 6), ironMat);
+      head.rotation.z = Math.PI / 2;
+      head.position.x = hx;
+      dGroup.add(head);
+    });
+    g.add(dGroup);
+  });
+
+  // 4. Bandeja dorada con Monedas / Puntos Cosmos de Recompensas
+  const tray = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.27, 0.03, 16), goldMat);
+  tray.position.set(0.65, 0.87, 0.06);
   g.add(tray);
 
-  const barGeo = new THREE.BoxGeometry(0.24, 0.055, 0.11);
-  // Fila base de lingotes (3x2)
-  for (let r = 0; r < 2; r++) {
-    for (let c = 0; c < 3; c++) {
-      const bar = new THREE.Mesh(barGeo, goldMat);
-      bar.position.set(-0.84 + c * 0.24, 0.065, -0.07 + r * 0.14);
-      bar.castShadow = true;
-      g.add(bar);
-    }
-  }
-  // Segunda fila de lingotes (2x2)
-  for (let r = 0; r < 2; r++) {
-    for (let c = 0; c < 2; c++) {
-      const bar = new THREE.Mesh(barGeo, goldMat);
-      bar.position.set(-0.72 + c * 0.24, 0.12, -0.07 + r * 0.14);
-      bar.castShadow = true;
-      g.add(bar);
-    }
-  }
-  // Cima de lingote (1)
-  const topBar = new THREE.Mesh(barGeo, goldMat);
-  topBar.position.set(-0.6, 0.175, 0);
-  topBar.castShadow = true;
-  g.add(topBar);
-
-  // 2. Múltiples Sacos de Caudales Rebosantes
-  // Saco parado grande
-  const sack1 = new THREE.Group();
-  sack1.position.set(0.1, 0, -0.2);
-  const sBody1 = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 10), burlapMat);
-  sBody1.scale.set(1.0, 1.25, 0.95);
-  sBody1.position.y = 0.32;
-  sBody1.castShadow = true;
-  sack1.add(sBody1);
-  const sRope1 = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.03, 8, 16), darkRopeMat);
-  sRope1.rotation.x = Math.PI / 2;
-  sRope1.position.y = 0.56;
-  sack1.add(sRope1);
-  const sTop1 = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.15, 8), burlapMat);
-  sTop1.position.y = 0.65;
-  sack1.add(sTop1);
-  g.add(sack1);
-
-  // Saco parado mediano inclinado
-  const sack2 = new THREE.Group();
-  sack2.position.set(0.58, 0, -0.1);
-  sack2.rotation.z = -0.2;
-  const sBody2 = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 10), burlapMat);
-  sBody2.scale.set(1.0, 1.2, 0.9);
-  sBody2.position.y = 0.26;
-  sBody2.castShadow = true;
-  sack2.add(sBody2);
-  const sRope2 = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.025, 8, 16), darkRopeMat);
-  sRope2.rotation.x = Math.PI / 2;
-  sRope2.position.y = 0.46;
-  sack2.add(sRope2);
-  g.add(sack2);
-
-  // Saco 3 volcado derramando monedas
-  const sack3 = new THREE.Group();
-  sack3.position.set(0.25, 0.12, 0.3);
-  sack3.rotation.z = Math.PI / 2.4;
-  sack3.rotation.y = 0.45;
-  const sBody3 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), burlapMat);
-  sBody3.scale.set(0.9, 1.3, 0.9);
-  sack3.add(sBody3);
-  g.add(sack3);
-
-  // 3. Alfombra abundante de Monedas de Oro Brillantes derramadas
-  const coinGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.016, 8);
-  for (let i = 0; i < 45; i++) {
-    const coin = new THREE.Mesh(coinGeo, goldMat);
-    const ang = Math.random() * Math.PI * 2;
-    const r = 0.1 + Math.random() * 0.65;
-    coin.position.set(0.2 + Math.cos(ang) * r, 0.012 + (i % 4) * 0.015, 0.2 + Math.sin(ang) * r);
-    coin.rotation.set((Math.random() - 0.5) * 0.25, Math.random() * Math.PI, (Math.random() - 0.5) * 0.25);
-    coin.castShadow = true;
+  for (let c = 0; c < 12; c++) {
+    const coin = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.012, 8), goldMat);
+    const ang = (c / 12) * Math.PI * 2;
+    const r = 0.08 + (c % 3) * 0.05;
+    coin.position.set(0.65 + Math.cos(ang) * r, 0.89 + (c % 4) * 0.014, 0.06 + Math.sin(ang) * r);
     g.add(coin);
   }
 
-  // Gemas preciosas cortadas mezcladas con las monedas
-  const gemGeo = new THREE.OctahedronGeometry(0.045, 0);
-  [
-    [0.15, 0.04, 0.35, gemRubyMat],
-    [0.35, 0.04, 0.15, gemEmeraldMat],
-    [-0.05, 0.04, 0.45, gemSapphireMat],
-    [0.45, 0.04, 0.4, gemRubyMat],
-    [-0.45, 0.04, 0.18, gemEmeraldMat]
-  ].forEach(([gx, gy, gz, gMat]) => {
-    const gem = new THREE.Mesh(gemGeo, gMat);
-    gem.position.set(gx, gy, gz);
-    g.add(gem);
-  });
-
-  // Luz dorada cálida que hace resplandecer todo el tesoro
-  const goldLight = new THREE.PointLight(0xffb703, 2.2, 5.0);
-  goldLight.position.set(0, 0.8, 0.2);
-  g.add(goldLight);
+  // Placa frontal grabada: "SALUD & BIENESTAR"
+  const plaque = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.16, 0.04), goldMat);
+  plaque.position.set(0, 0.70, 0.46);
+  g.add(plaque);
 
   return g;
 }
 
-// ── Paleta Oficial Bradesco & Heráldica ─────────────────────────────────────────
-const BRAND_PALETTE = {
-  red: 0xCC092F,         // Vermelho Bradesco (PMS 186)
-  darkRed: 0x900F15,     // Vermelho Escuro Bradesco (PMS 7427)
-  deepRed: 0xBA0A29,
-  cream: 0xF8F6F0,       // Wealth / Atacado Marfil
-  greige: 0xECE7DE,
-  gray: 0x808285
-};
-
-function createBradescoBanner(height = 3.6) {
-  const g = new THREE.Group();
-  const poleMat = new THREE.MeshStandardMaterial({ color: 0x422c19, roughness: 0.85 });
-  const brassMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    emissive: 0x997518,
-    emissiveIntensity: 0.35,
-    metalness: 0.85,
-    roughness: 0.25
-  });
-  const redBannerMat = new THREE.MeshStandardMaterial({ color: 0xCC092F, roughness: 0.65 });
-  const darkRedMat = new THREE.MeshStandardMaterial({ color: 0x900F15, roughness: 0.65 });
-  const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xf3cc78, metalness: 0.6, roughness: 0.3 });
-
-  // Base de piedra labrada
-  const stoneBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.26, 0.32, 0.28, 8),
-    new THREE.MeshStandardMaterial({ color: 0x6e685f, roughness: 0.9 })
-  );
-  stoneBase.position.y = 0.14;
-  stoneBase.castShadow = true;
-  g.add(stoneBase);
-
-  // Mástil de madera noble
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.05, height, 10), poleMat);
-  pole.position.y = height / 2 + 0.15;
-  pole.castShadow = true;
-  g.add(pole);
-
-  // Remate de lanza dorada
-  const spear = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.28, 6), brassMat);
-  spear.position.y = height + 0.3;
-  g.add(spear);
-
-  // Travesaño superior
-  const crossbar = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1.05, 8), poleMat);
-  crossbar.rotation.z = Math.PI / 2;
-  crossbar.position.set(0, height - 0.12, 0);
-  g.add(crossbar);
-
-  [-0.52, 0.52].forEach(x => {
-    const finial = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), brassMat);
-    finial.position.set(x, height - 0.12, 0);
-    g.add(finial);
-  });
-
-  // Tela del estandarte en Vermelho Bradesco (#CC092F)
-  const bannerCloth = new THREE.Mesh(new THREE.BoxGeometry(0.92, 1.6, 0.02), redBannerMat);
-  bannerCloth.position.set(0, height - 0.95, 0.015);
-  bannerCloth.castShadow = true;
-  g.add(bannerCloth);
-
-  // Cenefa inferior en Vermelho Escuro (#900F15)
-  const bottomBorder = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.22, 0.025), darkRedMat);
-  bottomBorder.position.set(0, height - 1.68, 0.018);
-  g.add(bottomBorder);
-
-  // Emblema heráldico central bordado en hilo de oro
-  const crest = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.34, 0.03), goldTrimMat);
-  crest.rotation.z = Math.PI / 4;
-  crest.position.set(0, height - 0.72, 0.02);
-  g.add(crest);
-
-  const innerCrest = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.035), darkRedMat);
-  innerCrest.rotation.z = Math.PI / 4;
-  innerCrest.position.set(0, height - 0.72, 0.022);
-  g.add(innerCrest);
-
-  return g;
-}
+// ── ESTACIÓN 06: HISTORIA & MUSEO CONSISTORIAL ────────────────────────────────
 
 function createFoundationalMonument() {
   const g = new THREE.Group();
-  // Paleta 100% coherente con la cantería y bronces de KayKit
-  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x756f65, roughness: 0.88 });
-  const stoneTrimMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.85 });
-  const bronzeGoldMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    emissive: 0x997518,
-    emissiveIntensity: 0.35,
-    metalness: 0.88,
-    roughness: 0.25
-  });
-  const brassMat = new THREE.MeshStandardMaterial({
-    color: 0xc59b27,
-    metalness: 0.90,
-    roughness: 0.24
-  });
-  const brandDarkRedMat = new THREE.MeshStandardMaterial({
-    color: 0x900F15,
-    roughness: 0.45
-  });
+  const graniteMat = new THREE.MeshStandardMaterial({ color: 0x544f48, roughness: 0.88 });
+  const darkGraniteMat = new THREE.MeshStandardMaterial({ color: 0x3d3934, roughness: 0.9 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.75, roughness: 0.35 });
+  const coreMat = new THREE.MeshStandardMaterial({ color: 0x00d2ff, emissive: 0x0088cc, emissiveIntensity: 2.5, roughness: 0.15 });
 
-  // 1. Base monumental circular escalonada de piedra medieval
-  const base1 = new THREE.Mesh(new THREE.CylinderGeometry(1.45, 1.6, 0.25, 16), stoneTrimMat);
-  base1.position.y = 0.125;
+  // 1. Pedestal octogonal de granito labrado
+  const base1 = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.7, 0.30, 8), darkGraniteMat);
+  base1.position.y = 0.15;
   base1.receiveShadow = true;
   g.add(base1);
 
-  const base2 = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.3, 0.25, 16), stoneMat);
-  base2.position.y = 0.375;
-  base2.receiveShadow = true;
-  g.add(base2);
-
-  // Pedestal octogonal moldurado de piedra labrada
-  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.88, 0.65, 8), stoneMat);
-  plinth.position.y = 0.825;
+  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.90, 1.05, 0.80, 8), graniteMat);
+  plinth.position.y = 0.70;
   plinth.castShadow = true;
+  plinth.receiveShadow = true;
   g.add(plinth);
 
-  // Moldura con ribete en Vermelho Escuro Bradesco y bronce
-  const plinthRing = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.038, 8, 24), bronzeGoldMat);
-  plinthRing.rotation.x = Math.PI / 2;
-  plinthRing.position.y = 1.15;
-  g.add(plinthRing);
+  // Herrajes de bronce en el pedestal
+  const ironRim = new THREE.Mesh(new THREE.TorusGeometry(0.92, 0.035, 6, 24), ironMat);
+  ironRim.rotation.x = Math.PI / 2;
+  ironRim.position.y = 1.10;
+  g.add(ironRim);
 
-  const brandAccentRing = new THREE.Mesh(new THREE.TorusGeometry(0.785, 0.02, 8, 24), brandDarkRedMat);
-  brandAccentRing.rotation.x = Math.PI / 2;
-  brandAccentRing.position.y = 1.12;
-  g.add(brandAccentRing);
-
-  // 4 Placas conmemorativas de bronce con la historia y el propósito
+  // 4 Placas de bronce grabadas con las 4 Eras
   for (let i = 0; i < 4; i++) {
     const ang = (i / 4) * Math.PI * 2;
-    const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.24, 0.025), bronzeGoldMat);
-    plaque.position.set(Math.sin(ang) * 0.78, 0.82, Math.cos(ang) * 0.78);
+    const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.22, 0.03), brassMat);
+    plaque.position.set(Math.sin(ang) * 0.91, 0.72, Math.cos(ang) * 0.91);
     plaque.rotation.y = ang;
     g.add(plaque);
   }
 
-  // 2. Esfera Armilar & Gran Astrolabio Solar de Bronce Dorado (Escala incrementada)
+  // 2. Gran Esfera Armilar y Astrolabio Solar de Bronce
   const armillary = new THREE.Group();
-  armillary.position.y = 1.72;
+  armillary.position.y = 1.75;
 
-  // Base del astrolabio
-  const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.2, 0.38, 12), brassMat);
-  stand.position.y = -0.19;
+  const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.20, 0.35, 8), brassMat);
+  stand.position.y = -0.18;
   armillary.add(stand);
 
-  // Anillo meridiano exterior fijo (radio 0.72)
-  const meridian = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.042, 8, 32), bronzeGoldMat);
+  const meridian = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.04, 6, 32), brassMat);
   armillary.add(meridian);
 
-  // Anillo armilar 1 (rotación continua, radio 0.62)
-  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.036, 8, 32), brassMat);
+  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.60, 0.032, 6, 32), brassMat);
   ring1.rotation.x = Math.PI / 3;
   armillary.add(ring1);
 
-  // Anillo armilar 2 (rotación continua, radio 0.52)
-  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.032, 8, 32), bronzeGoldMat);
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.48, 0.028, 6, 32), brassMat);
   ring2.rotation.y = Math.PI / 4;
   armillary.add(ring2);
 
-  // Núcleo: Sol Dorado del Propósito con corona de bronce
-  const sun = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), bronzeGoldMat);
-  armillary.add(sun);
+  const sunCore = new THREE.Mesh(new THREE.SphereGeometry(0.20, 16, 16), coreMat);
+  armillary.add(sunCore);
 
-  // Flecha solar del tiempo
-  const arrow = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1.55, 8), bronzeGoldMat);
-  arrow.rotation.z = Math.PI / 6;
-  armillary.add(arrow);
+  const axis = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.5, 6), brassMat);
+  axis.rotation.z = Math.PI / 6;
+  armillary.add(axis);
 
-  // Luz ámbar dorada envolvente
   const sunLight = new THREE.PointLight(0xffb703, 2.6, 6.5);
   sunLight.position.y = 0.1;
   armillary.add(sunLight);
@@ -1487,24 +1482,18 @@ function createFoundationalMonument() {
 
 function createHistoricalMilestonesGallery() {
   const g = new THREE.Group();
-  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x756f65, roughness: 0.88 });
-  const stoneTrimMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.85 });
-  const bronzeGoldMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    emissive: 0x997518,
-    emissiveIntensity: 0.35,
-    metalness: 0.88,
-    roughness: 0.25
-  });
-  const velvetMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, roughness: 0.55 });
-  const parchmentMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.cream, roughness: 0.75 });
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.88 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x3a2414, roughness: 0.82 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const velvetRedMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.75, roughness: 0.35 });
 
-  // 4 Columnas / Estelas Conmemorativas de las Eras en arco abierto
   const milestones = [
-    { x: -1.65, z: 0.25, rotY: 0.28, era: '1998 · EL ORIGEN', icon: 'scroll' },
-    { x: -0.55, z: -0.05, rotY: 0.12, era: '2008 · EXPANSIÓN', icon: 'compass' },
-    { x: 0.55, z: -0.05, rotY: -0.12, era: '2018 · INNOVACIÓN', icon: 'gear' },
-    { x: 1.65, z: 0.25, rotY: -0.28, era: 'PRESENTE · IMPACTO', icon: 'crown' }
+    { x: -1.75, z: 0.25, rotY: 0.28, type: 'origin' },
+    { x: -0.60, z: -0.05, rotY: 0.10, type: 'expansion' },
+    { x: 0.60, z: -0.05, rotY: -0.10, type: 'digital' },
+    { x: 1.75, z: 0.25, rotY: -0.28, type: 'present' }
   ];
 
   milestones.forEach((m, idx) => {
@@ -1512,93 +1501,80 @@ function createHistoricalMilestonesGallery() {
     col.position.set(m.x, 0, m.z);
     col.rotation.y = m.rotY;
 
-    // Base escalonada de piedra medieval
-    const b1 = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.16, 0.62), stoneTrimMat);
-    b1.position.y = 0.08;
-    b1.receiveShadow = true;
-    col.add(b1);
+    // Pedestal de piedra con capitel de roble oscuro
+    const bBase = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.18, 0.58), stoneMat);
+    bBase.position.y = 0.09;
+    bBase.receiveShadow = true;
+    col.add(bBase);
 
-    const b2 = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.14, 0.48), stoneMat);
-    b2.position.y = 0.23;
-    col.add(b2);
-
-    // Fuste de la estela clásica
-    const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.48, 1.15, 0.38), stoneMat);
-    shaft.position.y = 0.875;
+    const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.48, 1.10, 0.40), stoneMat);
+    shaft.position.y = 0.73;
     shaft.castShadow = true;
     col.add(shaft);
 
-    // Cornisa superior
-    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.12, 0.46), stoneTrimMat);
-    cap.position.y = 1.51;
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.08, 0.46), darkOakMat);
+    cap.position.y = 1.32;
     col.add(cap);
 
-    // Placa de bronce grabada con el hito
-    const tag = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.18, 0.02), bronzeGoldMat);
-    tag.position.set(0, 0.92, 0.2);
-    col.add(tag);
+    // Placa de bronce con el año grabado
+    const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.16, 0.02), brassMat);
+    plaque.position.set(0, 0.85, 0.21);
+    col.add(plaque);
 
-    // Reliquia dorada en la cima de cada pedestal:
-    if (m.icon === 'scroll') {
-      // 1. Códice / Pergamino Fundacional con lacre
-      const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.07, 0.26), velvetMat);
-      cushion.position.set(0, 1.61, 0);
-      col.add(cushion);
+    if (m.type === 'origin') {
+      // 1998: Pergamino de fundación con sello de lacre rojo y farol
+      const scroll = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.26, 8), parchmentMat);
+      scroll.rotation.z = Math.PI / 2;
+      scroll.position.set(0, 1.40, 0.05);
+      col.add(scroll);
 
-      const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.26, 8), parchmentMat);
-      roll.rotation.z = Math.PI / 2;
-      roll.position.set(0, 1.69, 0);
-      col.add(roll);
+      const seal = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.012, 6), velvetRedMat);
+      seal.position.set(0, 1.44, 0.08);
+      col.add(seal);
 
-      const waxSeal = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.015, 8), velvetMat);
-      waxSeal.position.set(0, 1.74, 0.03);
-      col.add(waxSeal);
-    } else if (m.icon === 'compass') {
-      // 2. Brújula náutica de bronce de expedición
-      const cmp = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.08, 16), bronzeGoldMat);
-      cmp.position.set(0, 1.61, 0);
-      col.add(cmp);
+      const lantern = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.12), ironMat);
+      lantern.position.set(0.16, 1.45, -0.10);
+      col.add(lantern);
+    } else if (m.type === 'expansion') {
+      // 2008: Brújula náutica dorada y mapa enrollado
+      const compass = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.11, 0.06, 12), brassMat);
+      compass.position.set(-0.08, 1.39, 0);
+      col.add(compass);
 
-      const needle = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.24, 4), bronzeGoldMat);
-      needle.rotation.x = Math.PI / 2;
-      needle.position.set(0, 1.68, 0);
-      col.add(needle);
-    } else if (m.icon === 'gear') {
-      // 3. Engranaje solar de bronce de innovación
-      const gear = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.06, 8), bronzeGoldMat);
-      gear.position.set(0, 1.62, 0);
+      const spyglass = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.035, 0.28, 8), brassMat);
+      spyglass.rotation.z = 0.6;
+      spyglass.position.set(0.10, 1.42, 0.02);
+      col.add(spyglass);
+    } else if (m.type === 'digital') {
+      // 2018: Engranaje de relojería de bronce y gema
+      const gear = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.05, 8), brassMat);
+      gear.position.set(0, 1.39, 0);
       col.add(gear);
 
-      const core = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 12), bronzeGoldMat);
-      core.position.set(0, 1.72, 0);
-      col.add(core);
+      const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.08, 0), new THREE.MeshStandardMaterial({ color: 0x00d2ff, emissive: 0x0088cc, emissiveIntensity: 2.2 }));
+      gem.position.set(0, 1.48, 0);
+      col.add(gem);
     } else {
-      // 4. Corona de laurel triunfal y antorcha de impacto
-      const wreath = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.025, 6, 16), bronzeGoldMat);
+      // Presente: Corona de laureles dorados sobre cojín carmesí
+      const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.26), velvetRedMat);
+      cushion.position.set(0, 1.40, 0);
+      col.add(cushion);
+
+      const wreath = new THREE.Mesh(new THREE.TorusGeometry(0.10, 0.022, 6, 16), brassMat);
       wreath.rotation.x = Math.PI / 2;
-      wreath.position.set(0, 1.62, 0);
+      wreath.position.set(0, 1.46, 0);
       col.add(wreath);
-
-      const torch = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.18, 6), bronzeGoldMat);
-      torch.position.set(0, 1.74, 0);
-      col.add(torch);
     }
-
-    // Luz ámbar suave sobre cada hito
-    const light = new THREE.PointLight(0xffd54f, 1.1, 2.2);
-    light.position.set(0, 1.85, 0);
-    col.add(light);
 
     g.add(col);
 
-    // Cordón ceremonial de terciopelo carmesí entre pedestales
     if (idx < milestones.length - 1) {
       const nextM = milestones[idx + 1];
       const midX = (m.x + nextM.x) / 2;
       const midZ = (m.z + nextM.z) / 2;
-      const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.95, 8), velvetMat);
+      const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 1.0, 6), velvetRedMat);
       rope.rotation.z = Math.PI / 2;
-      rope.position.set(midX, 0.85, midZ + 0.12);
+      rope.position.set(midX, 0.85, midZ + 0.10);
       g.add(rope);
     }
   });
@@ -1608,184 +1584,131 @@ function createHistoricalMilestonesGallery() {
 
 function createCorporateHeritageMemorial() {
   const g = new THREE.Group();
-  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x756f65, roughness: 0.88 });
-  const stoneTrimMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.85 });
-  const woodMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.80 });
-  const bronzeGoldMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    emissive: 0x997518,
-    emissiveIntensity: 0.35,
-    metalness: 0.88,
-    roughness: 0.25
-  });
-  const parchmentMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.cream, roughness: 0.75 });
-  const velvetMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, roughness: 0.55 });
-  const brandDarkRedMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.darkRed, roughness: 0.55 });
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x462d18, roughness: 0.82 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.75, roughness: 0.35 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const redVelvetMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
 
-  // 1. Muro Conmemorativo de los Tres Pilares (Misión, Visión, Valores)
-  const wallBase = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.25, 0.5), stoneTrimMat);
-  wallBase.position.set(0, 0.125, -0.4);
-  wallBase.receiveShadow = true;
-  g.add(wallBase);
+  // 1. Tríptico mural de madera de roble con molduras
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.35, 0.20), oakMat);
+  wall.position.set(0, 0.95, -0.4);
+  wall.castShadow = true;
+  g.add(wall);
 
-  const mainWall = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.4, 0.3), stoneMat);
-  mainWall.position.set(0, 0.95, -0.4);
-  mainWall.castShadow = true;
-  g.add(mainWall);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.08, 0.30), darkOakMat);
+  roof.position.set(0, 1.66, -0.4);
+  g.add(roof);
 
-  const wallCap = new THREE.Mesh(new THREE.BoxGeometry(2.85, 0.18, 0.42), stoneTrimMat);
-  wallCap.position.set(0, 1.74, -0.4);
-  g.add(wallCap);
+  // 3 Placas de bronce para Misión, Visión y Valores
+  [-0.80, 0, 0.80].forEach(x => {
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.85, 0.03), darkOakMat);
+    frame.position.set(x, 0.98, -0.28);
+    g.add(frame);
 
-  // 3 Placas de Bronce Grabadas con los Pilares Institucionales y marco esmaltado Vermelho Escuro Bradesco
-  const pillars = [
-    { x: -0.85, title: 'MISIÓN' },
-    { x: 0, title: 'VISIÓN' },
-    { x: 0.85, title: 'VALORES' }
-  ];
-
-  pillars.forEach(p => {
-    // Marco esmaltado en Vermelho Escuro Bradesco (#900F15)
-    const plaqueBack = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.83, 0.02), brandDarkRedMat);
-    plaqueBack.position.set(p.x, 1.0, -0.245);
-    g.add(plaqueBack);
-
-    // Placa conmemorativa de bronce
-    const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.79, 0.03), bronzeGoldMat);
-    plaque.position.set(p.x, 1.0, -0.24);
-    g.add(plaque);
-
-    // Medallón en relieve
-    const emblem = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.04, 16), bronzeGoldMat);
-    emblem.rotation.x = Math.PI / 2;
-    emblem.position.set(p.x, 1.18, -0.22);
-    g.add(emblem);
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.75, 0.02), brassMat);
+    plate.position.set(x, 0.98, -0.26);
+    g.add(plate);
   });
 
-  // 2. Gran Atril de Piedra con el Libro Abierto de las Crónicas de la Empresa
-  const lecternBase = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.4, 0.2, 8), stoneTrimMat);
-  lecternBase.position.set(-0.6, 0.1, 0.6);
-  g.add(lecternBase);
+  // 2. Gran Atril de Roble con el Libro de Crónicas
+  const lectern = new THREE.Group();
+  lectern.position.set(-0.55, 0, 0.55);
 
-  const lecternPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.8, 8), stoneMat);
-  lecternPillar.position.set(-0.6, 0.6, 0.6);
-  lecternPillar.castShadow = true;
-  g.add(lecternPillar);
+  const base = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.12, 0.45), darkOakMat);
+  base.position.y = 0.06;
+  lectern.add(base);
 
-  const lecternTop = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.06, 0.55), woodMat);
-  lecternTop.position.set(-0.6, 1.05, 0.6);
-  lecternTop.rotation.x = -0.32;
-  g.add(lecternTop);
+  const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.10, 0.78, 8), oakMat);
+  pillar.position.y = 0.51;
+  pillar.castShadow = true;
+  lectern.add(pillar);
 
-  // Libro de las Crónicas Abierto
-  const bookCover = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.03, 0.44), woodMat);
-  bookCover.position.set(-0.6, 1.08, 0.6);
-  bookCover.rotation.x = -0.32;
-  g.add(bookCover);
+  const slant = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.05, 0.50), oakMat);
+  slant.position.set(0, 0.96, 0);
+  slant.rotation.x = -0.32;
+  lectern.add(slant);
 
-  const bookPages = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.05, 0.4), parchmentMat);
-  bookPages.position.set(-0.6, 1.11, 0.6);
-  bookPages.rotation.x = -0.32;
-  g.add(bookPages);
+  const book = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.04, 0.38), parchmentMat);
+  book.position.set(0, 0.99, 0);
+  book.rotation.x = -0.32;
+  lectern.add(book);
 
-  // Cinta marcapáginas carmesí
-  const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.015, 0.45), velvetMat);
-  ribbon.position.set(-0.6, 1.14, 0.6);
+  const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.01, 0.44), redVelvetMat);
+  ribbon.position.set(0, 1.02, 0);
   ribbon.rotation.x = -0.32;
-  g.add(ribbon);
+  lectern.add(ribbon);
 
-  // Pluma de ave de bronce y tintero
-  const inkwell = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.07, 8), bronzeGoldMat);
-  inkwell.position.set(-0.25, 1.09, 0.48);
-  g.add(inkwell);
+  g.add(lectern);
 
-  const quill = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.015, 0.28, 6), bronzeGoldMat);
-  quill.rotation.z = Math.PI / 4;
-  quill.rotation.x = 0.2;
-  quill.position.set(-0.22, 1.2, 0.48);
-  g.add(quill);
+  // 3. Candelabro de hierro de 3 velas encendidas
+  const candelabra = new THREE.Group();
+  candelabra.position.set(0.75, 0, 0.50);
 
-  // 3. Farol Conmemorativo de Forja
-  const lampPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 1.6, 8), stoneTrimMat);
-  lampPillar.position.set(1.1, 0.8, 0.5);
-  lampPillar.castShadow = true;
-  g.add(lampPillar);
+  const cBase = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 0.08, 8), ironMat);
+  cBase.position.y = 0.04;
+  candelabra.add(cBase);
 
-  const lantern = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.35, 0.24), bronzeGoldMat);
-  lantern.position.set(1.1, 1.75, 0.5);
-  g.add(lantern);
+  const cPole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.035, 1.2, 8), ironMat);
+  cPole.position.y = 0.64;
+  candelabra.add(cPole);
 
-  const lampLight = new THREE.PointLight(0xffa726, 2.0, 4.5);
-  lampLight.position.set(1.1, 1.75, 0.5);
-  g.add(lampLight);
+  [-0.18, 0, 0.18].forEach((cx, idx) => {
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.18, 6), ironMat);
+    arm.position.set(cx, 1.24 + (idx === 1 ? 0.08 : 0), 0);
+    candelabra.add(arm);
 
-  // 4. Banco de piedra labrada para contemplación histórica
-  const benchSeat = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.1, 0.4), stoneMat);
-  benchSeat.position.set(0.45, 0.45, 0.65);
-  benchSeat.castShadow = true;
-  g.add(benchSeat);
+    const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.14, 6), parchmentMat);
+    candle.position.set(cx, 1.38 + (idx === 1 ? 0.08 : 0), 0);
+    candelabra.add(candle);
 
-  [-0.05, 0.95].forEach(bx => {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.4, 0.35), stoneTrimMat);
-    leg.position.set(bx, 0.2, 0.65);
-    g.add(leg);
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(0.018, 0.06, 6), new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff7700, emissiveIntensity: 3.0 }));
+    flame.position.set(cx, 1.48 + (idx === 1 ? 0.08 : 0), 0);
+    candelabra.add(flame);
   });
+
+  const cLight = new THREE.PointLight(0xffa726, 2.0, 4.5);
+  cLight.position.set(0, 1.55, 0);
+  candelabra.add(cLight);
+
+  g.add(candelabra);
 
   return g;
 }
 
+// ── ESTACIÓN 07: NPS (VOZ DEL CLIENTE & CALIDAD) ──────────────────────────────
+
 function createNPSScaleMonument() {
   const g = new THREE.Group();
-  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x756f65, roughness: 0.88 });
-  const stoneTrimMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.85 });
-  const bronzeGoldMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    emissive: 0x997518,
-    emissiveIntensity: 0.35,
-    metalness: 0.88,
-    roughness: 0.25
-  });
-  const darkWoodMat = new THREE.MeshStandardMaterial({ color: 0x442c1b, roughness: 0.85 });
+  const mahoganyMat = new THREE.MeshStandardMaterial({ color: 0x422614, roughness: 0.78 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x2e190d, roughness: 0.85 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.75, roughness: 0.35 });
+  const copperMat = new THREE.MeshStandardMaterial({ color: 0xb86532, metalness: 0.78, roughness: 0.32 });
 
-  // Materiales de cristales luminosos para cada grupo de la escala NPS
-  const detractorCrystalMat = new THREE.MeshStandardMaterial({
-    color: 0xc0392b,
-    emissive: 0x962d22,
-    emissiveIntensity: 0.75,
-    roughness: 0.18,
-    metalness: 0.2
-  });
-  const passiveCrystalMat = new THREE.MeshStandardMaterial({
-    color: 0xf39c12,
-    emissive: 0xd68910,
-    emissiveIntensity: 0.75,
-    roughness: 0.18,
-    metalness: 0.2
-  });
-  const promoterCrystalMat = new THREE.MeshStandardMaterial({
-    color: 0x27ae60,
-    emissive: 0x1e8449,
-    emissiveIntensity: 0.85,
-    roughness: 0.18,
-    metalness: 0.2
-  });
+  const rubyMat = new THREE.MeshStandardMaterial({ color: 0xff1e4d, emissive: 0xcc092f, emissiveIntensity: 2.2, roughness: 0.15 });
+  const amberMat = new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xd97706, emissiveIntensity: 2.2, roughness: 0.15 });
+  const emeraldMat = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 2.5, roughness: 0.15 });
 
-  // 1. Base monumental circular escalonada de cantería medieval
-  const base1 = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.5, 0.22, 24), stoneTrimMat);
-  base1.position.y = 0.11;
-  base1.receiveShadow = true;
-  g.add(base1);
+  // 1. Base semicircular de madera de caoba con herrajes de latón
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.5, 0.22, 24, 1, false, 0, Math.PI), mahoganyMat);
+  base.rotation.y = Math.PI / 2;
+  base.position.y = 0.11;
+  base.receiveShadow = true;
+  g.add(base);
 
-  const base2 = new THREE.Mesh(new THREE.CylinderGeometry(1.95, 2.15, 0.2, 24), stoneMat);
-  base2.position.y = 0.32;
-  base2.receiveShadow = true;
-  g.add(base2);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(2.3, 0.035, 6, 24, Math.PI), brassMat);
+  rim.rotation.x = Math.PI / 2;
+  rim.rotation.z = Math.PI;
+  rim.position.y = 0.22;
+  g.add(rim);
 
-  // 2. Las 11 Columnas de la Escala NPS (0 al 10) distribuidas en semicírculo
+  // 2. Las 11 Columnas de madera torneada de la Escala NPS (0 al 10)
   const totalSteps = 11;
-  const arcSpan = Math.PI * 0.95; // Semicírculo amplio
+  const arcSpan = Math.PI * 0.90;
   const startAng = -arcSpan / 2;
-  const radius = 1.65;
+  const radius = 1.75;
 
   for (let i = 0; i < totalSteps; i++) {
     const fraction = i / (totalSteps - 1);
@@ -1794,270 +1717,906 @@ function createNPSScaleMonument() {
     const pz = Math.cos(ang) * radius;
 
     const colGroup = new THREE.Group();
-    colGroup.position.set(px, 0.42, pz);
+    colGroup.position.set(px, 0.22, pz);
     colGroup.rotation.y = ang + Math.PI;
 
-    // Altura progresiva que simboliza superación y excelencia
-    const colHeight = 0.45 + (i >= 9 ? 0.35 : (i >= 7 ? 0.2 : 0.05));
-    const colMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, colHeight, 0.24), stoneMat);
+    const colHeight = 0.45 + (i >= 9 ? 0.35 : (i >= 7 ? 0.20 : 0.08));
+    const colMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, colHeight, 8), darkOakMat);
     colMesh.position.y = colHeight / 2;
     colMesh.castShadow = true;
     colGroup.add(colMesh);
 
-    // Cornisa de la columna
-    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.06, 0.28), stoneTrimMat);
-    cap.position.y = colHeight + 0.03;
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.04, 8), brassMat);
+    cap.position.y = colHeight + 0.02;
     colGroup.add(cap);
 
-    // Cristal luminoso de calificación (0-6 Rubí, 7-8 Ámbar, 9-10 Esmeralda)
-    let cMat = detractorCrystalMat;
-    if (i >= 9) cMat = promoterCrystalMat;
-    else if (i >= 7) cMat = passiveCrystalMat;
+    let cMat = rubyMat;
+    if (i >= 9) cMat = emeraldMat;
+    else if (i >= 7) cMat = amberMat;
 
-    const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(0.12, 0), cMat);
-    crystal.position.y = colHeight + 0.18;
+    const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(0.09, 0), cMat);
+    crystal.position.y = colHeight + 0.14;
     colGroup.add(crystal);
 
-    // Placa numerada de bronce (0 a 10)
-    const numPlaque = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.02), bronzeGoldMat);
-    numPlaque.position.set(0, colHeight * 0.55, 0.125);
-    colGroup.add(numPlaque);
+    // Chapa con el número (0-10)
+    const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.11, 0.02), brassMat);
+    plaque.position.set(0, colHeight * 0.55, 0.10);
+    colGroup.add(plaque);
 
     g.add(colGroup);
   }
 
-  // 3. Rótulos de Bronce de los 3 Grupos de Clientes en el friso
-  // Detractores (Izquierda)
-  const detPlaque = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.025), bronzeGoldMat);
-  detPlaque.position.set(-1.15, 0.26, 0.95);
-  detPlaque.rotation.y = 0.65;
-  g.add(detPlaque);
+  // 3. Gran Barómetro / Dial de Madera y Latón Central
+  const dialGroup = new THREE.Group();
+  dialGroup.position.set(0, 0.22, 0.15);
 
-  // Pasivos / Neutros (Centro)
-  const pasPlaque = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.15, 0.025), bronzeGoldMat);
-  pasPlaque.position.set(0.45, 0.26, 1.35);
-  pasPlaque.rotation.y = -0.15;
-  g.add(pasPlaque);
+  const dialPlinth = new THREE.Mesh(new THREE.CylinderGeometry(0.60, 0.70, 0.75, 12), mahoganyMat);
+  dialPlinth.position.y = 0.375;
+  dialPlinth.castShadow = true;
+  dialGroup.add(dialPlinth);
 
-  // Promotores (Derecha)
-  const proPlaque = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.15, 0.025), bronzeGoldMat);
-  proPlaque.position.set(1.25, 0.26, 0.85);
-  proPlaque.rotation.y = -0.7;
-  g.add(proPlaque);
+  const dialBezel = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.04, 6, 24), brassMat);
+  dialBezel.position.y = 0.78;
+  dialBezel.rotation.x = Math.PI / 2;
+  dialGroup.add(dialBezel);
 
-  // 4. Centro: Pedestal con el Gran Dial del NPS y Fórmula de Cálculo
-  const centerPlinth = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.75, 0.75, 16), stoneMat);
-  centerPlinth.position.y = 0.795;
-  centerPlinth.castShadow = true;
-  g.add(centerPlinth);
+  const dialPlate = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 0.03, 16), darkOakMat);
+  dialPlate.position.y = 0.76;
+  dialGroup.add(dialPlate);
 
-  const dialRing = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.04, 8, 32), bronzeGoldMat);
-  dialRing.position.y = 1.18;
-  dialRing.rotation.x = Math.PI / 2;
-  g.add(dialRing);
+  // Arco coloreado de las 3 zonas (Detractor, Pasivo, Promotor)
+  const arcDet = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.03, 4, 12, Math.PI * 0.45), rubyMat);
+  arcDet.rotation.x = Math.PI / 2;
+  arcDet.rotation.z = Math.PI * 0.85;
+  arcDet.position.y = 0.785;
+  dialGroup.add(arcDet);
 
-  // Esfera / Reloj de Aguja que apunta a la excelencia
-  const dialFace = new THREE.Mesh(new THREE.CylinderGeometry(0.54, 0.54, 0.04, 24), stoneTrimMat);
-  dialFace.position.y = 1.17;
-  g.add(dialFace);
+  const arcPro = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.03, 4, 12, Math.PI * 0.35), emeraldMat);
+  arcPro.rotation.x = Math.PI / 2;
+  arcPro.rotation.z = -Math.PI * 0.20;
+  arcPro.position.y = 0.785;
+  dialGroup.add(arcPro);
 
-  const needle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.02, 0.46), bronzeGoldMat);
-  needle.position.set(0.08, 1.20, -0.12);
-  needle.rotation.y = -0.45;
-  g.add(needle);
+  // Aguja de cobre apuntando con orgullo hacia la zona Promotor (10)
+  const needle = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.02, 0.44), copperMat);
+  needle.position.set(0.08, 0.81, -0.10);
+  needle.rotation.y = -0.55;
+  dialGroup.add(needle);
 
-  const needleHub = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), bronzeGoldMat);
-  needleHub.position.y = 1.21;
-  g.add(needleHub);
+  const needleHub = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 10), brassMat);
+  needleHub.position.y = 0.81;
+  dialGroup.add(needleHub);
 
-  // Luces sutiles que bañan el monumento con los tres tonos canónicos
-  const detLight = new THREE.PointLight(0xe74c3c, 1.2, 3.2);
-  detLight.position.set(-1.1, 1.1, 0.8);
-  g.add(detLight);
-
-  const proLight = new THREE.PointLight(0x2ecc71, 1.5, 3.8);
-  proLight.position.set(1.1, 1.3, 0.8);
-  g.add(proLight);
+  g.add(dialGroup);
 
   return g;
 }
 
 function createNPSSurveyDesk() {
   const g = new THREE.Group();
-  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x756f65, roughness: 0.88 });
-  const stoneTrimMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.85 });
-  const woodMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.80 });
-  const bronzeGoldMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    emissive: 0x997518,
-    emissiveIntensity: 0.35,
-    metalness: 0.88,
-    roughness: 0.25
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x4a3018, roughness: 0.8 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x331f0e, roughness: 0.85 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const rubyMat = new THREE.MeshStandardMaterial({ color: 0xff1e4d, roughness: 0.3 });
+  const amberMat = new THREE.MeshStandardMaterial({ color: 0xffa726, roughness: 0.3 });
+  const emeraldMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.3 });
+
+  // 1. Pupitre de encuesta de madera
+  const desk = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.08, 0.85), oakMat);
+  desk.position.y = 0.78;
+  desk.castShadow = true;
+  g.add(desk);
+
+  [[-0.78, -0.32], [0.78, -0.32], [-0.78, 0.32], [0.78, 0.32]].forEach(([x, z]) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.78, 0.08), darkOakMat);
+    leg.position.set(x, 0.39, z);
+    g.add(leg);
   });
-  const parchmentMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.cream, roughness: 0.75 });
-  const velvetMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, roughness: 0.55 });
 
-  // 1. Mostrador de Piedra y Roble para la Consulta y Atención
-  const base = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.85, 0.85), stoneMat);
-  base.position.y = 0.425;
-  base.castShadow = true;
-  g.add(base);
-
-  const tableTop = new THREE.Mesh(new THREE.BoxGeometry(2.25, 0.08, 0.95), woodMat);
-  tableTop.position.y = 0.89;
-  tableTop.castShadow = true;
-  g.add(tableTop);
-
-  // 2. Gran Pergamino Desplegado con la Pregunta de Oro del NPS
-  const parchment = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.015, 0.65), parchmentMat);
-  parchment.position.set(-0.25, 0.94, 0.05);
-  g.add(parchment);
-
-  // Sello oficial de lacre en Vermelho Bradesco (#CC092F)
-  const waxSeal = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.02, 8), velvetMat);
-  waxSeal.position.set(-0.25, 0.955, 0.28);
-  g.add(waxSeal);
-
-  // 11 Fichas / Runas Doradas de Calificación (0 al 10) sobre el mostrador
-  for (let i = 0; i <= 10; i++) {
-    const rx = -0.75 + (i * 0.1);
-    const token = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.02, 12), bronzeGoldMat);
-    token.position.set(rx, 0.96, 0.26);
-    g.add(token);
-  }
-
-  // 3. Urna de la Voz del Cliente (Voice of Customer) con ranura de sugerencias
+  // 2. Urna de votación de madera con ranura de bronce
   const ballotBox = new THREE.Group();
-  ballotBox.position.set(0.68, 0.93, -0.05);
+  ballotBox.position.set(0.55, 0.82, -0.05);
 
-  const boxBody = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.45, 0.35), woodMat);
-  boxBody.position.y = 0.225;
-  boxBody.castShadow = true;
-  ballotBox.add(boxBody);
+  const bBody = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.42, 0.32), darkOakMat);
+  bBody.position.y = 0.21;
+  bBody.castShadow = true;
+  ballotBox.add(bBody);
 
-  // Cinta decorativa de la urna en Vermelho Bradesco
-  const boxRibbon = new THREE.Mesh(new THREE.BoxGeometry(0.43, 0.06, 0.36), velvetMat);
-  boxRibbon.position.y = 0.25;
-  ballotBox.add(boxRibbon);
+  const bCap = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.04, 0.36), brassMat);
+  bCap.position.y = 0.44;
+  ballotBox.add(bCap);
 
-  const boxCap = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.05, 0.38), bronzeGoldMat);
-  boxCap.position.y = 0.475;
-  ballotBox.add(boxCap);
-
-  // Ranura dorada
-  const slot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.015, 0.03), stoneTrimMat);
-  slot.position.set(0, 0.505, 0);
-  ballotBox.add(slot);
-
-  // Placa de la urna
-  const bPlaque = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.1, 0.015), bronzeGoldMat);
-  bPlaque.position.set(0, 0.25, 0.18);
-  ballotBox.add(bPlaque);
+  const bSlot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.02, 0.02), brassMat);
+  bSlot.position.set(0, 0.46, 0);
+  ballotBox.add(bSlot);
 
   g.add(ballotBox);
 
-  // Pluma de ave de bronce y tintero
-  const ink = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.08, 8), bronzeGoldMat);
-  ink.position.set(0.45, 0.97, 0.28);
-  g.add(ink);
+  // 3. Tres recipientes de madera con fichas de votación
+  [-0.15, 0.02, 0.19].forEach((x, idx) => {
+    const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.08, 8), darkOakMat);
+    cup.position.set(x, 0.86, 0.20);
+    g.add(cup);
 
-  const quill = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.015, 0.26, 6), bronzeGoldMat);
-  quill.rotation.z = Math.PI / 4;
-  quill.position.set(0.48, 1.07, 0.28);
-  g.add(quill);
+    const tokenMat = (idx === 0 ? rubyMat : idx === 1 ? amberMat : emeraldMat);
+    const token = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.03, 8), tokenMat);
+    token.position.set(x, 0.91, 0.20);
+    g.add(token);
+  });
 
-  // 4. Farol de Forja con Iluminación Ámbar Cálida
-  const lampPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.09, 1.5, 8), stoneTrimMat);
-  lampPillar.position.set(-1.1, 0.75, -0.4);
-  lampPillar.castShadow = true;
-  g.add(lampPillar);
+  // 4. Tablilla de encuesta con pergamino
+  const clipboard = new THREE.Mesh(new THREE.BoxGeometry(0.50, 0.02, 0.40), darkOakMat);
+  clipboard.position.set(-0.48, 0.83, 0.02);
+  g.add(clipboard);
 
-  const lantern = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.22), bronzeGoldMat);
-  lantern.position.set(-1.1, 1.62, -0.4);
-  g.add(lantern);
-
-  const warmLight = new THREE.PointLight(0xffa726, 1.8, 4.0);
-  warmLight.position.set(-1.1, 1.62, -0.4);
-  g.add(warmLight);
+  const pSheet = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.01, 0.34), parchmentMat);
+  pSheet.position.set(-0.48, 0.845, 0.02);
+  g.add(pSheet);
 
   return g;
 }
 
 function createNPSProtocolBoard() {
   const g = new THREE.Group();
-  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x756f65, roughness: 0.88 });
-  const stoneTrimMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.85 });
-  const woodMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.80 });
-  const bronzeGoldMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    emissive: 0x997518,
-    emissiveIntensity: 0.35,
-    metalness: 0.88,
-    roughness: 0.25
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x462d18, roughness: 0.82 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
+
+  // 1. Tablón de madera con tejadillo rústico
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.30, 0.14), oakMat);
+  frame.position.set(0, 0.95, 0);
+  frame.castShadow = true;
+  g.add(frame);
+
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.08, 0.26), darkOakMat);
+  roof.position.set(0, 1.64, 0);
+  g.add(roof);
+
+  [-0.95, 0.95].forEach(x => {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.10, 1.5, 0.10), darkOakMat);
+    post.position.set(x, 0.75, 0);
+    g.add(post);
   });
-  const parchmentMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.cream, roughness: 0.75 });
-  const brandRedMat = new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, roughness: 0.55 });
 
-  // 1. Muro Arquitectónico del Protocolo de Cierre de Ciclo ("Closed Loop")
-  const wallBase = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.22, 0.45), stoneTrimMat);
-  wallBase.position.set(0, 0.11, 0);
-  wallBase.receiveShadow = true;
-  g.add(wallBase);
+  // 3 Tablillas con los pasos del Closed Loop
+  [-0.68, 0, 0.68].forEach((x, idx) => {
+    const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.82, 0.03), darkOakMat);
+    plaque.position.set(x, 0.95, 0.08);
+    g.add(plaque);
 
-  const wall = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.35, 0.28), stoneMat);
-  wall.position.set(0, 0.88, 0);
-  wall.castShadow = true;
-  g.add(wall);
+    const sheet = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.70, 0.02), parchmentMat);
+    sheet.position.set(x, 0.95, 0.10);
+    g.add(sheet);
 
-  const wallCap = new THREE.Mesh(new THREE.BoxGeometry(2.65, 0.16, 0.38), stoneTrimMat);
-  wallCap.position.set(0, 1.63, 0);
-  g.add(wallCap);
+    const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.04, 0.025), redMat);
+    ribbon.position.set(x, 1.25, 0.105);
+    g.add(ribbon);
 
-  // 3 Paneles de Pergamino con los 3 Pasos del Cierre de Ciclo
-  const steps = [
-    { x: -0.75, title: '1. MOMENTO' },
-    { x: 0, title: '2. PROFUNDIZAR' },
-    { x: 0.75, title: '3. ACTUAR' }
+    const numBadge = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 8), brassMat);
+    numBadge.rotation.x = Math.PI / 2;
+    numBadge.position.set(x, 1.25, 0.12);
+    g.add(numBadge);
+  });
+
+  return g;
+}
+
+// ── ESTACIÓN 08: GESTOR DOCUMENTAL (SCRIPTORIUM & ARCHIVO) ────────────────────
+
+function createDocManagerArchiveDisplay() {
+  const g = new THREE.Group();
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x462d18, roughness: 0.82 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x2e190d, roughness: 0.86 });
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x5a544c, roughness: 0.88 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const cyanOrbMat = new THREE.MeshStandardMaterial({ color: 0x00d2ff, emissive: 0x0088cc, emissiveIntensity: 2.5, roughness: 0.15 });
+
+  // 1. Pedestal de lectura de cantería y roble
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1.1, 0.26, 8), stoneMat);
+  base.position.y = 0.13;
+  base.receiveShadow = true;
+  g.add(base);
+
+  const col = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.75, 0.75, 8), stoneMat);
+  col.position.y = 0.635;
+  col.castShadow = true;
+  g.add(col);
+
+  const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.08, 1.1), oakMat);
+  tableTop.position.set(0, 1.05, 0);
+  tableTop.castShadow = true;
+  g.add(tableTop);
+
+  // 2. Gran Tomo Maestro de Archivo Digital abierto
+  const book = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.05, 0.50), parchmentMat);
+  book.position.set(0, 1.11, 0.05);
+  g.add(book);
+
+  const spine = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, 0.51), darkOakMat);
+  spine.position.set(0, 1.11, 0.05);
+  g.add(spine);
+
+  // 3. Orbe Crystalline de Búsqueda y Nube Digital flotando sobre el libro
+  const orbGroup = new THREE.Group();
+  orbGroup.position.set(0, 1.68, 0);
+
+  const orb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), cyanOrbMat);
+  orbGroup.add(orb);
+
+  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.016, 6, 24), brassMat);
+  ring1.rotation.x = Math.PI / 3;
+  orbGroup.add(ring1);
+
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.014, 6, 24), brassMat);
+  ring2.rotation.y = Math.PI / 4;
+  orbGroup.add(ring2);
+
+  const orbLight = new THREE.PointLight(0x00d2ff, 2.5, 5.0);
+  orbGroup.add(orbLight);
+
+  g.add(orbGroup);
+  g.userData.orbGroup = orbGroup;
+
+  return g;
+}
+
+function createArchiveBookshelfUnits() {
+  const g = new THREE.Group();
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x362111, roughness: 0.85 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const bookColors = [
+    new THREE.MeshStandardMaterial({ color: 0x8a1c14, roughness: 0.7 }),
+    new THREE.MeshStandardMaterial({ color: 0x1a4329, roughness: 0.7 }),
+    new THREE.MeshStandardMaterial({ color: 0x163456, roughness: 0.7 }),
+    new THREE.MeshStandardMaterial({ color: 0x6e471d, roughness: 0.75 })
   ];
 
-  steps.forEach(s => {
-    // Marco de madera noble
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.85, 0.04), woodMat);
-    frame.position.set(s.x, 0.95, 0.15);
-    g.add(frame);
+  // 2 Estanterías altas de archivo
+  [-1.4, 1.4].forEach(bx => {
+    const shelf = new THREE.Group();
+    shelf.position.set(bx, 0, -0.3);
 
-    // Pergamino interior en tono Wealth marfil
-    const pSheet = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.72, 0.02), parchmentMat);
-    pSheet.position.set(s.x, 0.95, 0.18);
-    g.add(pSheet);
+    // Mueble de estantería
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.65, 1.70, 0.38), darkOakMat);
+    body.position.y = 0.85;
+    body.castShadow = true;
+    shelf.add(body);
 
-    // Franja superior de acento en Vermelho Bradesco (#CC092F)
-    const stepRibbon = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.05, 0.025), brandRedMat);
-    stepRibbon.position.set(s.x, 1.28, 0.19);
-    g.add(stepRibbon);
+    // 3 Baldas con libros modelados y pergaminos
+    for (let s = 0; s < 3; s++) {
+      const sy = 0.35 + s * 0.48;
+      for (let b = 0; b < 6; b++) {
+        const bMat = bookColors[(s * 3 + b) % bookColors.length];
+        const bookMesh = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.28 + (b % 3) * 0.04, 0.24), bMat);
+        bookMesh.position.set(-0.20 + b * 0.08, sy, 0.05);
+        shelf.add(bookMesh);
+      }
 
-    // Placa de bronce del paso
-    const tag = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.025), bronzeGoldMat);
-    tag.position.set(s.x, 1.22, 0.2);
-    g.add(tag);
+      // Casillero con pergaminos enrollados
+      const scroll = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 6), parchmentMat);
+      scroll.rotation.x = Math.PI / 2;
+      scroll.position.set(0.24, sy, 0.05);
+      shelf.add(scroll);
+    }
+
+    // Tirador de latón en la cornisa
+    const tag = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.06, 0.02), brassMat);
+    tag.position.set(0, 1.62, 0.20);
+    shelf.add(tag);
+
+    g.add(shelf);
   });
 
-  // 2. Banco de Piedra Labrada Medieval para lectura del protocolo
-  const bench = new THREE.Group();
-  bench.position.set(0, 0, 0.95);
+  return g;
+}
 
-  const bSeat = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.08, 0.42), stoneMat);
-  bSeat.position.y = 0.44;
-  bSeat.castShadow = true;
-  bench.add(bSeat);
+function createScriptoriumFilingDesk() {
+  const g = new THREE.Group();
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x4a3018, roughness: 0.8 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x331f0e, roughness: 0.85 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
 
-  [-0.55, 0.55].forEach(bx => {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.4, 0.36), stoneTrimMat);
-    leg.position.set(bx, 0.2, 0);
-    bench.add(leg);
+  // Pupitre inclinado de escriba
+  const table = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.08, 0.75), oakMat);
+  table.position.y = 0.76;
+  table.castShadow = true;
+  g.add(table);
+
+  [[-0.55, -0.28], [0.55, -0.28], [-0.55, 0.28], [0.55, 0.28]].forEach(([x, z]) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.76, 0.07), darkOakMat);
+    leg.position.set(x, 0.38, z);
+    g.add(leg);
   });
 
-  g.add(bench);
+  // Bandejas de 3 niveles de documentos ("Entrada", "En Revisión", "Archivado")
+  const trayGroup = new THREE.Group();
+  trayGroup.position.set(0.38, 0.80, 0);
+  for (let t = 0; t < 3; t++) {
+    const tray = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.04, 0.26), darkOakMat);
+    tray.position.y = t * 0.08;
+    trayGroup.add(tray);
+
+    const doc = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.02, 0.20), parchmentMat);
+    doc.position.y = t * 0.08 + 0.025;
+    trayGroup.add(doc);
+  }
+  g.add(trayGroup);
+
+  // Lupa de lectura con mango de madera
+  const magGlass = new THREE.Group();
+  magGlass.position.set(-0.35, 0.82, -0.10);
+  const mRing = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.012, 6, 16), brassMat);
+  mRing.rotation.x = Math.PI / 2;
+  magGlass.add(mRing);
+  const mHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, 0.12, 6), darkOakMat);
+  mHandle.rotation.z = Math.PI / 3;
+  mHandle.position.set(0.07, 0, 0.05);
+  magGlass.add(mHandle);
+  g.add(magGlass);
+
+  // Sello oficial de aprobación con mango torneado
+  const stamp = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.035, 0.10, 8), darkOakMat);
+  stamp.position.set(-0.15, 0.85, 0.15);
+  g.add(stamp);
+
+  const stampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.02, 8), brassMat);
+  stampBase.position.set(-0.15, 0.81, 0.15);
+  g.add(stampBase);
+
+  return g;
+}
+
+// ── ESTACIÓN 09: CÓDIGO DE ÉTICA (TRIBUNAL DE INTEGRIDAD) ─────────────────────
+
+function createEthicsJusticeMonument() {
+  const g = new THREE.Group();
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.88 });
+  const darkStoneMat = new THREE.MeshStandardMaterial({ color: 0x3d3934, roughness: 0.9 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.88, roughness: 0.25 });
+  const emeraldMat = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 2.5, roughness: 0.15 });
+
+  // 1. Pedestal de cantería de piedra labrada
+  const base = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.24, 1.4), darkStoneMat);
+  base.position.y = 0.12;
+  base.receiveShadow = true;
+  g.add(base);
+
+  const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.42, 1.30, 8), stoneMat);
+  pillar.position.y = 0.89;
+  pillar.castShadow = true;
+  g.add(pillar);
+
+  const pillarCap = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.08, 8), brassMat);
+  pillarCap.position.y = 1.58;
+  g.add(pillarCap);
+
+  // 2. Gran Balanza Solar de la Justicia Ética en Latón Dorado
+  const scaleBeam = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.7, 8), brassMat);
+  scaleBeam.rotation.z = Math.PI / 2;
+  scaleBeam.position.set(0, 1.72, 0);
+  g.add(scaleBeam);
+
+  const scalePillar = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.45, 8), brassMat);
+  scalePillar.position.set(0, 1.80, 0);
+  g.add(scalePillar);
+
+  [-0.72, 0.72].forEach(x => {
+    const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.38, 4), brassMat);
+    chain.position.set(x, 1.52, 0);
+    g.add(chain);
+
+    const pan = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.18, 0.04, 12), brassMat);
+    pan.position.set(x, 1.32, 0);
+    g.add(pan);
+
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.09, 0), emeraldMat);
+    gem.position.set(x, 1.41, 0);
+    g.add(gem);
+  });
+
+  const ethLight = new THREE.PointLight(0x10b981, 2.0, 4.5);
+  ethLight.position.set(0, 1.85, 0.2);
+  g.add(ethLight);
+
+  return g;
+}
+
+function createOpenTomeOfEthics() {
+  const g = new THREE.Group();
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x462d18, roughness: 0.82 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+
+  // Atril de madera tallada
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.42, 0.10, 8), darkOakMat);
+  base.position.y = 0.05;
+  g.add(base);
+
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.80, 8), oakMat);
+  stem.position.y = 0.48;
+  stem.castShadow = true;
+  g.add(stem);
+
+  const slant = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.05, 0.54), oakMat);
+  slant.position.set(0, 0.94, 0);
+  slant.rotation.x = -0.32;
+  g.add(slant);
+
+  // Gran Tomo del Código de Ética
+  const book = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.04, 0.44), parchmentMat);
+  book.position.set(0, 0.97, 0);
+  book.rotation.x = -0.32;
+  g.add(book);
+
+  const bookmark = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.01, 0.48), redMat);
+  bookmark.position.set(0, 1.00, 0);
+  bookmark.rotation.x = -0.32;
+  g.add(bookmark);
+
+  // Vela encendida en candelero de latón
+  const candleBase = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.03, 8), brassMat);
+  candleBase.position.set(0.42, 0.90, -0.15);
+  g.add(candleBase);
+
+  const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.14, 6), parchmentMat);
+  candle.position.set(0.42, 0.98, -0.15);
+  g.add(candle);
+
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.018, 0.05, 6), new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff7700, emissiveIntensity: 3.0 }));
+  flame.position.set(0.42, 1.08, -0.15);
+  g.add(flame);
+
+  return g;
+}
+
+function createConfidentialWhistleblowerBox() {
+  const g = new THREE.Group();
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x2e190d, roughness: 0.85 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x242830, metalness: 0.8, roughness: 0.32 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
+
+  // Arcón / buzón vertical reforzado de roble y bandas de hierro
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.70, 8), darkOakMat);
+  post.position.y = 0.35;
+  g.add(post);
+
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.58, 0.36), darkOakMat);
+  box.position.y = 0.98;
+  box.castShadow = true;
+  g.add(box);
+
+  // Bandas de hierro de refuerzo con remaches
+  [-0.20, 0.20].forEach(yOff => {
+    const band = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.04, 0.37), ironMat);
+    band.position.set(0, 0.98 + yOff, 0);
+    g.add(band);
+  });
+
+  // Ranura superior para denuncias
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.025, 0.04), ironMat);
+  slot.position.set(0, 1.28, 0);
+  g.add(slot);
+
+  // Candado macizo de latón
+  const lock = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.09, 0.04), brassMat);
+  lock.position.set(0, 0.95, 0.20);
+  g.add(lock);
+
+  // Cartelito rojo "Canal Confidencial"
+  const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.12, 0.02), redMat);
+  plaque.position.set(0, 1.15, 0.19);
+  g.add(plaque);
+
+  return g;
+}
+
+// ── ESTACIÓN 10: CULTURA Y COMUNICACIÓN (ÁGORA & PREGONERO) ───────────────────
+
+function createCultureCommunicationMonument() {
+  const g = new THREE.Group();
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x4a3018, roughness: 0.82 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
+  const slateMat = new THREE.MeshStandardMaterial({ color: 0x2b3844, roughness: 0.55 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
+  const rubyMat = new THREE.MeshStandardMaterial({ color: 0xff1e4d, emissive: 0xcc092f, emissiveIntensity: 2.2, roughness: 0.15 });
+
+  // 1. Mural / Tablón de la Gaceta Comunitaria con techumbre de pizarra
+  const boardGroup = new THREE.Group();
+  boardGroup.position.set(0, 0, -0.3);
+
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.35, 0.12), oakMat);
+  panel.position.y = 1.0;
+  panel.castShadow = true;
+  boardGroup.add(panel);
+
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.08, 0.32), slateMat);
+  roof.position.set(0, 1.71, 0);
+  boardGroup.add(roof);
+
+  [-1.0, 1.0].forEach(x => {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.6, 0.12), darkOakMat);
+    post.position.set(x, 0.80, 0);
+    boardGroup.add(post);
+  });
+
+  // Carteles, gacetas y reconocimientos de empleados
+  [-0.70, -0.22, 0.25, 0.70].forEach((x, idx) => {
+    const poster = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.52 + (idx % 2) * 0.15, 0.02), parchmentMat);
+    poster.position.set(x, 1.0 - (idx % 2) * 0.05, 0.07);
+    boardGroup.add(poster);
+
+    const pin = new THREE.Mesh(new THREE.SphereGeometry(0.018, 6, 6), (idx === 1 ? rubyMat : brassMat));
+    pin.position.set(x, 1.25, 0.09);
+    boardGroup.add(pin);
+  });
+
+  g.add(boardGroup);
+
+  // 2. Podio del Pregonero con Clarín / Trompeta de Heraldo
+  const podium = new THREE.Group();
+  podium.position.set(-0.75, 0, 0.65);
+
+  const pBase = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.85, 0.55), oakMat);
+  pBase.position.y = 0.425;
+  pBase.castShadow = true;
+  podium.add(pBase);
+
+  const drapery = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.60, 0.03), redMat);
+  drapery.position.set(0, 0.48, 0.285);
+  podium.add(drapery);
+
+  // Clarín de heraldo de latón
+  const trumpet = new THREE.Group();
+  trumpet.position.set(0, 0.92, 0.10);
+  const tTube = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.50, 8), brassMat);
+  tTube.rotation.x = Math.PI / 2;
+  trumpet.add(tTube);
+  const tBell = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.14, 8), brassMat);
+  tBell.rotation.x = -Math.PI / 2;
+  tBell.position.set(0, 0, 0.28);
+  trumpet.add(tBell);
+  const tBanner = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.18, 0.22), redMat);
+  tBanner.position.set(0, -0.12, 0.05);
+  trumpet.add(tBanner);
+  podium.add(trumpet);
+
+  g.add(podium);
+
+  // 3. Fogonata de Convivencia con bancos y laúd
+  const bonfire = new THREE.Group();
+  bonfire.position.set(0.75, 0, 0.65);
+
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6e685f, roughness: 0.9 });
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const st = new THREE.Mesh(new THREE.DodecahedronGeometry(0.10, 0), stoneMat);
+    st.position.set(Math.cos(a) * 0.35, 0.06, Math.sin(a) * 0.35);
+    bonfire.add(st);
+  }
+  const flameMesh = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.35, 6), new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff4400, emissiveIntensity: 2.8 }));
+  flameMesh.position.y = 0.18;
+  bonfire.add(flameMesh);
+
+  // Banco de tronco
+  const bench = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.85, 6), darkOakMat);
+  bench.rotation.z = Math.PI / 2;
+  bench.position.set(0, 0.12, 0.55);
+  bonfire.add(bench);
+
+  g.add(bonfire);
+
+  return g;
+}
+
+// ── ESTACIÓN 11: RUTA 90 (EVALUACIONES 30 - 60 - 90 DÍAS) ─────────────────────
+
+function createRoute90Monument() {
+  const g = new THREE.Group();
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.88 });
+  const darkStoneMat = new THREE.MeshStandardMaterial({ color: 0x3d3934, roughness: 0.9 });
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x4a3018, roughness: 0.82 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const leatherMat = new THREE.MeshStandardMaterial({ color: 0x663616, roughness: 0.75 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
+
+  const sapphireMat = new THREE.MeshStandardMaterial({ color: 0x00d2ff, emissive: 0x0088cc, emissiveIntensity: 2.2, roughness: 0.15 });
+  const amberMat = new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xd97706, emissiveIntensity: 2.2, roughness: 0.15 });
+  const emeraldMat = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 2.5, roughness: 0.15 });
+
+  const milestones = [
+    { day: 30, x: -1.35, z: 0.25, color: sapphireMat, h: 0.95, label: '30 DÍAS' },
+    { day: 60, x: 0.0, z: -0.10, color: amberMat, h: 1.25, label: '60 DÍAS' },
+    { day: 90, x: 1.35, z: 0.25, color: emeraldMat, h: 1.55, label: '90 DÍAS' }
+  ];
+
+  // 1. Tres Monolitos de Hito a lo largo del sendero
+  milestones.forEach(m => {
+    const col = new THREE.Group();
+    col.position.set(m.x, 0, m.z);
+
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.18, 0.48), darkStoneMat);
+    base.position.y = 0.09;
+    base.receiveShadow = true;
+    col.add(base);
+
+    const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.42, m.h, 0.36), stoneMat);
+    pillar.position.y = 0.18 + m.h / 2;
+    pillar.castShadow = true;
+    col.add(pillar);
+
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.06, 0.42), darkStoneMat);
+    cap.position.y = 0.18 + m.h + 0.03;
+    col.add(cap);
+
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.12, 0), m.color);
+    gem.position.set(0, 0.18 + m.h + 0.18, 0);
+    col.add(gem);
+
+    const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.15, 0.025), brassMat);
+    plaque.position.set(0, 0.18 + m.h * 0.65, 0.19);
+    col.add(plaque);
+
+    if (m.day === 30) {
+      // Mochila de explorador en el suelo
+      const backpack = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.30, 0.18), leatherMat);
+      backpack.position.set(0.32, 0.15, 0.18);
+      col.add(backpack);
+    } else if (m.day === 60) {
+      // Escudo plateado apoyado
+      const shield = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.42, 0.04), new THREE.MeshStandardMaterial({ color: 0x95a5a6, metalness: 0.8, roughness: 0.3 }));
+      shield.rotation.y = 0.3;
+      shield.position.set(0.30, 0.22, 0.15);
+      col.add(shield);
+    } else {
+      // Corona de laureles dorados y diploma
+      const crown = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.024, 6, 16), brassMat);
+      crown.rotation.x = Math.PI / 2;
+      crown.position.set(0.32, 0.28, 0.12);
+      col.add(crown);
+
+      const dip = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.22, 8), parchmentMat);
+      dip.rotation.z = Math.PI / 2;
+      dip.position.set(0.32, 0.10, 0.12);
+      col.add(dip);
+    }
+
+    g.add(col);
+  });
+
+  // 2. Poste indicador de madera con flechas
+  const signpost = new THREE.Group();
+  signpost.position.set(-0.70, 0, 0.85);
+
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 1.8, 8), oakMat);
+  post.position.y = 0.9;
+  signpost.add(post);
+
+  ['30 DÍAS ➔', '60 DÍAS ➔', '90 DÍAS ★'].forEach((lbl, idx) => {
+    const arrow = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.03), oakMat);
+    arrow.position.set(0.18, 1.1 + idx * 0.22, 0);
+    arrow.rotation.y = 0.15 * idx;
+    signpost.add(arrow);
+  });
+  g.add(signpost);
+
+  return g;
+}
+
+// ── ESTACIÓN 12: SINDICATO (FORO DE LA ALIANZA & DIÁLOGO SOCIAL) ──────────────
+
+function createUnionAllianceMonument() {
+  const g = new THREE.Group();
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x462d18, roughness: 0.82 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.75, roughness: 0.35 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0x900f15, roughness: 0.65 });
+
+  // 1. Gran Mesa Redonda de la Alianza
+  const tableGroup = new THREE.Group();
+  tableGroup.position.set(0, 0, 0.35);
+
+  const tableTop = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 0.09, 20), oakMat);
+  tableTop.position.y = 0.76;
+  tableTop.castShadow = true;
+  tableGroup.add(tableTop);
+
+  const tableBase = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.40, 0.72, 8), darkOakMat);
+  tableBase.position.y = 0.36;
+  tableGroup.add(tableBase);
+
+  // Gran Pliego de Acuerdo Colectivo con 2 sellos de cera
+  const treaty = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.015, 0.55), parchmentMat);
+  treaty.position.set(0, 0.81, 0);
+  tableGroup.add(treaty);
+
+  const sealRed = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.02, 8), redMat);
+  sealRed.position.set(-0.18, 0.825, 0.15);
+  tableGroup.add(sealRed);
+
+  const sealGold = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.02, 8), brassMat);
+  sealGold.position.set(0.18, 0.825, 0.15);
+  tableGroup.add(sealGold);
+
+  // 2 Plumas enfrentadas (Firma bilateral)
+  [-0.24, 0.24].forEach((qx, idx) => {
+    const quill = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.012, 0.22, 6), parchmentMat);
+    quill.rotation.z = (idx === 0 ? 0.4 : -0.4);
+    quill.position.set(qx, 0.89, -0.10);
+    tableGroup.add(quill);
+  });
+
+  // 4 Sillas de madera con respaldo alrededor de la mesa
+  for (let i = 0; i < 4; i++) {
+    const ang = (i / 4) * Math.PI * 2 + Math.PI / 4;
+    const chair = new THREE.Group();
+    chair.position.set(Math.sin(ang) * 1.55, 0, Math.cos(ang) * 1.55);
+    chair.rotation.y = ang + Math.PI;
+
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.06, 0.40), darkOakMat);
+    seat.position.y = 0.44;
+    chair.add(seat);
+
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.52, 0.05), darkOakMat);
+    back.position.set(0, 0.72, -0.18);
+    chair.add(back);
+
+    [[-0.18, -0.16], [0.18, -0.16], [-0.18, 0.16], [0.18, 0.16]].forEach(([cx, cz]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.44, 0.05), darkOakMat);
+      leg.position.set(cx, 0.22, cz);
+      chair.add(leg);
+    });
+
+    tableGroup.add(chair);
+  }
+
+  g.add(tableGroup);
+
+  // 2. Pedestal con Escultura de Manos Unidas y Escudos Entrelazados
+  const monument = new THREE.Group();
+  monument.position.set(0, 0, -1.1);
+
+  const mBase = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.78, 0.35, 8), new THREE.MeshStandardMaterial({ color: 0x5e584f, roughness: 0.88 }));
+  mBase.position.y = 0.175;
+  monument.add(mBase);
+
+  // 2 Anillos entrelazados de latón (Pacto de Solidaridad)
+  [-0.14, 0.14].forEach(rx => {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.038, 6, 20), brassMat);
+    ring.position.set(rx, 0.65, 0);
+    monument.add(ring);
+  });
+
+  g.add(monument);
+
+  return g;
+}
+
+// ── ESTACIÓN 13: BASTIÓN DE LA VICTORIA & GRADUACIÓN ──────────────────────────
+
+function createCastleVictoryMonument() {
+  const g = new THREE.Group();
+  const oakMat = new THREE.MeshStandardMaterial({ color: 0x462d18, roughness: 0.82 });
+  const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
+  const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.88, roughness: 0.24 });
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.75, roughness: 0.35 });
+  const redCarpetMat = new THREE.MeshStandardMaterial({ color: 0xcc092f, roughness: 0.6 });
+  const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+
+  // 1. Alfombra Ceremonial Roja que conduce al Castillo
+  const carpet = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.02, 4.5), redCarpetMat);
+  carpet.position.set(0, 0.01, 1.2);
+  carpet.receiveShadow = true;
+  g.add(carpet);
+
+  // Ribetes dorados de la alfombra
+  [-0.80, 0.80].forEach(x => {
+    const goldTrim = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.025, 4.5), brassMat);
+    goldTrim.position.set(x, 0.012, 1.2);
+    g.add(goldTrim);
+  });
+
+  // 2. Podio del Gran Orador con el Diploma de Graduación
+  const podium = new THREE.Group();
+  podium.position.set(0, 0, -0.6);
+
+  const pBase = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.95, 0.65), oakMat);
+  pBase.position.y = 0.475;
+  pBase.castShadow = true;
+  podium.add(pBase);
+
+  const pCloth = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.70, 0.03), redCarpetMat);
+  pCloth.position.set(0, 0.55, 0.335);
+  podium.add(pCloth);
+
+  // Gran Diploma de Graduación con lazo escarlata
+  const diploma = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.03, 0.46), parchmentMat);
+  diploma.position.set(0, 0.98, 0.05);
+  podium.add(diploma);
+
+  const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.01, 0.08), redCarpetMat);
+  ribbon.position.set(0, 1.00, 0.05);
+  podium.add(ribbon);
+
+  // Gran Llave Dorada del Reino
+  const keyStem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.32, 8), brassMat);
+  keyStem.rotation.z = Math.PI / 2;
+  keyStem.position.set(0, 1.05, 0.05);
+  podium.add(keyStem);
+
+  const keyRing = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.012, 6, 16), brassMat);
+  keyRing.position.set(-0.16, 1.05, 0.05);
+  podium.add(keyRing);
+
+  g.add(podium);
+
+  // 3. Mesa de Banquete de Victoria con Gran Trofeo Dorado
+  const banquet = new THREE.Group();
+  banquet.position.set(1.85, 0, 0.5);
+
+  const bTable = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.08, 1.8), oakMat);
+  bTable.position.y = 0.72;
+  bTable.castShadow = true;
+  banquet.add(bTable);
+
+  [[-0.36, -0.80], [0.36, -0.80], [-0.36, 0.80], [0.36, 0.80]].forEach(([x, z]) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.72, 0.08), darkOakMat);
+    leg.position.set(x, 0.36, z);
+    banquet.add(leg);
+  });
+
+  // Gran Trofeo Dorado de la Victoria
+  const trophy = new THREE.Group();
+  trophy.position.set(0, 0.76, 0);
+  const trBase = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.14, 0.06, 12), brassMat);
+  trophy.add(trBase);
+  const trStem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.04, 0.16, 8), brassMat);
+  trStem.position.y = 0.11;
+  trophy.add(trStem);
+  const trCup = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.08, 0.22, 12), brassMat);
+  trCup.position.y = 0.28;
+  trophy.add(trCup);
+  banquet.add(trophy);
+
+  g.add(banquet);
+
+  // 4. Braseros de Victoria con grandes llamas
+  [-1.6, 1.6].forEach(bx => {
+    const brazier = new THREE.Group();
+    brazier.position.set(bx, 0, -1.2);
+
+    const bStand = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.24, 0.85, 8), ironMat);
+    bStand.position.y = 0.425;
+    brazier.add(bStand);
+
+    const bBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.16, 0.20, 8), ironMat);
+    bBowl.position.y = 0.95;
+    brazier.add(bBowl);
+
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.60, 6), new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff4400, emissiveIntensity: 3.2 }));
+    flame.position.y = 1.30;
+    brazier.add(flame);
+
+    const bLight = new THREE.PointLight(0xff7700, 2.8, 6.0);
+    bLight.position.set(0, 1.4, 0);
+    brazier.add(bLight);
+
+    g.add(brazier);
+  });
 
   return g;
 }
@@ -2107,7 +2666,7 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     const worldX = mission.x + pos[0];
     const worldZ = mission.z + pos[2];
     const gy = getTerrainY(worldX, worldZ);
-    inst.position.set(pos[0], gy, pos[2]);
+    inst.position.set(pos[0], gy + (pos[1] || 0), pos[2]);
     inst.rotation.y = rotY;
     g.add(inst);
 
@@ -2130,32 +2689,56 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
   switch (mission.type) {
     case 'lobby': {
-      // ESTACIÓN 0: Campamento Base & Bienvenida (Gran Casa de la Expedición / Guildhall)
-      await spawn(ASSETS.buildings.townhall, 5.2, [0, 0, -3.8], 0);
+      // ═════════════════════════════════════════════════════════════════════════
+      // ESTACIÓN 00: CAMPAMENTO BASE & BIENVENIDA (Lobby de Expedición)
+      // Escalas recalibradas a proporción humana real + Intención espacial
+      // ═════════════════════════════════════════════════════════════════════════
 
-      await spawn(ASSETS.props.banner, 3.2, [-3.2, 0, 0.2], 0.2);
-      await spawn(ASSETS.props.banner, 3.2, [3.2, 0, 0.2], -0.2);
+      // 1. Cuartel General de la Expedición al fondo (Acceso frontal despejado)
+      await spawn(ASSETS.polyfork.villageTavern, 5.8, [0, 0, -5.2], 0);
 
-      // Terraza adoquinada de bienvenida: Mesa de cartografía y mapa del reino
-      await spawn(ASSETS.props.signingTable, 1.05, [0, 0, -0.6], 0);
+      // 2. Círculo Central de Bienvenida: Hoguera con bancos de tronco a escala real (0.45m asiento)
+      const campWelcomeFire = createCampfire();
+      campWelcomeFire.position.set(0, getTerrainY(mission.x, mission.z + 0.4), 0.4);
+      g.add(campWelcomeFire);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-1.8, 0, 0.4], Math.PI / 2);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [1.8, 0, 0.4], -Math.PI / 2);
 
-      // Pertrechos y suministros de expedición
-      await spawn(ASSETS.props.chest, 0.85, [2.0, 0, -0.8], 0.3);
-      await spawn(ASSETS.props.stackedBoxes, 1.2, [-2.0, 0, -0.8], -0.3);
-      await spawn(ASSETS.props.barrel, 1.0, [3.4, 0, -1.8], -0.4);
-      await spawn(ASSETS.props.barrel, 1.0, [-3.4, 0, -1.8], 0.4);
+      // 3. Lateral Izquierdo: Muelle de descarga de carretas (Escala proporcionada)
+      await spawn(ASSETS.polyfork.fourWheelWagon, 1.45, [-6.0, 0, -2.2], -0.25);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.6, 0, -2.8], 0.3);
+      await spawn(ASSETS.polyfork.grainSack, 0.48, [-5.2, 0, -1.0], -0.4);
 
-      // Caballos de viaje para los exploradores
-      await spawn(ASSETS.animals.horse, 1.35, [-6.2, 0, -1.2], 0.7);
-      await spawn(ASSETS.animals.stag, 1.30, [6.2, 0, -1.2], -0.7);
+      // 4. Rincón de Manantial: Pozo de piedra rústica a escala 1.55m
+      await spawn(ASSETS.polyfork.villageWell, 1.55, [-4.2, 0, 1.8], 0.2);
 
-      // Entorno arbolado noble del cuartel general
-      await spawn(ASSETS.trees[0], 6.8, [-8.0, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[1], 6.5, [8.0, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[2], 5.8, [-8.8, 0, 2.5], 0.8);
-      await spawn(ASSETS.trees[3], 5.8, [8.8, 0, 2.5], -0.8);
-      await spawn(ASSETS.bushes[0], 1.4, [-5.5, 0, 1.0], 0.4);
-      await spawn(ASSETS.bushes[1], 1.4, [5.5, 0, 1.0], -0.4);
+      // 5. Lateral Derecho: Mesa de planeación (0.76m altura real de mesa)
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [4.8, 0, -1.8], 0);
+      // Provisiones de viaje sobre la mesa
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [4.8, 0.76, -1.8], 0);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [5.1, 0.76, -1.8], 0.4);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [4.5, 0.76, -1.8], 0);
+
+      // 6. Frente Derecho: Tablón de bienvenida con el mapa de la expedición
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [4.2, 0, 2.5], -0.6);
+
+      // 7. Portal de faroles medievales recibiendo a los exploradores
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [-5.2, 0, 3.0], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [5.2, 0, 3.0], -0.3);
+
+      // 8. Vallas de madera perimetrales (0.95m altura de valla)
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.0, 0, 0.5], 0.8);
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.0, 0, 0.5], -0.8);
+
+      // 9. Animales y naturaleza
+      await spawn(ASSETS.animals.horse, 1.35, [-6.8, 0, 2.5], 0.6);
+      await spawn(ASSETS.animals.stag, 1.30, [6.8, 0, 2.5], -0.6);
+      await spawn(ASSETS.trees[0], 6.8, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[1], 6.5, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[2], 5.8, [-9.0, 0, 2.5], 0.8);
+      await spawn(ASSETS.trees[3], 5.8, [9.0, 0, 2.5], -0.8);
+      await spawn(ASSETS.bushes[0], 1.4, [-5.8, 0, 1.0], 0.4);
+      await spawn(ASSETS.bushes[1], 1.4, [5.8, 0, 1.0], -0.4);
 
       // Guía rúnica flotante de bienvenida Vermelho Bradesco
       const guideGem = new THREE.Mesh(
@@ -2163,35 +2746,59 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
         new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.5, roughness: 0.22 })
       );
       const gemY = getTerrainY(mission.x, mission.z);
-      guideGem.position.set(0, gemY + 2.2, -0.6);
+      guideGem.position.set(0, gemY + 2.2, 0.4);
       g.add(guideGem);
       g.userData.crystal = guideGem;
       break;
     }
 
     case 'camp': {
-      // MISIÓN 1: Arsenal y Equipos
-      await spawn(ASSETS.buildings.tent, 3.2, [-2.8, 0, -1.8], 0.6);
-      await spawn(ASSETS.buildings.tent, 3.2, [2.8, 0, -1.8], -0.6);
-      await spawn(ASSETS.buildings.tent, 2.8, [0, 0, -3.4], Math.PI);
+      // ═════════════════════════════════════════════════════════════════════════
+      // ESTACIÓN 01: ARSENAL Y EQUIPOS (Puesto de Inicio / Armería)
+      // Escalas humanas reales + Intención espacial:
+      // - Torre de vigía al fondo centro vigilando el horizonte (6.5m)
+      // - Herrería y yunque a escala de trabajo real (yunque 0.82m, barril temple 0.7m)
+      // - Armero y maniquí de armadura a altura de guerrero (1.5m y 1.85m)
+      // - Fogata con trípode de cocción (1.3m) y pila de leña proporcionada (0.55m)
+      // - Carretas y tiendas en proporciones reales de expedición
+      // ═════════════════════════════════════════════════════════════════════════
 
-      await spawn(ASSETS.props.chest, 0.85, [0, 0, -0.1], 0);
-      await spawn(ASSETS.props.stackedBoxes, 1.3, [1.8, 0, -0.3], -0.4);
-      await spawn(ASSETS.props.barrel, 1.1, [-1.8, 0, -0.3], 0.4);
-      await spawn(ASSETS.props.largeBox, 0.95, [3.2, 0, 0.5], 0.3);
-      await spawn(ASSETS.props.barrel, 0.95, [-3.2, 0, 0.5], -0.3);
+      // 1. Torre de Vigía del Arsenal custodiando el perímetro al fondo centro
+      await spawn(ASSETS.polyfork.watchtower, 6.5, [0, 0, -5.5], 0);
 
+      // 2. Ala Izquierda: Cuartel de lona de la guarnición y carreta de pertrechos
+      await spawn(ASSETS.polyfork.canvasWallTent, 2.7, [-4.8, 0, -2.5], 0.4);
+      await spawn(ASSETS.polyfork.woodenCart, 1.35, [-5.8, 0, 0.4], 0.3);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.2, 0, 0.8], 0.2);
+      await spawn(ASSETS.polyfork.grainSack, 0.48, [-4.8, 0, 1.4], -0.4);
+
+      // 3. Ala Derecha: Tienda de campaña de intendencia
+      await spawn(ASSETS.polyfork.canvasRidgeTent, 1.6, [4.8, 0, -2.5], -0.4);
+
+      // 4. Sector de Herrería y Mantenimiento de Armas (Lateral derecho a escala humana)
+      await spawn(ASSETS.polyfork.blacksmithForge, 2.4, [4.6, 0, 0.4], -1.2);
+      await spawn(ASSETS.polyfork.anvil, 0.82, [3.4, 0, 1.0], 0.3);
+      await spawn(ASSETS.polyfork.quenchBarrel, 0.70, [4.8, 0, 1.4], 0);
+
+      // 5. Mostrador Central de Armería: Armero y soporte de armadura enmarcando el corredor
+      await spawn(ASSETS.polyfork.weaponRack, 1.50, [-1.8, 0, -1.0], 0.3);
+      await spawn(ASSETS.polyfork.armourStand, 1.85, [1.8, 0, -1.0], -0.3);
+
+      // 6. Vivac de Guardia al frente: Fogata con trípode y leña ordenada al lateral
       const campfire = createCampfire();
-      campfire.position.set(-0.2, getTerrainY(mission.x - 0.2, mission.z + 1.6), 1.6);
+      campfire.position.set(-0.5, getTerrainY(mission.x - 0.5, mission.z + 1.8), 1.8);
       g.add(campfire);
+      await spawn(ASSETS.polyfork.campfireCookTripod, 1.30, [-0.5, 0, 1.8], 0);
+      await spawn(ASSETS.polyfork.firewoodStack, 0.55, [-2.2, 0, 1.8], 0.1);
 
-      await spawn(ASSETS.trees[0], 6.5, [-7.2, 0, -4.5], 0.4);
-      await spawn(ASSETS.trees[1], 5.8, [7.2, 0, -4.5], -0.4);
-      await spawn(ASSETS.trees[2], 7.0, [0, 0, -6.8], Math.PI);
+      // Entorno natural
+      await spawn(ASSETS.trees[0], 6.5, [-7.8, 0, -4.5], 0.4);
+      await spawn(ASSETS.trees[1], 5.8, [7.8, 0, -4.5], -0.4);
+      await spawn(ASSETS.trees[2], 7.0, [0, 0, -7.8], Math.PI);
       await spawn(ASSETS.trees[3], 5.2, [-8.5, 0, 1.8], 1.2);
       await spawn(ASSETS.trees[4], 5.2, [8.5, 0, 1.8], -1.2);
-      await spawn(ASSETS.bushes[0], 1.4, [-5.8, 0, -2.8], 0.4);
-      await spawn(ASSETS.bushes[1], 1.4, [5.8, 0, -2.8], -0.4);
+      await spawn(ASSETS.bushes[0], 1.4, [-6.2, 0, -2.8], 0.4);
+      await spawn(ASSETS.bushes[1], 1.4, [6.2, 0, -2.8], -0.4);
       await spawn(ASSETS.bushes[2], 1.2, [-4.5, 0, 3.5], 1.1);
       await spawn(ASSETS.bushes[3], 1.2, [4.5, 0, 3.5], -1.1);
       await spawn(ASSETS.rocks[0], 1.3, [-6.8, 0, 3.2], 0.5);
@@ -2204,7 +2811,7 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
         new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.2, roughness: 0.3 })
       );
       const crystalY = getTerrainY(mission.x, mission.z);
-      crystal.position.set(0, crystalY + 1.6, -0.1);
+      crystal.position.set(0, crystalY + 1.6, 0);
       g.add(crystal);
       g.userData.crystal = crystal;
       break;
@@ -2212,65 +2819,151 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
     case 'sanctuary':
     case 'monument': {
-      // MISIÓN 2: Firma de Contrato y Beneficios
-      await spawn(ASSETS.buildings.shrine, 5.8, [0, 0, -2.8], 0);
-      await spawn(ASSETS.props.signingTable, 1.05, [0, 0, 0], 0);
+      // ═════════════════════════════════════════════════════════════════════════
+      // ESTACIÓN 02: FIRMA DE CONTRATO Y BENEFICIOS (Santuario del Pacto)
+      // Escalas sagradas recalibradas a proporción humana:
+      // - Capilla de piedra al fondo (6.2m)
+      // - Altar central de piedra a altura de mesa sagrada (0.95m)
+      // - Atril con el gran libro de juramento (1.25m)
+      // - Caballeros guardianes de honor a estatura heroica (2.1m)
+      // - Braseros ceremoniales a cintura (1.0m) flanqueando el paso abierto
+      // - Cofre de beneficios con herrajes de hierro a tamaño de arcón real (0.52m)
+      // - Estantería de pergaminos a escala de archivo (1.45m)
+      // ═════════════════════════════════════════════════════════════════════════
 
-      await spawn(ASSETS.props.banner, 2.8, [-2.2, 0, 0], 0.2);
-      await spawn(ASSETS.props.banner, 2.8, [2.2, 0, 0], -0.2);
+      // 1. Templo/Capilla de Piedra Sagrada retirada al fondo
+      await spawn(ASSETS.polyfork.stoneChapel, 6.2, [0, 0, -6.8], 0);
 
-      await spawn(ASSETS.props.chest, 0.8, [-1.8, 0, 1.2], 0.4);
-      await spawn(ASSETS.props.barrel, 1.0, [1.8, 0, 1.2], -0.4);
-      await spawn(ASSETS.trees[2], 7.2, [-7.5, 0, -4.0], 0.3);
-      await spawn(ASSETS.trees[5], 6.8, [7.5, 0, -4.0], -0.3);
-      await spawn(ASSETS.trees[0], 6.5, [0, 0, -6.5], 0);
-      await spawn(ASSETS.animals.stag, 1.1, [-8.5, 0, 0], 0.6);
-      await spawn(ASSETS.bushes[2], 1.3, [-4.8, 0, -2.5], 0.2);
-      await spawn(ASSETS.bushes[3], 1.3, [4.8, 0, -2.5], -0.2);
-      await spawn(ASSETS.rocks[2], 1.4, [-5.5, 0, 1.5], 0.5);
-      await spawn(ASSETS.rocks[3], 1.4, [5.5, 0, 1.5], -0.5);
+      // 2. Muretes bajos de piedra perimetrales que enmarcan el recinto sagrado
+      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [-4.2, 0, -4.5], 0.3);
+      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [4.2, 0, -4.5], -0.3);
 
+      // 3. Altar Sagrado de Piedra en el corazón ceremonial (0.95m altura de altar)
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -2.4], 0);
+
+      // 4. Atril con el Gran Libro del Pacto
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, -2.1], 0);
+
+      // 5. Guardia de Honor: Estatuas de Caballeros flanqueando el altar (2.1m estatura noble)
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.1, [-2.8, 0, -2.4], 0.15);
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.1, [2.8, 0, -2.4], -0.15);
+
+      // 6. Candelabros ceremoniales de velas junto a los escalones
+      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [-1.8, 0, -4.8], 0);
+      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [1.8, 0, -4.8], 0);
+
+      // 7. Avenida de Acceso Solemne: Braseros a escala humana (1.0m) delimitando pasillo
+      await spawn(ASSETS.polyfork.standingBrazier, 1.0, [-2.4, 0, 1.0], 0);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.0, [2.4, 0, 1.0], 0);
+
+      // 8. Lateral Izquierdo: Estantería con los pergaminos oficiales del contrato (1.45m)
+      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-3.8, 0, -0.4], 0.5);
+
+      // 9. Lateral Derecho: Arcón acorazado con los beneficios (0.52m altura de cofre real)
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [3.8, 0, -0.4], -0.5);
+
+      // 10. Faroles solemnes en el acceso frontal
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.4], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.4], -0.3);
+
+      // Entorno solemne de montaña
+      await spawn(ASSETS.trees[2], 7.2, [-7.8, 0, -4.0], 0.3);
+      await spawn(ASSETS.trees[5], 6.8, [7.8, 0, -4.0], -0.3);
+      await spawn(ASSETS.trees[0], 6.5, [0, 0, -8.5], 0);
+      await spawn(ASSETS.animals.stag, 1.2, [-8.5, 0, 0.5], 0.6);
+      await spawn(ASSETS.bushes[2], 1.3, [-5.2, 0, -2.5], 0.2);
+      await spawn(ASSETS.bushes[3], 1.3, [5.2, 0, -2.5], -0.2);
+      await spawn(ASSETS.rocks[2], 1.4, [-5.8, 0, 1.5], 0.5);
+      await spawn(ASSETS.rocks[3], 1.4, [5.8, 0, 1.5], -0.5);
+
+      // Sello flotante místico del Pacto elevado sobre el altar
       const covenantSeal = new THREE.Mesh(
         new THREE.TorusGeometry(0.35, 0.07, 12, 32),
         new THREE.MeshStandardMaterial({ color: 0xffd369, emissive: 0xd49b29, emissiveIntensity: 2.5, roughness: 0.3 })
       );
       const sealY = getTerrainY(mission.x, mission.z);
-      covenantSeal.position.set(0, sealY + 1.8, 0);
+      covenantSeal.position.set(0, sealY + 2.5, -2.4);
       g.add(covenantSeal);
 
-      // Núcleo rúnico carmesí Bradesco en el sello
+      // Núcleo rúnico carmesí Bradesco en el centro del sello
       const sealCore = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.18, 0),
-        new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 1.8, roughness: 0.25 })
+        new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.2, roughness: 0.25 })
       );
-      sealCore.position.set(0, sealY + 1.8, 0);
+      sealCore.position.set(0, sealY + 2.5, -2.4);
       g.add(sealCore);
       g.userData.covenantSeal = covenantSeal;
       break;
     }
 
     case 'garden': {
-      // MISIÓN 3: Humand y Comedor
-      await spawn(ASSETS.buildings.tavern, 6.2, [-3.8, 0, -2.8], 0.3);
-      await spawn(ASSETS.buildings.market, 3.8, [3.6, 0, -2.2], -0.3);
-      await spawn(ASSETS.props.signingTable, 1.05, [-1.0, 0, 0], 0);
-      await spawn(ASSETS.props.stackedBoxes, 1.3, [2.2, 0, 0.2], 0.4);
-      await spawn(ASSETS.props.barrel, 1.1, [1.3, 0, 0.4], -0.2);
-      await spawn(ASSETS.props.barrel, 0.95, [-2.5, 0, 1.2], 0.6);
-      await spawn(ASSETS.trees[3], 6.2, [-8.0, 0, -4.5], 0.5);
-      await spawn(ASSETS.trees[4], 5.8, [8.0, 0, -4.5], -0.5);
-      await spawn(ASSETS.animals.horse, 1.3, [8.5, 0, 1.0], -0.7);
+      // ═════════════════════════════════════════════════════════════════════════
+      // ESTACIÓN 03: HUMAND Y COMEDOR (Valle del Refectorio)
+      // Plaza gastronómica comunitaria a escala humana real con comida servida:
+      // - Gran Salón Comedor al fondo (6.0m) con puertas 100% despejadas
+      // - Dos mesas rústicas comunales a escala humana (0.76m de altura)
+      // - COMIDA SERVIDA EN LAS MESAS: Cazuela humeante, lechón/carne asada,
+      //   tartas rústicas, hogazas de pan recién horneado, jarras de vino y copas
+      // - Panadería artesanal con horno de barro (1.6m), cesta de vegetales y barril
+      // - Buffet / Puesto con toldo rústico (2.15m)
+      // - Jardineras florales compactas (0.35m) enmarcando el paseo
+      // ═════════════════════════════════════════════════════════════════════════
+
+      // 1. El Gran Salón Refectorio al fondo centro (Puertas totalmente libres de paso)
+      await spawn(ASSETS.polyfork.timberBarn, 6.0, [0, 0, -5.5], 0);
+
+      // 2. Sector Panadería y Cocina (Lateral Derecho): Horno de barro, cesta de pan y bebidas
+      await spawn(ASSETS.polyfork.clayBreadOven, 1.60, [5.0, 0, -2.0], -0.8);
+      await spawn(ASSETS.polyfork.basketOfProduce, 0.48, [3.8, 0, -1.8], 0.1);
+      await spawn(ASSETS.polyfork.polyforkBarrel, 0.85, [5.2, 0, -0.6], 0.2);
+
+      // 3. Sector de Autoservicio / Buffet (Lateral Izquierdo): Puesto con toldo rústico
+      await spawn(ASSETS.polyfork.marketStall, 2.15, [-5.2, 0, -2.0], 0.8);
+
+      // 4. MESA COMUNAL IZQUIERDA (0.76m altura humana real de mesa)
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [-3.4, 0, 0.8], 0.10);
+      // Banquete servido sobre la mesa izquierda:
+      await spawn(ASSETS.polyfork.roastMeat, 0.20, [-3.4, 0.76, 0.8], 0.2);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-3.9, 0.76, 0.8], 0.4);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [-2.9, 0.76, 0.75], -0.3);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [-3.15, 0.76, 0.62], 0);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [-3.65, 0.76, 0.62], 0);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.10, [-3.2, 0.76, 0.96], -0.5);
+
+      // 5. MESA COMUNAL DERECHA (0.76m altura humana real de mesa)
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [3.4, 0, 0.8], -0.10);
+      // Banquete servido sobre la mesa derecha:
+      await spawn(ASSETS.polyfork.cazuelaPot, 0.18, [3.4, 0.76, 0.8], 0.1);
+      await spawn(ASSETS.polyfork.rusticPie, 0.09, [3.9, 0.76, 0.8], 0.3);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [2.9, 0.76, 0.75], -0.4);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [3.65, 0.76, 0.96], 0.5);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [3.15, 0.76, 0.62], 0);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [3.65, 0.76, 0.62], 0);
+
+      // 6. Jardineras florales decorativas compactas enmarcando el paseo sin estorbar
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.35, [-5.2, 0, 2.2], 0);
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.35, [5.2, 0, 2.2], 0);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.8], 0.3);
+
+      // 7. Entrada: Tablón de Avisos de Humand (Turnos, menú diario y reglas del comedor)
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [2.0, 0, 2.6], -0.2);
+
+      // Entorno arbolado del valle fértil
+      await spawn(ASSETS.trees[3], 6.5, [-8.2, 0, -4.5], 0.5);
+      await spawn(ASSETS.trees[4], 6.0, [8.2, 0, -4.5], -0.5);
+      await spawn(ASSETS.animals.horse, 1.35, [8.5, 0, 1.0], -0.7);
       await spawn(ASSETS.bushes[1], 1.4, [-5.8, 0, -1.0], 0.8);
       await spawn(ASSETS.bushes[0], 1.3, [5.5, 0, -1.0], -0.8);
       await spawn(ASSETS.rocks[1], 1.2, [-4.8, 0, 1.8], 0.3);
       await spawn(ASSETS.rocks[0], 1.2, [4.8, 0, 1.8], -0.3);
 
+      // Kiosco digital de la App Humand interactivo con halo verde
       const humandTerminal = new THREE.Mesh(
         new THREE.BoxGeometry(0.4, 0.6, 0.08),
         new THREE.MeshStandardMaterial({ color: 0x2ee59d, emissive: 0x17a06a, emissiveIntensity: 2.5, roughness: 0.3 })
       );
-      const termY = getTerrainY(mission.x + 1.1, mission.z - 0.1);
-      humandTerminal.position.set(1.1, termY + 1.7, -0.1);
+      const termY = getTerrainY(mission.x + 2.0, mission.z + 2.6);
+      humandTerminal.position.set(2.0, termY + 1.8, 2.6);
       g.add(humandTerminal);
       g.userData.humandTerminal = humandTerminal;
       break;
@@ -2377,114 +3070,83 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'vault':
     case 'plaza': {
       // ═════════════════════════════════════════════════════════════════════════
-      // MISIÓN 05: TARJETA COSMOS (Bóveda Cosmos)
-      // Diseño 100% coherente con la arquitectura del juego y rico en riqueza:
-      // - Edificio KayKit Workshop (sin árboles colisionando en su chimenea)
-      // - Mesa de banquero limpia sin comida ni vajilla, fuera del porche de bolas de cañón
-      // - Talismán Dorado Cosmos flotante de mayor tamaño con monedas en la base
-      // - Gran despliegue de dinero: lingotes de oro de 24K en pirámide, sacos de monedas abiertos,
-      //   cofre de oro del gremio y alfombra de monedas derramadas
-      // - Pertrechos comerciales ordenados en el lateral derecho
-      // - Entorno natural espacioso sin colisiones
+      // MISIÓN 05: TARJETA COSMOS (Pabellón de Beneficios & Convenios VIP)
+      // Distribución abierta en herradura:
+      // - Edificio Bazar Comercial (Market) al fondo con fachada abierta
+      // - Centro: Gran Pedestal de Mármol & Terciopelo con Tarjeta Cosmos VIP giratoria
+      // - Flanco Izquierdo: Stand de Convenios & Descuentos (Restaurantes, Tiendas, Vouchers)
+      // - Flanco Derecho: Stand de Salud, Fitness, Farmacias & Puntos Cosmos
       // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.market, 6.5, [0, 0, -5.6], 0);
 
-      // 1. EDIFICIO PRINCIPAL (Gremio / Bóveda Comercial KayKit)
-      await spawn(ASSETS.buildings.workshop, 6.2, [0, 0, -3.4], 0);
-
-      // 2. CENTRO: TALISMÁN DORADO DE LA TARJETA COSMOS
-      const talismanAltar = createCosmosGoldenTalisman();
-      const altY = getTerrainY(mission.x, mission.z + 0.2);
-      talismanAltar.position.set(0, altY, 0.2);
-      g.add(talismanAltar);
-      g.userData.cosmosCard = talismanAltar.userData.cardMesh;
+      // 1. Centro: Gran Pedestal VIP con la Tarjeta Cosmos flotante
+      const vipPedestal = createCosmosVIPPedestal();
+      const altY = getTerrainY(mission.x, mission.z - 0.4);
+      vipPedestal.position.set(0, altY, -0.4);
+      g.add(vipPedestal);
+      g.userData.cosmosCard = vipPedestal.userData.cardMesh;
       g.userData.cosmosCardBaseY = 1.75;
 
-      // 3. MESA DE FIRMA DE CONTRATOS, CONVENIOS Y BALANZA (Despejada del porche de bolas)
-      const desk = createContractDesk();
-      const dtY = getTerrainY(mission.x - 3.4, mission.z + 0.8);
-      desk.position.set(-3.4, dtY, 0.8);
-      desk.rotation.y = 0.28;
-      g.add(desk);
+      // 2. Flanco Izquierdo: Mostrador de Convenios Comerciales (Alimentos, Moda, Catálogos)
+      const merchantsBooth = createCosmosMerchantsBooth();
+      const dtY = getTerrainY(mission.x - 3.6, mission.z + 0.4);
+      merchantsBooth.position.set(-3.6, dtY, 0.4);
+      merchantsBooth.rotation.y = 0.35;
+      g.add(merchantsBooth);
 
+      // 3. Flanco Derecho: Mostrador de Salud, Deporte y Recompensas Cosmos
+      const wellnessBooth = createCosmosWellnessRewardsBooth();
+      const trY = getTerrainY(mission.x + 3.6, mission.z + 0.4);
+      wellnessBooth.position.set(3.6, trY, 0.4);
+      wellnessBooth.rotation.y = -0.35;
+      g.add(wellnessBooth);
 
+      await spawn(ASSETS.props.chest, 0.95, [4.8, 0, -1.2], -0.4);
+      await spawn(ASSETS.props.stackedBoxes, 1.0, [-4.8, 0, -1.2], 0.4);
 
-      // 4. GRAN DESPLIEGUE DE RIQUEZA Y DINERO: COFRE, LINGOTES Y SACOS DE MONEDAS
-      await spawn(ASSETS.props.chest, 0.95, [1.8, 0, 0.5], -0.25);
-      const treasure = createWealthTreasureDisplay();
-      const trY = getTerrainY(mission.x + 1.8, mission.z + 0.8);
-      treasure.position.set(1.8, trY, 0.8);
-      g.add(treasure);
-
-      // 5. PERTRECHOS COMERCIALES Y CARGAS (Separados hacia el lateral)
-      await spawn(ASSETS.props.stackedBoxes, 1.25, [3.8, 0, -0.4], -0.3);
-      await spawn(ASSETS.props.barrel, 1.05, [4.0, 0, 0.8], 0.3);
-      await spawn(ASSETS.props.largeBox, 0.95, [3.2, 0, -1.6], 0.2);
-
-      // 6. ENTORNO NATURAL LIMPIO Y SIN COLISIONES (Cero árboles en la chimenea)
+      // Entorno perimetral verde
       await spawn(ASSETS.trees[1], 6.8, [-8.2, 0, -4.5], 0.4);
       await spawn(ASSETS.trees[3], 6.5, [8.2, 0, -4.5], -0.4);
-      await spawn(ASSETS.trees[0], 6.5, [-5.8, 0, -7.5], 0.2);
-      await spawn(ASSETS.bushes[0], 1.3, [-5.5, 0, 1.6], 0.3);
-      await spawn(ASSETS.bushes[1], 1.3, [5.5, 0, 1.6], -0.3);
-      await spawn(ASSETS.rocks[1], 1.2, [-6.2, 0, -1.2], 0.5);
-      await spawn(ASSETS.rocks[2], 1.2, [6.2, 0, -1.2], -0.5);
-      await spawn(ASSETS.animals.deer, 1.0, [-7.5, 0, 1.0], 0.8);
+      await spawn(ASSETS.animals.deer, 1.1, [-7.5, 0, 1.0], 0.8);
       break;
     }
 
     case 'history':
     case 'harbor': {
       // ═════════════════════════════════════════════════════════════════════════
-      // MISIÓN 06: INTRODUCCIÓN A LA COMPAÑÍA (Gran Salón Consistorial & Museo Histórico)
-      // Paleta 100% coherente con las estaciones previas: cantería medieval, roble y bronce dorado.
-      // Entorno exuberante y vivo (cero seco): árboles nobles, jardineras de arbustos y fauna.
-      // Elementos que denotan la historia de la empresa:
-      // 1. Gran Ayuntamiento Cívico de la Organización (ASSETS.buildings.townhall).
-      // 2. Mesa ceremonial de cancillería oficial de KayKit (ASSETS.props.signingTable).
-      // 3. Arcas y cofres de oro fundacionales con documentos históricos (ASSETS.props.chest).
-      // 4. Gran Astrolabio Solar del Tiempo y Obelisco de la Fundación en el centro.
-      // 5. Galería Abierta de las 4 Eras Históricas (1998, 2008, 2018, Presente).
-      // 6. Carta Magna / Gran Mapa de Expansión, Libros de Actas, Candelabro y Globo Náutico.
-      // 7. Jardines y arboleda noble perimetral que otorgan frescura y vida natural.
+      // MISIÓN 06: INTRODUCCIÓN A LA COMPAÑÍA (Gran Salón Consistorial & Museo)
       // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.townhall, 7.0, [0, 0, -4.8], 0);
 
-      // 1. GRAN AYUNTAMIENTO CÍVICO & CASA CONSISTORIAL DE LA COMPAÑÍA
-      await spawn(ASSETS.buildings.townhall, 7.0, [0, 0, -3.6], 0);
-
-      // 2. CENTRO: GRAN ASTROLABIO & OBELISCO SOLAR DE LA FUNDACIÓN
+      // 1. Centro: Gran Astrolabio Solar del Tiempo y Esfera Armilar Dorada
       const monument = createFoundationalMonument();
-      const monY = getTerrainY(mission.x, mission.z + 0.3);
-      monument.position.set(0, monY, 0.3);
+      const monY = getTerrainY(mission.x, mission.z - 0.6);
+      monument.position.set(0, monY, -0.6);
       g.add(monument);
       if (monument.userData?.ring1 && monument.userData?.ring2) {
         g.userData.armillaryRing1 = monument.userData.ring1;
         g.userData.armillaryRing2 = monument.userData.ring2;
       }
 
-
-
-      // 3. FLANCO IZQUIERDO: GALERÍA DE LAS ERAS HISTÓRICAS (1998, 2008, 2018, HOY)
-      // Disposición semicircular envolvente
+      // 2. Flanco Izquierdo: Galería de las 4 Eras (1998, 2008, 2018, Hoy) en arco abierto
       const milestones = createHistoricalMilestonesGallery();
-      const msY = getTerrainY(mission.x - 3.5, mission.z + 0.85);
-      milestones.position.set(-3.5, msY, 0.85);
-      milestones.rotation.y = 0.36;
+      const msY = getTerrainY(mission.x - 3.4, mission.z + 0.9);
+      milestones.position.set(-3.4, msY, 0.9);
+      milestones.rotation.y = 0.35;
       g.add(milestones);
 
-      // 4. FLANCO DERECHO: MEMORIAL DE MISIÓN, VISIÓN, VALORES & GRAN LIBRO DE CRÓNICAS
+      // 3. Flanco Derecho: Memorial de Misión, Visión, Valores y Libro de Crónicas
       const heritageMemorial = createCorporateHeritageMemorial();
-      const hmY = getTerrainY(mission.x + 3.5, mission.z + 0.85);
-      heritageMemorial.position.set(3.5, hmY, 0.85);
-      heritageMemorial.rotation.y = -0.36;
+      const hmY = getTerrainY(mission.x + 3.4, mission.z + 0.9);
+      heritageMemorial.position.set(3.4, hmY, 0.9);
+      heritageMemorial.rotation.y = -0.35;
       g.add(heritageMemorial);
 
-      // 5. ENTORNO ARBOLADO PERIMETRAL EN EL CÉSPED (Cero arbustos en el pavimento, robles majestuosos y ciervo noble)
+      await spawn(ASSETS.props.chest, 0.9, [-4.4, 0, -1.2], 0.4);
+
+      // Arboleda perimetral
       await spawn(ASSETS.trees[0], 7.2, [-8.5, 0, -4.5], 0.3);
       await spawn(ASSETS.trees[1], 7.0, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[2], 6.6, [0, 0, -7.5], 0);
-      await spawn(ASSETS.trees[5], 6.2, [-8.8, 0, 1.8], 0.6);
-      await spawn(ASSETS.rocks[1], 1.3, [-6.8, 0, -0.6], 0.5);
-      await spawn(ASSETS.rocks[2], 1.3, [6.8, 0, -0.6], -0.5);
       await spawn(ASSETS.animals.stag, 1.25, [-7.4, 0, 0.8], 0.7);
       break;
     }
@@ -2492,72 +3154,275 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'nps':
     case 'archive': {
       // ═════════════════════════════════════════════════════════════════════════
-      // MISIÓN 07: NPS (Net Promoter Score & Satisfacción al Cliente)
-      // Paleta 100% armonizada: Cantería medieval, roble noble, bronce histórico y detalles Bradesco.
-      // Cero comida, cero cofres piratas, cero barriles, cero bolas verdes en el piso.
-      // 1. Casa Consistorial / Gremio de Atención al Cliente (ASSETS.buildings.home).
-      // 2. Centro: Gran Monumento de la Escala NPS 0-10 con cristales rubí Bradesco, ámbar y esmeralda.
-      // 3. Flanco Izquierdo: Módulo de Aplicación de la Encuesta con la Pregunta de Oro, fichas y Urna.
-      // 4. Flanco Derecho: Muro del Protocolo de Cierre de Ciclo ("Closed Loop") y banco de lectura.
-      // 5. Estandartes Oficiales de Marca Bradesco en los flancos de la plaza.
-      // 6. Arboleda perimetral en el pasto y fauna sin invadir la plaza.
+      // MISIÓN 07: NPS (Satisfacción al Cliente & Semáforo de Calidad)
       // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.home, 6.4, [0, 0, -4.6], 0);
 
-      // 1. EDIFICIO CIVIL CONSISTORIAL DE ATENCIÓN AL CLIENTE (KayKit)
-      await spawn(ASSETS.buildings.home, 6.4, [0, 0, -3.6], 0);
-
-      // 2. CENTRO: GRAN MONUMENTO Y TERMÓMETRO DE LA ESCALA NPS 0-10
+      // 1. Centro: Gran Barómetro Semáforo de la Escala NPS (Rojo, Ámbar, Verde Promotor)
       const npsScale = createNPSScaleMonument();
-      const npsY = getTerrainY(mission.x, mission.z + 0.2);
-      npsScale.position.set(0, npsY, 0.2);
+      const npsY = getTerrainY(mission.x, mission.z - 0.4);
+      npsScale.position.set(0, npsY, -0.4);
       g.add(npsScale);
 
-
-
-      // 3. FLANCO IZQUIERDO: MÓDULO DE LA ENCUESTA A CLIENTES (Pregunta de Oro, Fichas y Urna)
-      // Disposición semicircular envolvente
+      // 2. Flanco Izquierdo: Módulo de Encuestas con Urna y Fichas Tricolor
       const surveyDesk = createNPSSurveyDesk();
-      const sdY = getTerrainY(mission.x - 3.5, mission.z + 0.85);
-      surveyDesk.position.set(-3.5, sdY, 0.85);
-      surveyDesk.rotation.y = 0.38;
+      const sdY = getTerrainY(mission.x - 3.2, mission.z + 0.9);
+      surveyDesk.position.set(-3.2, sdY, 0.9);
+      surveyDesk.rotation.y = 0.35;
       g.add(surveyDesk);
 
-      // 4. FLANCO DERECHO: PROTOCOLO DE CIERRE DE CICLO ("CLOSED LOOP")
+      // 3. Flanco Derecho: Muro del Protocolo Closed Loop
       const protocolBoard = createNPSProtocolBoard();
-      const pbY = getTerrainY(mission.x + 3.5, mission.z + 0.85);
-      protocolBoard.position.set(3.5, pbY, 0.85);
-      protocolBoard.rotation.y = -0.38;
+      const pbY = getTerrainY(mission.x + 3.2, mission.z + 0.9);
+      protocolBoard.position.set(3.2, pbY, 0.9);
+      protocolBoard.rotation.y = -0.35;
       g.add(protocolBoard);
 
-      // 5. ENTORNO ARBOLADO PERIMETRAL EN EL CÉSPED (Cero arbustos en el pavimento)
+      // Arboleda perimetral
       await spawn(ASSETS.trees[2], 7.2, [-8.5, 0, -4.5], 0.3);
       await spawn(ASSETS.trees[4], 7.0, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[1], 6.6, [0, 0, -7.8], 0);
-      await spawn(ASSETS.trees[5], 6.2, [-8.8, 0, 1.8], 0.5);
-      await spawn(ASSETS.rocks[1], 1.3, [-6.8, 0, -0.6], 0.4);
-      await spawn(ASSETS.rocks[2], 1.3, [6.8, 0, -0.6], -0.4);
       await spawn(ASSETS.animals.fox, 1.1, [-7.6, 0, 1.2], 0.8);
       break;
     }
 
-    case 'forge': {
-      await spawn(ASSETS.buildings.blacksmith, 5.5, [-4.0, 0, -2.0], 0.2);
-      await spawn(ASSETS.buildings.workshop, 5.5, [4.0, 0, -2.0], -0.2);
-      await spawn(ASSETS.buildings.windmill, 8.5, [0, 0, 4.0], Math.PI);
-      await spawn(ASSETS.props.barrel, 1.1, [-2.0, 0, 1.0], 0.3);
-      await spawn(ASSETS.props.stackedBoxes, 1.3, [2.0, 0, 1.0], -0.3);
-      await spawn(ASSETS.trees[12], 8.0, [-8.5, 0, -3.0], 0.2);
-      await spawn(ASSETS.trees[6], 8.0, [8.5, 0, -3.0], -0.2);
-      await spawn(ASSETS.animals.wolf, 0.75, [-8.0, 0, 2.0], 0.6);
+    case 'docmanager': {
+      // ═════════════════════════════════════════════════════════════════════════
+      // MISIÓN 08: GESTOR DOCUMENTAL (Archivo Central & Scriptorium Digital)
+      // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.workshop, 6.5, [0, 0, -4.8], 0);
+
+      // 1. Centro: Pedestal de lectura con Tomo Maestro y Orbe Cyan Holográfico
+      const docDisplay = createDocManagerArchiveDisplay();
+      const docY = getTerrainY(mission.x, mission.z - 0.4);
+      docDisplay.position.set(0, docY, -0.4);
+      g.add(docDisplay);
+
+      // 2. Flanco Izquierdo: Pupitre de escriba con bandejas de 3 niveles, lupa y sellos
+      const filingDesk = createScriptoriumFilingDesk();
+      const fdY = getTerrainY(mission.x - 3.2, mission.z + 0.8);
+      filingDesk.position.set(-3.2, fdY, 0.8);
+      filingDesk.rotation.y = 0.35;
+      g.add(filingDesk);
+
+      // 3. Flanco Derecho: 2 Altas Estanterías con libros de colores (rojo, verde, azul, cuero)
+      const bookshelves = createArchiveBookshelfUnits();
+      const bkY = getTerrainY(mission.x + 3.0, mission.z + 0.8);
+      bookshelves.position.set(3.0, bkY, 0.8);
+      bookshelves.rotation.y = -0.35;
+      g.add(bookshelves);
+
+      await spawn(ASSETS.props.chest, 0.95, [-4.2, 0, -1.2], 0.3);
+
+      await spawn(ASSETS.trees[1], 6.8, [-8.0, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[2], 6.5, [8.0, 0, -4.5], -0.3);
+      await spawn(ASSETS.animals.stag, 1.2, [-7.2, 0, 1.0], 0.6);
+      break;
+    }
+
+    case 'ethics': {
+      // ═════════════════════════════════════════════════════════════════════════
+      // MISIÓN 09: CÓDIGO DE ÉTICA (Tribunal de Integridad & Principios)
+      // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.church, 6.8, [0, 0, -4.8], 0);
+
+      // 1. Centro: Balanza Solar de la Justicia Ética en latón dorado con gema esmeralda
+      const ethicsMonument = createEthicsJusticeMonument();
+      const ethY = getTerrainY(mission.x, mission.z - 0.5);
+      ethicsMonument.position.set(0, ethY, -0.5);
+      g.add(ethicsMonument);
+
+      // 2. Flanco Izquierdo: Gran Tomo del Código de Ética iluminado por vela en atril
+      const tome = createOpenTomeOfEthics();
+      const tmY = getTerrainY(mission.x - 3.2, mission.z + 0.85);
+      tome.position.set(-3.2, tmY, 0.85);
+      tome.rotation.y = 0.35;
+      g.add(tome);
+
+      // 3. Flanco Derecho: Buzón blindado del Canal Confidencial con candado y cartel
+      const whistleBox = createConfidentialWhistleblowerBox();
+      const wbY = getTerrainY(mission.x + 3.0, mission.z + 0.85);
+      whistleBox.position.set(3.0, wbY, 0.85);
+      whistleBox.rotation.y = -0.35;
+      g.add(whistleBox);
+
+      // 4. Pebeteros de fuego de la transparencia a los lados
+      const bMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.8, roughness: 0.3 });
+      const fMat = new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff4400, emissiveIntensity: 2.8 });
+      [-2.2, 2.2].forEach(bx => {
+        const brazier = new THREE.Group();
+        const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.14, 0.16, 8), bMat);
+        bowl.position.y = 0.55;
+        brazier.add(bowl);
+        const fl = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.35, 6), fMat);
+        fl.position.y = 0.78;
+        brazier.add(fl);
+        const bY = getTerrainY(mission.x + bx, mission.z - 1.8);
+        brazier.position.set(bx, bY, -1.8);
+        g.add(brazier);
+      });
+
+      await spawn(ASSETS.trees[0], 7.0, [-8.5, 0, -4.2], 0.3);
+      await spawn(ASSETS.trees[3], 6.8, [8.5, 0, -4.2], -0.3);
+      await spawn(ASSETS.animals.deer, 1.15, [7.4, 0, 1.0], -0.7);
+      break;
+    }
+
+    case 'culture': {
+      // ═════════════════════════════════════════════════════════════════════════
+      // MISIÓN 10: CULTURA Y COMUNICACIÓN (Ágora de la Comunidad & Convivencia)
+      // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.tavern, 6.4, [0, 0, -4.8], 0);
+
+      // 1. Flanco Izquierdo: Mural de la Gaceta Comunitaria y avisos de colores
+      const board = new THREE.Group();
+      const oakMat = new THREE.MeshStandardMaterial({ color: 0x4a3018, roughness: 0.82 });
+      const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
+      const slateMat = new THREE.MeshStandardMaterial({ color: 0x2b3844, roughness: 0.55 });
+      const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
+      const pinColors = [0xf97316, 0xfbbf24, 0x3b82f6, 0xcc092f];
+
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.25, 0.10), oakMat);
+      panel.position.y = 0.95;
+      panel.castShadow = true;
+      board.add(panel);
+
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.08, 0.28), slateMat);
+      roof.position.set(0, 1.60, 0);
+      board.add(roof);
+
+      [-0.85, 0.85].forEach(x => {
+        const post = new THREE.Mesh(new THREE.BoxGeometry(0.10, 1.5, 0.10), darkOakMat);
+        post.position.set(x, 0.75, 0);
+        board.add(post);
+      });
+
+      [-0.55, -0.18, 0.20, 0.55].forEach((x, idx) => {
+        const poster = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.48 + (idx % 2) * 0.12, 0.02), parchmentMat);
+        poster.position.set(x, 0.95 - (idx % 2) * 0.04, 0.06);
+        board.add(poster);
+
+        const pin = new THREE.Mesh(new THREE.SphereGeometry(0.018, 6, 6), new THREE.MeshStandardMaterial({ color: pinColors[idx % pinColors.length] }));
+        pin.position.set(x, 1.18, 0.08);
+        board.add(pin);
+      });
+
+      const bY = getTerrainY(mission.x - 3.4, mission.z + 0.8);
+      board.position.set(-3.4, bY, 0.8);
+      board.rotation.y = 0.35;
+      g.add(board);
+
+      // 2. Centro: Podio de orador con clarín de heraldo de latón
+      const podium = new THREE.Group();
+      const pBase = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.85, 0.55), oakMat);
+      pBase.position.y = 0.425;
+      pBase.castShadow = true;
+      podium.add(pBase);
+
+      const drapery = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.60, 0.03), new THREE.MeshStandardMaterial({ color: 0xcc092f, roughness: 0.65 }));
+      drapery.position.set(0, 0.48, 0.285);
+      podium.add(drapery);
+
+      const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
+      const tTube = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.48, 8), brassMat);
+      tTube.rotation.x = Math.PI / 2;
+      tTube.position.set(0, 0.92, 0.10);
+      podium.add(tTube);
+      const tBell = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.14, 8), brassMat);
+      tBell.rotation.x = -Math.PI / 2;
+      tBell.position.set(0, 0.92, 0.36);
+      podium.add(tBell);
+
+      const pdY = getTerrainY(mission.x, mission.z - 0.3);
+      podium.position.set(0, pdY, -0.3);
+      g.add(podium);
+
+      // 3. Flanco Derecho: Fogonata de convivencia con bancos de tronco y laúd
+      const bonfire = new THREE.Group();
+      const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6e685f, roughness: 0.9 });
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        const st = new THREE.Mesh(new THREE.DodecahedronGeometry(0.10, 0), stoneMat);
+        st.position.set(Math.cos(a) * 0.35, 0.06, Math.sin(a) * 0.35);
+        bonfire.add(st);
+      }
+      const flameMesh = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.38, 6), new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff4400, emissiveIntensity: 2.8 }));
+      flameMesh.position.y = 0.20;
+      bonfire.add(flameMesh);
+
+      const bench = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.85, 6), darkOakMat);
+      bench.rotation.z = Math.PI / 2;
+      bench.position.set(0, 0.12, 0.55);
+      bonfire.add(bench);
+
+      const bfY = getTerrainY(mission.x + 3.2, mission.z + 0.9);
+      bonfire.position.set(3.2, bfY, 0.9);
+      bonfire.rotation.y = -0.35;
+      g.add(bonfire);
+
+      await spawn(ASSETS.trees[2], 6.6, [-7.8, 0, -4.0], 0.2);
+      await spawn(ASSETS.trees[4], 6.6, [7.8, 0, -4.0], -0.2);
+      await spawn(ASSETS.animals.fox, 1.0, [-6.8, 0, 1.5], 0.8);
+      break;
+    }
+
+    case 'route90': {
+      // ═════════════════════════════════════════════════════════════════════════
+      // MISIÓN 11: RUTA 90 (Sendero de las 3 Postas: 30 - 60 - 90 Días)
+      // Tiendas separadas a los extremos para dejar un camino central amplio
+      // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.tent, 3.6, [-4.5, 0, -2.8], 0.4);
+      await spawn(ASSETS.buildings.tent, 3.6, [4.5, 0, -2.8], -0.4);
+
+      // 1. Centro: Las 3 Postas de Hito escalonadas a lo largo del sendero
+      const routeMonument = createRoute90Monument();
+      const rtY = getTerrainY(mission.x, mission.z + 0.1);
+      routeMonument.position.set(0, rtY, 0.1);
+      g.add(routeMonument);
+
+      // 2. Mesa de campamento de integración en el lateral izquierdo
+      await spawn(ASSETS.props.signingTable, 1.05, [-2.8, 0, 1.2], 0.3);
+
+      await spawn(ASSETS.animals.horse, 1.25, [5.2, 0, 0.5], -0.6);
+      await spawn(ASSETS.trees[0], 6.8, [-8.0, 0, -4.0], 0.3);
+      await spawn(ASSETS.trees[1], 6.8, [8.0, 0, -4.0], -0.3);
+      break;
+    }
+
+    case 'union': {
+      // ═════════════════════════════════════════════════════════════════════════
+      // MISIÓN 12: SINDICATO (Foro de la Alianza Laboral & Mesa de Acuerdos)
+      // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.townhall, 6.8, [0, 0, -4.8], 0);
+
+      // 1. Centro: Gran Mesa Redonda con 4 sillas, pliego bilateral y escultura de manos unidas
+      const unionMonument = createUnionAllianceMonument();
+      const unY = getTerrainY(mission.x, mission.z - 0.2);
+      unionMonument.position.set(0, unY, -0.2);
+      g.add(unionMonument);
+
+      await spawn(ASSETS.trees[1], 7.0, [-8.2, 0, -4.2], 0.3);
+      await spawn(ASSETS.trees[3], 7.0, [8.2, 0, -4.2], -0.3);
+      await spawn(ASSETS.animals.stag, 1.2, [-7.2, 0, 1.2], 0.7);
       break;
     }
 
     case 'castle': {
-      await spawn(ASSETS.buildings.castle, 12.0, [0, 0, -3.0], 0);
-      await spawn(ASSETS.buildings.cannonTower, 8.0, [-6.5, 0, 3.0], 0.3);
-      await spawn(ASSETS.buildings.cannonTower, 8.0, [6.5, 0, 3.0], -0.3);
-      await spawn(ASSETS.buildings.tower, 7.0, [-6.5, 0, -7.5], 0);
-      await spawn(ASSETS.buildings.tower, 7.0, [6.5, 0, -7.5], 0);
+      // ═════════════════════════════════════════════════════════════════════════
+      // MISIÓN 13: CIERRE (Gran Castillo & Bastión de Graduación)
+      // ═════════════════════════════════════════════════════════════════════════
+      await spawn(ASSETS.buildings.castle, 12.0, [0, 0, -4.0], 0);
+      await spawn(ASSETS.buildings.cannonTower, 8.0, [-7.5, 0, 2.5], 0.3);
+      await spawn(ASSETS.buildings.cannonTower, 8.0, [7.5, 0, 2.5], -0.3);
+      await spawn(ASSETS.buildings.tower, 7.0, [-7.5, 0, -8.0], 0);
+      await spawn(ASSETS.buildings.tower, 7.0, [7.5, 0, -8.0], 0);
+
+      // Ceremonia de Graduación: Alfombra roja ceremonial, Podio con Diploma y Llave del Reino,
+      // Mesa de banquete con Trofeo Dorado y Braseros de llamas vivas
+      const victorySet = createCastleVictoryMonument();
+      const vicY = getTerrainY(mission.x, mission.z);
+      victorySet.position.set(0, vicY, 0);
+      g.add(victorySet);
+
       await spawn(ASSETS.trees[7], 8.5, [-11.0, 0, -5.0], 0.2);
       await spawn(ASSETS.trees[8], 8.5, [11.0, 0, -5.0], -0.2);
       break;
@@ -2640,13 +3505,13 @@ export class ProgressiveWorldStreamer {
     this.mixers = [];
     this.birds = [];
 
-    // 24 Spatial Chunks (6 columns x 4 rows across 680x440 continent)
-    this.chunkCols = 6;
+    // 32 Spatial Chunks (8 columns x 4 rows across 920x480 continent)
+    this.chunkCols = 8;
     this.chunkRows = 4;
-    this.minX = -340;
-    this.maxX = 340;
-    this.minZ = -220;
-    this.maxZ = 220;
+    this.minX = -380;
+    this.maxX = 540;
+    this.minZ = -240;
+    this.maxZ = 240;
     this.chunkW = (this.maxX - this.minX) / this.chunkCols;
     this.chunkD = (this.maxZ - this.minZ) / this.chunkRows;
 
@@ -2683,7 +3548,7 @@ export class ProgressiveWorldStreamer {
   prepareEntities() {
     const isStationClearing = (x, z) => {
       for (const m of this.missions) {
-        const rad = (m.id === 4 || m.id === 5) ? 30.0 : 22.0;
+        const rad = (m.id === 4 || m.id === 5 || m.id === 13) ? 28.0 : 22.0;
         if (Math.hypot(x - m.x, z - m.z) < rad) return true;
       }
       if (this.trailPoints && this.trailPoints.length) {
@@ -2705,7 +3570,7 @@ export class ProgressiveWorldStreamer {
 
     let seedIdx = 1;
 
-    // ── 1. Organic Multi-Species Oak & Broadleaf Groves (Central & Southern Valleys) ──
+    // ── 1. Organic Multi-Species Oak & Broadleaf Groves (Across the 920x480 Continent) ──
     const oakModels = [
       ASSETS.trees[0], ASSETS.trees[1], ASSETS.trees[2],
       ASSETS.trees[3], ASSETS.trees[4], ASSETS.trees[5],
@@ -2714,10 +3579,10 @@ export class ProgressiveWorldStreamer {
     const bushModels = ASSETS.bushes;
     const rockModels = ASSETS.rocks;
 
-    // 85 Organic Grove Centers
-    for (let g = 0; g < 85; g++) {
-      const gx = -280 + seeded(seedIdx++) * 560;
-      const gz = -150 + seeded(seedIdx++) * 300;
+    // 120 Organic Grove Centers
+    for (let g = 0; g < 120; g++) {
+      const gx = -340 + seeded(seedIdx++) * 820;
+      const gz = -180 + seeded(seedIdx++) * 360;
       if (isStationClearing(gx, gz)) continue;
       const gy = this.getTerrainY(gx, gz);
       if (gy < -0.3 || gy > 28.0) continue;
@@ -2774,16 +3639,16 @@ export class ProgressiveWorldStreamer {
       }
     }
 
-    // ── 2. Alpine Pines & Conifer Forests (Highlands, Northern Ridge & Mountain Slopes) ──
+    // ── 2. Alpine Pines & Conifer Forests (Highlands, Ridges & Mountain Slopes) ──
     const pineModels = [
       ASSETS.trees[6], ASSETS.trees[7], ASSETS.trees[8],
       ASSETS.trees[11], ASSETS.trees[12]
     ];
 
-    // 85 Alpine Pine Clusters
-    for (let p = 0; p < 85; p++) {
-      const px = -290 + seeded(seedIdx++) * 580;
-      const pz = -180 + seeded(seedIdx++) * 360;
+    // 120 Alpine Pine Clusters
+    for (let p = 0; p < 120; p++) {
+      const px = -350 + seeded(seedIdx++) * 840;
+      const pz = -200 + seeded(seedIdx++) * 400;
       if (isStationClearing(px, pz)) continue;
       const py = this.getTerrainY(px, pz);
       if (py < -0.3 || py > 42.0) continue;
@@ -2809,9 +3674,9 @@ export class ProgressiveWorldStreamer {
     }
 
     // ── 3. Scattered Nature: Boulders & Wildflower Glades ────────────────────
-    for (let i = 0; i < 140; i++) {
-      const x = -280 + seeded(seedIdx++) * 560;
-      const z = -160 + seeded(seedIdx++) * 320;
+    for (let i = 0; i < 180; i++) {
+      const x = -340 + seeded(seedIdx++) * 820;
+      const z = -190 + seeded(seedIdx++) * 380;
       if (isStationClearing(x, z)) continue;
       const y = this.getTerrainY(x, z);
       if (y < -0.3 || y > 38.0) continue;
@@ -2821,9 +3686,9 @@ export class ProgressiveWorldStreamer {
       addInstance(rockModel, height, [x, y, z], seeded(seedIdx++) * Math.PI * 2);
     }
 
-    for (let i = 0; i < 180; i++) {
-      const x = -270 + seeded(seedIdx++) * 540;
-      const z = -150 + seeded(seedIdx++) * 300;
+    for (let i = 0; i < 240; i++) {
+      const x = -330 + seeded(seedIdx++) * 800;
+      const z = -180 + seeded(seedIdx++) * 360;
       if (isStationClearing(x, z)) continue;
       const y = this.getTerrainY(x, z);
       if (y < -0.3 || y > 30.0) continue;

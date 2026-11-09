@@ -11,6 +11,7 @@ const MIME = {
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.gltf': 'application/json; charset=utf-8',
+  '.glb': 'model/gltf-binary',
   '.bin': 'application/octet-stream',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',

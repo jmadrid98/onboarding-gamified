@@ -1,8 +1,8 @@
-import * as THREE from 'three';
+import * as THREE from './vendor/three/build/three.module.js';
 window.THREE = THREE;
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Sky } from 'three/addons/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=175.0.0';
+import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
+import { Sky } from './vendor/three/examples/jsm/objects/Sky.js';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=187.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -18,7 +18,12 @@ function updateBootProgress(value, label) {
   if (pctEl) pctEl.textContent = pct + '%';
 }
 
+updateBootProgress(0.15, 'Iniciando motor 3D...');
+
+let bootReadyCalled = false;
 function showBootReady() {
+  if (bootReadyCalled) return;
+  bootReadyCalled = true;
   updateBootProgress(1, 'Carga completada');
   const loaderBox = document.getElementById('bootLoaderBox');
   const actions = document.getElementById('bootActions');
@@ -35,6 +40,13 @@ function showBootReady() {
   }
 }
 
+// Global safety timeout so the boot screen can never hang
+setTimeout(() => {
+  if (!bootReadyCalled) {
+    showBootReady();
+  }
+}, 5000);
+
 function dismissBoot() {
   const b = document.getElementById('boot');
   if (b && !b.classList.contains('hidden')) {
@@ -44,23 +56,30 @@ function dismissBoot() {
     }, 750);
   }
 }
+window.dismissBoot = dismissBoot;
 
-// ── Mission Checkpoints Catalog (Station 0: Lobby + 9 Exploration Checkpoints) ──
+// ── Mission Checkpoints Catalog (Station 0: Lobby + 13 Exploration Checkpoints) ──
 const SEED = [
-  { id: 0, name: 'Campamento Base & Bienvenida', desc: 'Punto de reunión inicial para todos los aventureros. Aquí se presentan los equipos, se explican las metas de la expedición y se prepara la partida hacia las 9 misiones del reino.', region: 'Lobby de Expedición', x: -248, z: 118, baseY: 0.0, type: 'lobby' },
-  { id: 1, name: 'Arsenal y Equipos', desc: 'Entrega y verificación del equipamiento inicial: Laptop corporativa, tarjeta de acceso, periféricos tech y kit de bienvenida.', region: 'Puesto de Inicio', x: -220, z: 85, baseY: 0.0, type: 'camp' },
-  { id: 2, name: 'Firma de Contrato y Beneficios', desc: 'Formalización del pacto laboral, firma de contrato, pólizas de salud, vales y catálogo de beneficios corporativos.', region: 'Santuario del Pacto', x: -160, z: -90, baseY: 4.5, type: 'sanctuary' },
-  { id: 3, name: 'Humand y Comedor', desc: 'Guía de uso de la App Humand para checar entradas/salidas, reporte de incidencias, turnos y normas del comedor corporativo.', region: 'Valle del Refectorio', x: -85, z: 55, baseY: 0.0, type: 'garden' },
-  { id: 4, name: 'Protección Civil y Estacionamiento', desc: 'Protocolos de emergencia, brigadas de auxilio, rutas de evacuación y registro de vehículos en el estacionamiento corporativo.', region: 'Altos de la Vigilancia', x: -25, z: 120, baseY: 7.5, type: 'safety' },
-  { id: 5, name: 'Tarjeta Cosmos', desc: 'Beneficios, convenios comerciales, descuentos y privilegios exclusivos con la Tarjeta Cosmos.', region: 'Bóveda Cosmos', x: 45, z: 55, baseY: 0.0, type: 'vault' },
-  { id: 6, name: 'Introducción a la compañía', desc: 'Historia, origen, evolución, pilares, propósito y cultura que definen el camino de nuestra organización.', region: 'Salón de las Crónicas', x: 110, z: -85, baseY: 3.2, type: 'history' },
-  { id: 7, name: 'NPS', desc: 'Metodología, escala y aplicación de la encuesta NPS a clientes para medir satisfacción, lealtad y calidad de servicio.', region: 'Pabellón NPS', x: 175, z: -105, baseY: 5.0, type: 'nps' },
-  { id: 8, name: 'Herramientas y Operación', desc: 'Sistemas, accesos, canales y operación del día a día.', region: 'Forja Operativa', x: 225, z: 40, baseY: 7.8, type: 'forge' },
-  { id: 9, name: 'Boss Final', desc: 'Cierre integral, último checkpoint y símbolo de pertenencia.', region: 'Bastión de Cierre', x: 280, z: 115, baseY: 16.0, type: 'castle' }
+  { id: 0, name: 'Campamento Base & Bienvenida', desc: 'Punto de reunión inicial para todos los aventureros. Aquí se presentan los equipos, se explican las metas de la expedición y se prepara la partida hacia las 13 misiones del reino.', region: 'Lobby de Expedición', x: -280, z: 120, baseY: 0.0, type: 'lobby' },
+  { id: 1, name: 'Arsenal y Equipos', desc: 'Entrega y verificación del equipamiento inicial: Laptop corporativa, tarjeta de acceso, periféricos tech y kit de bienvenida.', region: 'Puesto de Inicio', x: -240, z: 70, baseY: 0.0, type: 'camp' },
+  { id: 2, name: 'Firma de Contrato y Beneficios', desc: 'Formalización del pacto laboral, firma de contrato, pólizas de salud, vales y catálogo de beneficios corporativos.', region: 'Santuario del Pacto', x: -170, z: -110, baseY: 4.5, type: 'sanctuary' },
+  { id: 3, name: 'Humand y Comedor', desc: 'Guía de uso de la App Humand para checar entradas/salidas, reporte de incidencias, turnos y normas del comedor corporativo.', region: 'Valle del Refectorio', x: -80, z: 65, baseY: 0.0, type: 'garden' },
+  { id: 4, name: 'Protección Civil y Estacionamiento', desc: 'Protocolos de emergencia, brigadas de auxilio, rutas de evacuación y registro de vehículos en el estacionamiento corporativo.', region: 'Altos de la Vigilancia', x: -10, z: 140, baseY: 7.5, type: 'safety' },
+  { id: 5, name: 'Tarjeta Cosmos', desc: 'Beneficios, convenios comerciales, descuentos y privilegios exclusivos con la Tarjeta Cosmos.', region: 'Bóveda Cosmos', x: 65, z: 65, baseY: 0.0, type: 'vault' },
+  { id: 6, name: 'Introducción a la compañía', desc: 'Historia, origen, evolución, pilares, propósito y cultura que definen el camino de nuestra organización.', region: 'Salón de las Crónicas', x: 135, z: -100, baseY: 3.2, type: 'history' },
+  { id: 7, name: 'NPS', desc: 'Metodología, escala y aplicación de la encuesta NPS a clientes para medir satisfacción, lealtad y calidad de servicio.', region: 'Pabellón NPS', x: 205, z: -120, baseY: 5.0, type: 'nps' },
+  { id: 8, name: 'Gestor Documental', desc: 'Aprende el funcionamiento, organización, resguardo y políticas del gestor documental corporativo.', region: 'Archivo Central', x: 265, z: -35, baseY: 4.0, type: 'docmanager' },
+  { id: 9, name: 'Código de Ética', desc: 'Directrices, conducta profesional, integridad, canal confidencial y normas éticas de Bradesco.', region: 'Tribunal de Integridad', x: 320, z: 60, baseY: 6.5, type: 'ethics' },
+  { id: 10, name: 'Cultura y Comunicación', desc: 'Estrategias de comunicación interna, sentido de pertenencia, cultura viva y canales de difusión.', region: 'Plaza de la Cultura', x: 375, z: -55, baseY: 5.0, type: 'culture' },
+  { id: 11, name: 'Ruta 90', desc: 'Acompañamiento, metas y evaluaciones de desempeño 30-60-90 días para nuevos ingresos.', region: 'Sendero de las 3 Lunas', x: 425, z: 50, baseY: 8.0, type: 'route90' },
+  { id: 12, name: 'Sindicato', desc: 'Información integral sobre la representación sindical, derechos laborales, pacto colectivo y acuerdos mutuos.', region: 'Foro de la Alianza', x: 470, z: -40, baseY: 6.0, type: 'union' },
+  { id: 13, name: 'Cierre', desc: 'Graduación final de la expedición, consolidación del aprendizaje y coronación en el Bastión.', region: 'Bastión de Cierre', x: 515, z: 110, baseY: 18.0, type: 'castle' }
 ];
 
+const MAX_MISSION = SEED.length - 1;
+
 // ── State Management ─────────────────────────────────────────────────────────
-const KEY = 'nextGenOnboardingDay.v69_megamap';
+const KEY = 'nextGenOnboardingDay.v70_megamap';
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 let missions = structuredClone(SEED);
@@ -71,31 +90,11 @@ if (Array.isArray(saved.missions) && saved.missions.length === SEED.length) {
     }
   });
 }
-if (missions[5]) {
-  missions[5].name = 'Tarjeta Cosmos';
-  missions[5].region = 'Bóveda Cosmos';
-  missions[5].desc = 'Beneficios, convenios comerciales, descuentos y privilegios exclusivos con la Tarjeta Cosmos.';
-  missions[5].type = 'vault';
-}
-if (missions[6]) {
-  missions[6].name = 'Introducción a la compañía';
-  missions[6].region = 'Salón de las Crónicas';
-  missions[6].desc = 'Historia, origen, evolución, pilares, propósito y cultura que definen el camino de nuestra organización.';
-  missions[6].type = 'history';
-  missions[6].baseY = 3.2;
-}
-if (missions[7]) {
-  missions[7].name = 'NPS';
-  missions[7].region = 'Pabellón NPS';
-  missions[7].desc = 'Metodología, escala y aplicación de la encuesta NPS a clientes para medir satisfacción, lealtad y calidad de servicio.';
-  missions[7].type = 'nps';
-  missions[7].baseY = 5.0;
-}
 function getMission(id) {
   const num = Number(id);
   return missions.find(m => m.id === num) || missions[0];
 }
-let current = (saved.current !== undefined && !isNaN(saved.current)) ? clamp(Number(saved.current), 0, 9) : 0;
+let current = (saved.current !== undefined && !isNaN(saved.current)) ? clamp(Number(saved.current), 0, MAX_MISSION) : 0;
 const colors = ['#0e807f', '#d69c39', '#7257c8', '#be6150', '#3677c9', '#668e4f', '#c64e91', '#e47b30'];
 const initials = n => String(n || '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]?.toUpperCase()).join('') || 'AV';
 
@@ -367,54 +366,174 @@ const DEFAULT_EVALUATIONS = {
   8: {
     mid: {
       id: "s8_mid",
-      title: "Evaluación Intermedia: Accesos y Canales de Operación",
-      question: "¿Qué debes hacer si detectas una falla en una herramienta o sistema operativo en tu jornada?",
+      title: "Evaluación Intermedia: Gestión y Organización Documental",
+      question: "¿Cuál es el propósito primordial del Gestor Documental corporativo en tus actividades diarias?",
       options: [
-        { id: "A", text: "Levantar un ticket formal en la Mesa de Ayuda (Service Desk) con el detalle y capturas del error." },
-        { id: "B", text: "Intentar reparar el software sin autorización técnica." },
-        { id: "C", text: "Suspender labores sin avisar al líder del equipo." },
-        { id: "D", text: "Publicar el error en redes sociales personales." }
+        { id: "A", text: "Garantizar la trazabilidad, control de versiones, confidencialidad y rápido acceso a expedientes oficiales." },
+        { id: "B", text: "Guardar copias personales no autorizadas en carpetas sin clasificar." },
+        { id: "C", text: "Eliminar registros históricos sin autorización previa." },
+        { id: "D", text: "Reemplazar los sistemas operativos de la empresa." }
       ],
       correctOption: "A",
-      explanation: "El canal formal de Service Desk asegura el seguimiento, la trazabilidad y la pronta resolución técnica de cualquier incidencia.",
+      explanation: "El Gestor Documental centraliza la información institucional, manteniendo altos estándares de seguridad, orden, auditoría y control de versiones.",
       xp: 50
     },
     final: {
       id: "s8_final",
-      title: "Reto de Cierre: Seguridad de la Información y Operación",
-      question: "¿Cuál es una práctica indispensable de ciberseguridad en el manejo de datos de clientes?",
+      title: "Reto de Cierre: Políticas de Retención y Resguardo",
+      question: "¿Qué lineamiento es indispensable aplicar al subir o consultar expedientes en el Gestor Documental?",
       options: [
-        { id: "A", text: "Bloquear tu equipo (Win+L) al levantarte y nunca compartir contraseñas ni datos sensibles." },
-        { id: "B", text: "Escribir las contraseñas en notas adhesivas pegadas al monitor." },
-        { id: "C", text: "Enviar bases de datos a correos electrónicos personales." },
-        { id: "D", text: "Usar contraseñas simples como '123456'." }
+        { id: "A", text: "Asignar los permisos de acceso correctos según la clasificación de seguridad y respetar los periodos de retención." },
+        { id: "B", text: "Compartir enlaces públicos sin restricción a usuarios externos." },
+        { id: "C", text: "Modificar la fecha original de los contratos sin registro de auditoría." },
+        { id: "D", text: "Descargar información sensible a memorias USB no cifradas." }
       ],
       correctOption: "A",
-      explanation: "El resguardo de contraseñas y el bloqueo de pantalla protegen la confidencialidad de la información institucional y la privacidad de nuestros clientes.",
+      explanation: "El correcto etiquetado de confidencialidad y apego a las políticas de retención protegen los activos de información y el cumplimiento legal.",
       xp: 75
     }
   },
   9: {
     mid: {
       id: "s9_mid",
-      title: "Evaluación Intermedia: Integración y Trabajo en Equipo",
-      question: "¿Cuál es el factor clave para el éxito en proyectos colaborativos y multidisciplinarios?",
+      title: "Evaluación Intermedia: Código de Ética y Conducta",
+      question: "¿Qué conducta establece nuestro Código de Ética ante un posible conflicto de interés o dilema ético?",
       options: [
-        { id: "A", text: "Comunicación asertiva, objetivos compartidos, empatía y apoyo mutuo entre áreas." },
-        { id: "B", text: "Trabajar en silos aislados sin compartir información." },
-        { id: "C", text: "Competir negativamente con los compañeros de equipo." },
-        { id: "D", text: "Evitar la retroalimentación constructiva." }
+        { id: "A", text: "Declararlo con transparencia a tu líder y al área de Cumplimiento para asegurar decisiones imparciales." },
+        { id: "B", text: "Ocultarlo mientras no genere sospechas inmediatas." },
+        { id: "C", text: "Aceptar beneficios personales a cambio de favores comerciales." },
+        { id: "D", text: "Tomar decisiones basándose únicamente en el beneficio propio." }
       ],
       correctOption: "A",
-      explanation: "La sinergia entre diferentes áreas multiplica la capacidad de innovación y asegura resultados extraordinarios para la organización.",
+      explanation: "La transparencia y la pronta declaración de conflictos de interés resguardan la integridad personal y el prestigio de nuestra organización.",
       xp: 50
     },
     final: {
       id: "s9_final",
-      title: "Reto Final Épico: Compromiso y Graduación Onboarding",
-      question: "¿Qué representa concluir exitosamente la Expedición de Onboarding de Bradesco México?",
+      title: "Reto de Cierre: Canal Confidencial de Integridad",
+      question: "¿Cuál es la garantía principal al realizar un reporte a través del Canal Confidencial de Integridad?",
       options: [
-        { id: "A", text: "Estar completamente preparado, equipado y alineado con los valores y metas para triunfar en tu nueva aventura profesional." },
+        { id: "A", text: "Confidencialidad absoluta, posibilidad de anonimato e investigación rigurosa con cero tolerancia a represalias." },
+        { id: "B", text: "Divulgación pública de los datos del reportante." },
+        { id: "C", text: "Sanción automática para quien realiza la consulta ética." },
+        { id: "D", text: "No se realiza ningún tipo de seguimiento." }
+      ],
+      correctOption: "A",
+      explanation: "El Canal de Integridad asegura un espacio seguro, protegido y ético para expresar inquietudes y denunciar cualquier falta a nuestros valores.",
+      xp: 75
+    }
+  },
+  10: {
+    mid: {
+      id: "s10_mid",
+      title: "Evaluación Intermedia: Canales de Comunicación Interna",
+      question: "¿Cuáles son los canales oficiales para mantenerte informado sobre metas, eventos y anuncios corporativos?",
+      options: [
+        { id: "A", text: "La plataforma Humand, correos oficiales, reuniones de equipo (Town Halls) y comunicados institucionales." },
+        { id: "B", text: "Rumores informales en pasillos sin confirmación." },
+        { id: "C", text: "Cuentas personales de redes sociales externas." },
+        { id: "D", text: "Blogs anónimos de internet." }
+      ],
+      correctOption: "A",
+      explanation: "Los canales oficiales garantizan información verificada, oportuna y alineada con la estrategia de la organización.",
+      xp: 50
+    },
+    final: {
+      id: "s10_final",
+      title: "Reto de Cierre: Vivencia de la Cultura y Pertenencia",
+      question: "¿De qué manera contribuyes activamente a fortalecer la cultura y el clima organizacional?",
+      options: [
+        { id: "A", text: "Fomentando el respeto, colaborando con entusiasmo, reconociendo el logro de los demás y viviendo nuestros valores." },
+        { id: "B", text: "Aislándote de las actividades de integración del equipo." },
+        { id: "C", text: "Generando desinformación entre compañeros." },
+        { id: "D", text: "Ignorando las iniciativas de bienestar y cultura." }
+      ],
+      correctOption: "A",
+      explanation: "La cultura la construimos todos los días a través del trato respetuoso, la colaboración activa y el sentido de pertenencia.",
+      xp: 75
+    }
+  },
+  11: {
+    mid: {
+      id: "s11_mid",
+      title: "Evaluación Intermedia: Objetivos de la Ruta 30-60-90",
+      question: "¿Cuál es el objetivo principal del programa de acompañamiento y evaluaciones 30-60-90 días?",
+      options: [
+        { id: "A", text: "Acompañar tu integración, alinear objetivos de desempeño y brindar retroalimentación constructiva continua." },
+        { id: "B", text: "Asignar penalizaciones sin oportunidad de mejora." },
+        { id: "C", text: "Postergar tu plan de inducción hasta el final del año." },
+        { id: "D", text: "Revisar únicamente asistencia sin evaluar metas." }
+      ],
+      correctOption: "A",
+      explanation: "La Ruta 30-60-90 permite calibrar el avance, resolver obstáculos a tiempo y asegurar una curva de aprendizaje óptima y motivadora.",
+      xp: 50
+    },
+    final: {
+      id: "s11_final",
+      title: "Reto de Cierre: Consolidación y Plan de Desarrollo",
+      question: "¿Qué hito clave se logra al completar satisfactoriamente los primeros 90 días en el equipo?",
+      options: [
+        { id: "A", text: "Consolidación en el puesto, definición de metas anuales y trazado del plan de crecimiento profesional." },
+        { id: "B", text: "Conclusión de toda meta laboral futura." },
+        { id: "C", text: "Dejar de recibir retroalimentación del líder." },
+        { id: "D", text: "Reiniciar el proceso de contratación desde cero." }
+      ],
+      correctOption: "A",
+      explanation: "Completar la Ruta 90 consolida tu autonomía, autonomía funcional y abre la puerta al desarrollo continuo dentro de la organización.",
+      xp: 75
+    }
+  },
+  12: {
+    mid: {
+      id: "s12_mid",
+      title: "Evaluación Intermedia: Diálogo Colectivo y Representación",
+      question: "¿Cuál es el rol fundamental de la representación sindical en el entorno laboral?",
+      options: [
+        { id: "A", text: "Representar los intereses colectivos de los trabajadores y fomentar un diálogo constructivo con la empresa." },
+        { id: "B", text: "Generar barreras en los procesos de comunicación." },
+        { id: "C", text: "Reemplazar los contratos individuales por acuerdos verbales." },
+        { id: "D", text: "Impedir las mejoras en las condiciones de trabajo." }
+      ],
+      correctOption: "A",
+      explanation: "La colaboración sindical impulsa acuerdos justos, clima de respeto mutuo y resguardo de los derechos colectivos.",
+      xp: 50
+    },
+    final: {
+      id: "s12_final",
+      title: "Reto de Cierre: Contrato Colectivo y Beneficios",
+      question: "¿Dónde y cómo puedes informarte acerca del pacto y los beneficios derivados del Contrato Colectivo?",
+      options: [
+        { id: "A", text: "Con el área de Relaciones Laborales y tus delegados sindicales autorizados." },
+        { id: "B", text: "Buscando en páginas web no oficiales." },
+        { id: "C", text: "A través de rumores sin sustento documental." },
+        { id: "D", text: "No está permitida su consulta." }
+      ],
+      correctOption: "A",
+      explanation: "El área de Relaciones Laborales y los representantes autorizados brindan orientación clara sobre las cláusulas y beneficios colectivos.",
+      xp: 75
+    }
+  },
+  13: {
+    mid: {
+      id: "s13_mid",
+      title: "Evaluación Intermedia: Recorrido Integral de Expedición",
+      question: "¿Qué pilares componen la formación integral recibida durante toda esta expedición de Onboarding?",
+      options: [
+        { id: "A", text: "Equipamiento, marco laboral, cultura, herramientas digitales, ética, normatividad y trabajo en equipo." },
+        { id: "B", text: "Únicamente instalación de programas básicos." },
+        { id: "C", text: "Solo memorización de nombres de directivos." },
+        { id: "D", text: "Ningún aprendizaje aplicable a la operación diaria." }
+      ],
+      correctOption: "A",
+      explanation: "El programa integral de Onboarding te dota de las competencias, valores y herramientas necesarias para triunfar en tu trayectoria corporativa.",
+      xp: 50
+    },
+    final: {
+      id: "s13_final",
+      title: "Reto Final Épico: Compromiso y Graduación Onboarding",
+      question: "¿Qué representa concluir victoriosamente la Expedición de Onboarding de Bradesco México?",
+      options: [
+        { id: "A", text: "Estar plenamente preparado, equipado y alineado con los valores y metas para triunfar en tu nueva aventura profesional." },
         { id: "B", text: "Solo un trámite sin aplicación en tu vida laboral." },
         { id: "C", text: "El final de todo aprendizaje dentro de la empresa." },
         { id: "D", text: "Una certificación decorativa." }
@@ -506,11 +625,11 @@ function getTerrainY(wx, wz) {
   let h = fbm(wx * s + 3.7, wz * s + 1.4) * 6.5 - 0.9;
   h += fbm(wx * s * 3.2 + 7.1, wz * s * 3.2 + 2.9) * 0.9 - 0.35;
 
-  // Mountain boundaries
-  if (wz < -160) { const t = clamp((-160 - wz) / 50, 0, 1); h += t * t * (fbm(wx * s * 1.6 + 1.3, wz * s * 1.6 + 5.2) * 32 + 18); }
-  if (wz > 160) { const t = clamp((wz - 160) / 50, 0, 1); h += t * t * (fbm(wx * s * 2.1 + 4.5, wz * s * 2.1 + 0.8) * 28 + 14); }
-  if (wx < -280) { const t = clamp((-280 - wx) / 50, 0, 1); h += t * t * (fbm(wx * s * 1.7 + 2.1, wz * s * 1.7 + 6.3) * 30 + 16); }
-  if (wx > 310) { const t = clamp((wx - 310) / 45, 0, 1); h += t * t * (fbm(wx * s * 1.7 + 8.5, wz * s * 1.7 + 3.1) * 34 + 20); }
+  // Mountain boundaries (Expanded 920x480 continent)
+  if (wz < -190) { const t = clamp((-190 - wz) / 50, 0, 1); h += t * t * (fbm(wx * s * 1.6 + 1.3, wz * s * 1.6 + 5.2) * 32 + 18); }
+  if (wz > 190) { const t = clamp((wz - 190) / 50, 0, 1); h += t * t * (fbm(wx * s * 2.1 + 4.5, wz * s * 2.1 + 0.8) * 28 + 14); }
+  if (wx < -340) { const t = clamp((-340 - wx) / 50, 0, 1); h += t * t * (fbm(wx * s * 1.7 + 2.1, wz * s * 1.7 + 6.3) * 30 + 16); }
+  if (wx > 580) { const t = clamp((wx - 580) / 45, 0, 1); h += t * t * (fbm(wx * s * 1.7 + 8.5, wz * s * 1.7 + 3.1) * 34 + 20); }
 
   // Lake Basin (situated north at z = -150 so it never touches Station 6 at z = -85)
   const ld = Math.hypot((wx - 110) * 0.7, wz + 150);
@@ -604,35 +723,41 @@ function updateSky(elevation = 38, azimuth = -152) {
 }
 updateSky();
 
-// ── Rustic Organic Trail Waypoints ───────────────────────────────────────────
+// ── Rustic Organic Trail Waypoints (34 Continuous Smooth Waypoints) ───────────
 const roadWaypoints = [
-  new THREE.Vector3(-248, 0, 118),  // Station 0: Lobby de Expedición (Campamento Base)
-  new THREE.Vector3(-235, 0, 100),
-  new THREE.Vector3(-220, 0, 85),   // Station 1: Arsenal & Equipos (Camp center)
-  new THREE.Vector3(-205, 0, 60),
-  new THREE.Vector3(-190, 0, 20),
-  new THREE.Vector3(-180, 0, -25),
-  new THREE.Vector3(-170, 0, -60),
-  new THREE.Vector3(-160, 0, -90),  // Station 2: Santuario del Pacto (Shrine center)
-  new THREE.Vector3(-145, 0, -60),
+  new THREE.Vector3(-280, 0, 120),  // Station 0: Lobby de Expedición (Campamento Base)
+  new THREE.Vector3(-260, 0, 95),
+  new THREE.Vector3(-240, 0, 70),   // Station 1: Arsenal & Equipos (Camp center)
+  new THREE.Vector3(-220, 0, 30),
+  new THREE.Vector3(-195, 0, -40),
+  new THREE.Vector3(-170, 0, -110), // Station 2: Santuario del Pacto (Shrine center)
+  new THREE.Vector3(-150, 0, -70),
   new THREE.Vector3(-135, 0, -38),
   new THREE.Vector3(-125, 0, -20),  // Bridge 1 crossing
-  new THREE.Vector3(-110, 0, 10),
-  new THREE.Vector3(-98, 0, 35),
-  new THREE.Vector3(-85, 0, 55),    // Station 3: Humand y Comedor (Tavern & market center)
-  new THREE.Vector3(-60, 0, 85),
-  new THREE.Vector3(-25, 0, 120),   // Station 4: Torre de Vigilancia
-  new THREE.Vector3(10, 0, 90),
-  new THREE.Vector3(45, 0, 55),     // Station 5: Campamento Avanzado
-  new THREE.Vector3(65, 0, 15),
+  new THREE.Vector3(-105, 0, 20),
+  new THREE.Vector3(-80, 0, 65),    // Station 3: Humand y Comedor (Tavern & market center)
+  new THREE.Vector3(-45, 0, 105),
+  new THREE.Vector3(-10, 0, 140),   // Station 4: Torre de Vigilancia & Estacionamiento
+  new THREE.Vector3(25, 0, 105),
+  new THREE.Vector3(65, 0, 65),     // Station 5: Tarjeta Cosmos (Bóveda Comercial)
+  new THREE.Vector3(75, 0, 20),
   new THREE.Vector3(80, 0, -20),    // Bridge 2 crossing
-  new THREE.Vector3(110, 0, -85),   // Station 6: Embarcadero del Lago
-  new THREE.Vector3(145, 0, -100),
-  new THREE.Vector3(175, 0, -105),  // Station 7: Granja y Molino
-  new THREE.Vector3(200, 0, -35),
-  new THREE.Vector3(225, 0, 40),    // Station 8: Cantera de Piedra
-  new THREE.Vector3(255, 0, 80),
-  new THREE.Vector3(280, 0, 115)    // Station 9: Ciudadela y Castillo
+  new THREE.Vector3(105, 0, -65),
+  new THREE.Vector3(135, 0, -100),  // Station 6: Introducción a la compañía (Townhall)
+  new THREE.Vector3(170, 0, -115),
+  new THREE.Vector3(205, 0, -120),  // Station 7: NPS (Escala de Excelencia)
+  new THREE.Vector3(235, 0, -80),
+  new THREE.Vector3(265, 0, -35),   // Station 8: Gestor Documental
+  new THREE.Vector3(290, 0, 15),
+  new THREE.Vector3(320, 0, 60),    // Station 9: Código de Ética (Tribunal)
+  new THREE.Vector3(350, 0, 0),
+  new THREE.Vector3(375, 0, -55),   // Station 10: Cultura y Comunicación (Ágora)
+  new THREE.Vector3(400, 0, 0),
+  new THREE.Vector3(425, 0, 50),    // Station 11: Ruta 90 (Sendero de las 3 Lunas)
+  new THREE.Vector3(450, 0, 5),
+  new THREE.Vector3(470, 0, -40),   // Station 12: Sindicato (Foro de la Alianza)
+  new THREE.Vector3(492, 0, 35),
+  new THREE.Vector3(515, 0, 110)    // Station 13: Cierre (Bastión de la Victoria / Castillo)
 ];
 
 const roadCurve = new THREE.CatmullRomCurve3(roadWaypoints, false, 'catmullrom', 0.20);
@@ -811,8 +936,8 @@ function createTrailSplatTexture() {
   ctx.fillRect(0, 0, 2048, 2048);
 
   const toCanvas = (wx, wz) => [
-    ((wx + 340) / 680) * 2048,
-    ((wz + 220) / 440) * 2048
+    ((wx + 380) / 920) * 2048,
+    ((wz + 240) / 480) * 2048
   ];
 
   const pts = roadCurve.getSpacedPoints(600);
@@ -934,8 +1059,8 @@ terrainMat.onBeforeCompile = shader => {
     uniform sampler2D uDirt;
     uniform sampler2D uCobble;
     uniform sampler2D uTrailSplat;
-    uniform vec2 uStations[10];
-    uniform float uStationRadii[10];`
+    uniform vec2 uStations[14];
+    uniform float uStationRadii[14];`
   ).replace(
     '#include <map_fragment>',
     `
@@ -986,9 +1111,9 @@ terrainMat.onBeforeCompile = shader => {
     float riverSand = (vWorldPos.x > -155.0 && vWorldPos.x < 82.0 && vWorldPos.y < 0.1) ? smoothstep(0.1, -1.2, vWorldPos.y) : 0.0;
     float sandWeight = clamp((lakeSand + riverSand) * (1.0 - rockWeight * 0.8), 0.0, 1.0);
 
-    // 3. Station Courtyard Plazas: Clean, elegant, noble medieval cobblestone foundation
+    // 3. Station Courtyard Plazas: Clean, elegant, noble medieval cobblestone foundation (14 Stations)
     float stationBlend = 0.0;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 14; i++) {
       float dSt = length(vWorldPos.xz - uStations[i]);
       float r = uStationRadii[i];
       float w = smoothstep(r, r - 2.0, dSt);
@@ -996,7 +1121,7 @@ terrainMat.onBeforeCompile = shader => {
     }
 
     // 4. Natural Organic Trail (Solid, connected thoroughfare across the continent)
-    vec2 splatUV = vec2((vWorldPos.x + 340.0) / 680.0, (vWorldPos.z + 220.0) / 440.0);
+    vec2 splatUV = vec2((vWorldPos.x + 380.0) / 920.0, (vWorldPos.z + 240.0) / 480.0);
     vec4 splat = texture2D(uTrailSplat, splatUV);
     float roadPresence = max(splat.r, splat.g); // Never zero in center!
     float cobblePresence = splat.g;
@@ -1030,8 +1155,8 @@ terrainMat.onBeforeCompile = shader => {
   terrainMat.userData.shader = shader;
 };
 
-// ── 100% Solid 3D Terrain Plane ──────────────────────────────────────────────
-const terrainGeo = new THREE.PlaneGeometry(680, 440, 160, 110);
+// ── 100% Solid 3D Terrain Plane (920x480) ───────────────────────────────────
+const terrainGeo = new THREE.PlaneGeometry(920, 480, 200, 120);
 const posAttr = terrainGeo.attributes.position;
 for (let i = 0; i < posAttr.count; i++) {
   const lx = posAttr.getX(i), ly = posAttr.getY(i);
@@ -1048,7 +1173,7 @@ scene.add(ground);
 
 // ── Airtight Continuous Cliff Skirt (Extruded from outer terrain perimeter down to y = -35m) ──
 {
-  const width = 680, depth = 440, segX = 160, segZ = 110, bottomY = -35.0;
+  const width = 920, depth = 480, segX = 200, segZ = 120, bottomY = -35.0;
   const perimeter = [];
 
   // 1. North edge: z = -depth / 2, x from -width/2 to +width/2
@@ -1441,7 +1566,7 @@ function rebuildPlayers(startMission = null, targetMission = null) {
 
 function updateNavButtons() {
   const isFirst = current <= 0;
-  const isLast = current >= 9;
+  const isLast = current >= MAX_MISSION;
 
   const cardBack = document.getElementById('cardBackBtn');
   if (cardBack) {
@@ -1514,14 +1639,34 @@ const DEFAULT_STATION_MEDIA = {
     { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
   ],
   8: [
-    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
-    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
-    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+    { order: 1, type: 'video', title: 'Introducción al Gestor Documental', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Manual de Archivo y Clasificación', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Flujo de Trazabilidad y Firmas', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
   ],
   9: [
-    { order: 1, type: 'video', title: 'Introducción a la Misión', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
-    { order: 2, type: 'image', title: 'Guía de Estrategia y Objetivos', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
-    { order: 3, type: 'image', title: 'Diagrama de Procesos', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+    { order: 1, type: 'video', title: 'Introducción al Código de Ética', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Principios de Conducta e Integridad', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Canal Confidencial de Reportes', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  10: [
+    { order: 1, type: 'video', title: 'Cultura y Conexión Institucional', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Canales de Comunicación Interna', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Comunidad y Eventos Corporativos', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  11: [
+    { order: 1, type: 'video', title: 'Acompañamiento Ruta 30-60-90', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Hitos y Metas de Integración', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Evaluaciones y Feedback Continuo', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  12: [
+    { order: 1, type: 'video', title: 'Información Sindical y Diálogo', file: 'assets/media/station_02/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Derechos y Contrato Colectivo', file: 'assets/media/station_02/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Representación y Alianza Laboral', file: 'assets/media/station_02/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
+  ],
+  13: [
+    { order: 1, type: 'video', title: 'Cierre de Expedición y Victoria', file: 'assets/media/station_01/01_Introduccion.mp4', desc: 'Cápsula de Video', badge: 'Video' },
+    { order: 2, type: 'image', title: 'Compromiso con la Excelencia', file: 'assets/media/station_01/03_Descrubre los beneficios.png', desc: 'Infografía Visual', badge: 'Infografía' },
+    { order: 3, type: 'image', title: 'Coronación y Graduación Oficial', file: 'assets/media/station_01/05_Analiza el flujo.png', desc: 'Infografía Visual', badge: 'Infografía' }
   ]
 };
 
@@ -1574,7 +1719,7 @@ function applyStates() {
 
 function renderUI() {
   const q = getMission(current);
-  const pct = Math.round((current / 9) * 100);
+  const pct = Math.round((current / MAX_MISSION) * 100);
 
   // Update Mission Card in Sidebar
   const mEyebrow = document.getElementById('missionEyebrow');
@@ -1582,7 +1727,7 @@ function renderUI() {
     if (current === 0) {
       mEyebrow.textContent = 'BIENVENIDA · CAMPAMENTO BASE';
     } else {
-      mEyebrow.textContent = `CHECKPOINT ${String(current).padStart(2, '0')}/09 · ${q.region.toUpperCase()}`;
+      mEyebrow.textContent = `CHECKPOINT ${String(current).padStart(2, '0')}/${String(MAX_MISSION).padStart(2, '0')} · ${q.region.toUpperCase()}`;
     }
   }
 
@@ -1609,7 +1754,7 @@ function renderUI() {
   if (pPct) pPct.textContent = pct + '%';
 
   const mStatus = document.getElementById('missionStatus');
-  if (mStatus) mStatus.textContent = current === missions.length ? 'Último Checkpoint' : 'En curso';
+  if (mStatus) mStatus.textContent = current === MAX_MISSION ? 'Último Checkpoint' : 'En curso';
 
   const numEl = document.getElementById('skyMissionNum');
   if (numEl) numEl.textContent = `MISIÓN ${String(current).padStart(2, '0')}`;
@@ -1759,16 +1904,20 @@ function setJourneyCopy(msg) {
 // ── Cinematic Camera Shots ───────────────────────────────────────────────────
 let travel = null;
 const SHOTS = {
-  0: { o: [5.2, 6.8, 9.8], h: 1.5 }, // Lobby de Expedición
-  1: { o: [4.2, 5.8, 8.5], h: 1.2 },
-  2: { o: [4.8, 6.8, 9.2], h: 1.5 },
-  3: { o: [4.5, 6.5, 9.0], h: 1.4 },
-  4: { o: [5.8, 9.6, 14.5], h: 2.2 },
-  5: { o: [4.8, 6.8, 9.5], h: 1.5 },
-  6: { o: [4.8, 6.8, 10.2], h: 1.6 },
-  7: { o: [5.2, 7.5, 10.2], h: 2.0 },
-  8: { o: [5.0, 7.2, 9.8], h: 1.8 },
-  9: { o: [7.0, 10.5, -13.0], h: 4.2 }
+  0: { o: [5.2, 6.8, 9.8], h: 1.5 },   // Lobby de Expedición
+  1: { o: [4.2, 5.8, 8.5], h: 1.2 },   // Arsenal y Equipos
+  2: { o: [4.8, 6.8, 9.2], h: 1.5 },   // Firma de Contrato
+  3: { o: [4.5, 6.5, 9.0], h: 1.4 },   // Humand y Comedor
+  4: { o: [5.8, 9.6, 14.5], h: 2.2 },  // Protección Civil y Estacionamiento
+  5: { o: [4.8, 6.8, 9.5], h: 1.5 },   // Tarjeta Cosmos
+  6: { o: [4.8, 6.8, 10.2], h: 1.6 },  // Introducción a la compañía
+  7: { o: [5.2, 7.5, 10.2], h: 2.0 },  // NPS
+  8: { o: [5.0, 7.0, 9.5], h: 1.6 },   // Gestor Documental
+  9: { o: [5.2, 7.2, 9.8], h: 1.8 },   // Código de Ética
+  10: { o: [5.0, 7.0, 9.5], h: 1.6 },  // Cultura y Comunicación
+  11: { o: [5.2, 7.5, 10.0], h: 1.8 }, // Ruta 90
+  12: { o: [5.0, 7.0, 9.5], h: 1.6 },  // Sindicato
+  13: { o: [7.0, 10.5, -13.0], h: 4.2 } // Cierre (Gran Bastión / Castillo)
 };
 
 function cameraPose(q) {
@@ -2135,12 +2284,12 @@ function prevMission() {
 }
 
 function nextMission() {
-  if (current >= 9) return;
+  if (current >= MAX_MISSION) return;
   setMission(current + 1, true);
 }
 
 function setMission(id, move = true) {
-  const targetId = clamp(Number(id) ?? 0, 0, 9);
+  const targetId = clamp(Number(id) ?? 0, 0, MAX_MISSION);
   const startMission = getMission(current);
   current = targetId;
   const targetMission = getMission(current);
@@ -2151,7 +2300,7 @@ function setMission(id, move = true) {
     if (current === 0) {
       mEyebrow.textContent = 'BIENVENIDA · CAMPAMENTO BASE';
     } else {
-      mEyebrow.textContent = `CHECKPOINT ${String(current).padStart(2, '0')}/09 · ${targetMission.region.toUpperCase()}`;
+      mEyebrow.textContent = `CHECKPOINT ${String(current).padStart(2, '0')}/${String(MAX_MISSION).padStart(2, '0')} · ${targetMission.region.toUpperCase()}`;
     }
   }
 
@@ -2175,11 +2324,11 @@ function setMission(id, move = true) {
   if (mNum) mNum.textContent = String(current).padStart(2, '0');
 
   const pPct = document.getElementById('progressPct');
-  if (pPct) pPct.textContent = Math.round((current / 9) * 100) + '%';
+  if (pPct) pPct.textContent = Math.round((current / MAX_MISSION) * 100) + '%';
 
   const mStatus = document.getElementById('missionStatus');
   if (mStatus) {
-    mStatus.textContent = current === 0 ? 'Punto de Partida' : (current === 9 ? 'Último Checkpoint' : 'En curso');
+    mStatus.textContent = current === 0 ? 'Punto de Partida' : (current === MAX_MISSION ? 'Último Checkpoint' : 'En curso');
   }
 
   // Lobby CTA button vs Standard Nav
@@ -3801,7 +3950,7 @@ function initAdminEvalEditor() {
   if (!stationSelect || !typeSelect) return;
 
   stationSelect.innerHTML = '';
-  for (let i = 1; i <= 9; i++) {
+  for (let i = 1; i <= MAX_MISSION; i++) {
     const m = getMission(i);
     const opt = document.createElement('option');
     opt.value = i;
