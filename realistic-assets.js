@@ -182,32 +182,35 @@ function seeded(i) {
 // ── Model Paths Catalog ──────────────────────────────────────────────────────
 const ASSETS = {
   trees: [
-    './assets/stylized/nature/Tree_1_A_Color1.gltf',
-    './assets/stylized/nature/Tree_1_B_Color1.gltf',
-    './assets/stylized/nature/Tree_1_C_Color1.gltf',
-    './assets/stylized/nature/Tree_2_A_Color1.gltf',
-    './assets/stylized/nature/Tree_2_B_Color1.gltf',
-    './assets/stylized/nature/Tree_2_C_Color1.gltf',
-    './assets/stylized/nature/Tree_3_A_Color1.gltf',
-    './assets/stylized/nature/Tree_3_B_Color1.gltf',
-    './assets/stylized/nature/Tree_3_C_Color1.gltf',
-    './assets/stylized/nature/Tree_4_A_Color1.gltf',
-    './assets/stylized/nature/Tree_5_A_Color1.gltf',
-    './assets/stylized/nature/Tree_6_A_Color1.gltf',
-    './assets/stylized/nature/Tree_7_A_Color1.gltf'
+    './assets/polyfork/broadleaf-oak-997c22.glb',       // 0: Roble frondoso
+    './assets/polyfork/campground-pine-stand-0bf4f2.glb',// 1: Arboleda de coníferas en grupo
+    './assets/polyfork/birch-tree-181b33.glb',          // 2: Abedul nórdico (corteza blanca)
+    './assets/polyfork/tall-pine-tree-ab4108.glb',      // 3: Pino alpino alto
+    './assets/polyfork/windblown-larch-abb99c.glb',      // 4: Alerce alpino barrido por el viento
+    './assets/polyfork/apple-tree-ef0ba0.glb',          // 5: Manzano frondoso con manzanas rojas
+    './assets/polyfork/bare-mountain-rowan-10e72e.glb',  // 6: Serbal de montaña
+    './assets/polyfork/twisted-dead-oak-49457b.glb',     // 7: Roble milenario retorcido
+    './assets/polyfork/tree-fern-78320e.glb',           // 8: Helecho arborescente gigante
+    './assets/polyfork/young-pine-0d7695.glb',          // 9: Pino joven cónico
+    './assets/polyfork/maple-tree-65fa12.glb',          // 10: Arce templado
+    './assets/polyfork/campground-pine-stand-0bf4f2.glb',// 11
+    './assets/polyfork/windblown-larch-abb99c.glb'       // 12
   ],
   bushes: [
-    './assets/stylized/nature/Bush_1_A_Color1.gltf',
-    './assets/stylized/nature/Bush_1_E_Color1.gltf',
-    './assets/stylized/nature/Bush_2_A_Color1.gltf',
-    './assets/stylized/nature/Bush_3_A_Color1.gltf'
+    './assets/polyfork/wildflower-68d3a1.glb',          // 0: Ramillete de flores silvestres con tallos y pétalos (CERO bolas verdes)
+    './assets/polyfork/fern-plant-1559b8.glb',          // 1: Helecho silvestre con frondas de hojas reales
+    './assets/polyfork/flower-bed-708e73.glb',          // 2: Macizo de flores naturales de suelo
+    './assets/polyfork/wildflower-68d3a1.glb',          // 3: Flores silvestres
+    './assets/polyfork/toadstool-257a4a.glb',           // 4: Setas mágicas de bosque con tallo
+    './assets/polyfork/grass-tuft-a40a08.glb',          // 5: Mechón de hierba con briznas
+    './assets/polyfork/flower-planter-500ed2.glb'       // 6: Jardinera de madera con flores de colores
   ],
   rocks: [
-    './assets/stylized/nature/Rock_1_A_Color1.gltf',
-    './assets/stylized/nature/Rock_1_E_Color1.gltf',
-    './assets/stylized/nature/Rock_2_A_Color1.gltf',
-    './assets/stylized/nature/Rock_3_A_Color1.gltf',
-    './assets/stylized/nature/Rock_5_A_Color1.gltf'
+    './assets/polyfork/large-boulder-a29b99.glb',  // 0: Peñasco de granito
+    './assets/polyfork/medium-rock-e08405.glb',    // 1: Roca mediana
+    './assets/polyfork/small-rock-db33a7.glb',     // 2: Roca pequeña
+    './assets/polyfork/fallen-log-1685fb.glb',     // 3: Tronco caído con musgo
+    './assets/polyfork/tree-stump-ec3f48.glb'      // 4: Tocón de árbol
   ],
   props: {
     chest: './assets/stylized/props/chest_gold.gltf',
@@ -269,12 +272,18 @@ const ASSETS = {
     cazuelaPot: './assets/polyfork/cazuela-pot-79f0ee.glb'
   },
   animals: {
-    deer: './assets/stylized/animals/Deer.gltf',
-    stag: './assets/stylized/animals/Stag.gltf',
-    fox: './assets/stylized/animals/Fox.gltf',
-    horse: './assets/stylized/animals/Horse.gltf',
-    alpaca: './assets/stylized/animals/Alpaca.gltf',
-    wolf: './assets/stylized/animals/Wolf.gltf'
+    deer: './assets/polyfork/forest-deer-fe648d.glb',
+    stag: './assets/polyfork/alpine-ibex-base.glb',
+    fox: './assets/polyfork/red-fox-5c3bc0.glb',
+    horse: './assets/polyfork/wild-horse-047e93.glb',
+    bear: './assets/polyfork/black-bear-adbdc7.glb',
+    wolf: './assets/polyfork/wolf-base.glb',
+    rabbit: './assets/polyfork/forest-rabbit-ea2da0.glb',
+    chicken: './assets/polyfork/village-chicken-9ba715.glb',
+    sheep: './assets/polyfork/sheep-base.glb',
+    goat: './assets/polyfork/goat-base.glb',
+    crow: './assets/polyfork/crow-base.glb',
+    alpaca: './assets/polyfork/sheep-base.glb'
   },
   buildings: {
     tent: './assets/stylized/medieval/building_tent_blue.gltf',
@@ -2730,15 +2739,32 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.0, 0, 0.5], 0.8);
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.0, 0, 0.5], -0.8);
 
-      // 9. Animales y naturaleza
-      await spawn(ASSETS.animals.horse, 1.35, [-6.8, 0, 2.5], 0.6);
-      await spawn(ASSETS.animals.stag, 1.30, [6.8, 0, 2.5], -0.6);
-      await spawn(ASSETS.trees[0], 6.8, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[1], 6.5, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[2], 5.8, [-9.0, 0, 2.5], 0.8);
-      await spawn(ASSETS.trees[3], 5.8, [9.0, 0, 2.5], -0.8);
-      await spawn(ASSETS.bushes[0], 1.4, [-5.8, 0, 1.0], 0.4);
-      await spawn(ASSETS.bushes[1], 1.4, [5.8, 0, 1.0], -0.4);
+      // 9. Animales y naturaleza exuberante (Marco de bosque Polyfork visible en cámara)
+      // Árboles de fondo enmarcando la taberna (visibles claramente tras el tejado y flancos)
+      await spawn(ASSETS.trees[3], 8.8, [-4.5, 0, -7.5], 0.2); // Pino alpino alto sobresaliendo tras el tejado
+      await spawn(ASSETS.trees[2], 7.2, [0.0, 0, -8.2], 0.5);  // Abedul nórdico con corteza blanca
+      await spawn(ASSETS.trees[1], 7.5, [4.5, 0, -7.5], -0.3); // Arboleda de coníferas
+      await spawn(ASSETS.trees[5], 5.5, [-6.8, 0, -4.8], 0.3); // Manzano con frutos rojos
+      await spawn(ASSETS.trees[6], 5.2, [6.8, 0, -4.8], -0.3); // Serbal de montaña
+
+      // Jardineras de flores y vegetación natural (CERO bolas o círculos verdes en el suelo)
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [-4.2, 0, 0.2], 0);  // Jardinera de madera con flores junto a la taberna
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [4.2, 0, 0.2], 0);   // Jardinera de madera con flores junto a la mesa
+      await spawn(ASSETS.bushes[1], 0.60, [-6.2, 0, 1.8], 0.2); // Helecho frondoso en la orilla
+      await spawn(ASSETS.bushes[0], 0.45, [-3.2, 0, 3.2], 0);   // Flores silvestres en el borde
+      await spawn(ASSETS.bushes[0], 0.45, [3.2, 0, 3.2], 0.3);  // Flores silvestres en el borde
+      await spawn(ASSETS.bushes[4], 0.35, [-4.6, 0, 1.8], 0.5); // Setas con tallo junto al pozo
+      await spawn(ASSETS.rocks[3], 0.85, [-5.8, 0, 2.4], 0.4);  // Tronco caído con musgo
+      await spawn(ASSETS.rocks[4], 0.50, [5.6, 0, 1.2], 0.1);   // Tocón de árbol de madera
+      await spawn(ASSETS.rocks[0], 0.95, [-6.5, 0, -1.0], 0.5); // Peñasco de granito
+
+      // Fauna animada variada y visible en el encuadre
+      await spawn(ASSETS.animals.horse, 1.35, [-6.0, 0, 0.2], 0.8);   // Caballo noble junto a la carreta
+      await spawn(ASSETS.animals.chicken, 0.35, [-3.8, 0, 2.0], 0.3); // Gallina de granja picoteando cerca del pozo
+      await spawn(ASSETS.animals.chicken, 0.35, [-4.3, 0, 2.3], -0.6);// Segunda gallina cerca del grano
+      await spawn(ASSETS.animals.fox, 0.55, [5.5, 0, 0.2], -0.8);     // Zorro rojo curioso cerca de la mesa
+      await spawn(ASSETS.animals.rabbit, 0.35, [3.6, 0, 2.4], -0.5);  // Conejito silvestre junto al tablón
+      await spawn(ASSETS.animals.crow, 0.38, [4.2, 1.55, 2.5], -0.4); // Cuervo posado sobre el poste del tablón
 
       // Guía rúnica flotante de bienvenida Vermelho Bradesco
       const guideGem = new THREE.Mesh(
@@ -2791,20 +2817,30 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.campfireCookTripod, 1.30, [-0.5, 0, 1.8], 0);
       await spawn(ASSETS.polyfork.firewoodStack, 0.55, [-2.2, 0, 1.8], 0.1);
 
-      // Entorno natural
-      await spawn(ASSETS.trees[0], 6.5, [-7.8, 0, -4.5], 0.4);
-      await spawn(ASSETS.trees[1], 5.8, [7.8, 0, -4.5], -0.4);
-      await spawn(ASSETS.trees[2], 7.0, [0, 0, -7.8], Math.PI);
-      await spawn(ASSETS.trees[3], 5.2, [-8.5, 0, 1.8], 1.2);
-      await spawn(ASSETS.trees[4], 5.2, [8.5, 0, 1.8], -1.2);
-      await spawn(ASSETS.bushes[0], 1.4, [-6.2, 0, -2.8], 0.4);
-      await spawn(ASSETS.bushes[1], 1.4, [6.2, 0, -2.8], -0.4);
-      await spawn(ASSETS.bushes[2], 1.2, [-4.5, 0, 3.5], 1.1);
-      await spawn(ASSETS.bushes[3], 1.2, [4.5, 0, 3.5], -1.1);
-      await spawn(ASSETS.rocks[0], 1.3, [-6.8, 0, 3.2], 0.5);
-      await spawn(ASSETS.rocks[1], 1.3, [6.8, 0, 3.2], -0.5);
-      await spawn(ASSETS.animals.deer, 0.95, [-9.2, 0, -1.2], 0.8);
-      await spawn(ASSETS.animals.horse, 1.25, [8.8, 0, -0.6], -0.8);
+      // Entorno natural diverso y orgánico (Completamente libre de esferas o círculos verdes)
+      await spawn(ASSETS.trees[1], 8.5, [0.0, 0, -8.2], 0.2);   // Arboleda de coníferas tras la atalaya
+      await spawn(ASSETS.trees[3], 8.8, [-2.2, 0, -8.6], 0.1);  // Pino alpino alto
+      await spawn(ASSETS.trees[4], 7.2, [-4.5, 0, -7.0], 0.4);  // Alerce alpino barrido por el viento
+      await spawn(ASSETS.trees[2], 6.8, [4.2, 0, -7.0], -0.4);  // Abedul nórdico esbelto
+      await spawn(ASSETS.trees[5], 5.2, [-6.5, 0, -4.5], 0.3);  // Manzano frondoso con frutos
+      await spawn(ASSETS.trees[6], 5.5, [6.5, 0, -4.5], -0.3);  // Serbal de montaña
+
+      // Vegetación real y jardineras (CERO bolas/círculos verdes en el pavimento)
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [-3.8, 0, 0.6], 0.4); // Jardinera de madera con flores junto a la tienda
+      await spawn(ASSETS.bushes[1], 0.60, [-6.2, 0, 1.8], 0.4); // Helecho silvestre con hojas en la orilla
+      await spawn(ASSETS.bushes[1], 0.60, [6.2, 0, 1.8], -0.4); // Helecho silvestre en la orilla del camino
+      await spawn(ASSETS.bushes[0], 0.45, [-2.6, 0, 3.2], 0);   // Flores silvestres con tallos en el borde
+      await spawn(ASSETS.bushes[0], 0.45, [2.6, 0, 3.2], 0);    // Flores silvestres con tallos en el borde
+      await spawn(ASSETS.rocks[3], 0.85, [-5.8, 0, 2.4], 0.3);  // Tronco caído con musgo natural
+      await spawn(ASSETS.rocks[4], 0.50, [5.6, 0, 2.0], 0.1);   // Tocón de madera
+      await spawn(ASSETS.rocks[0], 1.10, [-6.0, 0, 0.8], 0.4);  // Peñasco de granito donde sube el íbice
+
+      // Fauna animada variada y única para el puesto militar
+      await spawn(ASSETS.animals.stag, 1.25, [-6.0, 0.6, 0.8], 0.6);   // Íbice alpino cornudo erguido sobre el peñasco
+      await spawn(ASSETS.animals.wolf, 1.10, [-1.8, 0, -4.2], 0.2);     // Lobo guardián vigilando al pie de la atalaya
+      await spawn(ASSETS.animals.fox, 0.55, [-3.2, 0, 2.2], 0.8);      // Zorro rojo curioso asomándose tras la leña
+      await spawn(ASSETS.animals.goat, 0.95, [5.6, 0, 0.8], -0.7);     // Cabra montés junto al barril de la herrería
+      await spawn(ASSETS.animals.crow, 0.38, [-1.8, 1.5, -1.0], -0.3); // Cuervo vigía posado sobre el armero de madera
 
       const crystal = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.28, 0),
@@ -2866,15 +2902,28 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.4], 0.3);
       await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.4], -0.3);
 
-      // Entorno solemne de montaña
-      await spawn(ASSETS.trees[2], 7.2, [-7.8, 0, -4.0], 0.3);
-      await spawn(ASSETS.trees[5], 6.8, [7.8, 0, -4.0], -0.3);
-      await spawn(ASSETS.trees[0], 6.5, [0, 0, -8.5], 0);
-      await spawn(ASSETS.animals.stag, 1.2, [-8.5, 0, 0.5], 0.6);
-      await spawn(ASSETS.bushes[2], 1.3, [-5.2, 0, -2.5], 0.2);
-      await spawn(ASSETS.bushes[3], 1.3, [5.2, 0, -2.5], -0.2);
-      await spawn(ASSETS.rocks[2], 1.4, [-5.8, 0, 1.5], 0.5);
-      await spawn(ASSETS.rocks[3], 1.4, [5.8, 0, 1.5], -0.5);
+      // Entorno solemne de montaña (Roble retorcido místico y pinos sagrados enmarcando la capilla)
+      await spawn(ASSETS.trees[7], 7.5, [-3.8, 0, -8.2], 0.3); // Roble milenario retorcido
+      await spawn(ASSETS.trees[3], 9.2, [3.2, 0, -8.2], -0.3); // Pino alpino alto
+      await spawn(ASSETS.trees[2], 7.2, [-5.8, 0, -5.2], 0.4); // Abedul de corteza blanca
+      await spawn(ASSETS.trees[6], 5.8, [5.8, 0, -5.2], -0.4); // Serbal de montaña
+      await spawn(ASSETS.trees[4], 5.2, [0.0, 0, -9.0], 0);    // Alerce alpino
+
+      // Helechos, setas místicas con tallo y rocas ceremoniales (CERO bolas verdes)
+      await spawn(ASSETS.bushes[1], 0.65, [-3.8, 0, -3.2], 0.2); // Helecho silvestre con frondas
+      await spawn(ASSETS.bushes[1], 0.65, [3.8, 0, -3.2], -0.2);
+      await spawn(ASSETS.bushes[4], 0.42, [-1.5, 0, -2.6], 0.4); // Setas místicas con tallo junto al altar
+      await spawn(ASSETS.bushes[4], 0.42, [1.5, 0, -2.6], -0.4);
+      await spawn(ASSETS.bushes[0], 0.45, [-3.5, 0, 2.2], 0);   // Flores silvestres con pétalos
+      await spawn(ASSETS.bushes[0], 0.45, [3.5, 0, 2.2], 0);
+      await spawn(ASSETS.rocks[0], 1.15, [-5.5, 0, 1.2], 0.5);  // Gran peñasco de granito
+      await spawn(ASSETS.rocks[3], 0.85, [5.5, 0, 1.2], -0.5);  // Tronco caído con musgo
+
+      // Fauna ceremonial del santuario (variada y visible)
+      await spawn(ASSETS.animals.deer, 1.25, [-4.8, 0, 0.4], 0.5);    // Ciervo noble reverente ante el templo
+      await spawn(ASSETS.animals.sheep, 0.95, [5.2, 0, 0.6], -0.6);   // Oveja lanuda pastando junto al murete
+      await spawn(ASSETS.animals.crow, 0.42, [-4.2, 0.82, -4.5], 0.2);// Cuervo posado solemnemente sobre el murete de piedra
+      await spawn(ASSETS.animals.rabbit, 0.35, [-2.2, 0, -2.4], 0.4); // Conejito cerca de las setas místicas
 
       // Sello flotante místico del Pacto elevado sobre el altar
       const covenantSeal = new THREE.Mesh(
@@ -2948,14 +2997,28 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // 7. Entrada: Tablón de Avisos de Humand (Turnos, menú diario y reglas del comedor)
       await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [2.0, 0, 2.6], -0.2);
 
-      // Entorno arbolado del valle fértil
-      await spawn(ASSETS.trees[3], 6.5, [-8.2, 0, -4.5], 0.5);
-      await spawn(ASSETS.trees[4], 6.0, [8.2, 0, -4.5], -0.5);
-      await spawn(ASSETS.animals.horse, 1.35, [8.5, 0, 1.0], -0.7);
-      await spawn(ASSETS.bushes[1], 1.4, [-5.8, 0, -1.0], 0.8);
-      await spawn(ASSETS.bushes[0], 1.3, [5.5, 0, -1.0], -0.8);
-      await spawn(ASSETS.rocks[1], 1.2, [-4.8, 0, 1.8], 0.3);
-      await spawn(ASSETS.rocks[0], 1.2, [4.8, 0, 1.8], -0.3);
+      // Entorno arbolado del valle fértil (Manzanos cargados de fruta, arces y abedules)
+      await spawn(ASSETS.trees[5], 5.8, [-4.2, 0, -7.5], 0.3); // Manzano frondoso con manzanas rojas
+      await spawn(ASSETS.trees[10], 6.5, [4.2, 0, -7.5], -0.4); // Arce templado frondoso
+      await spawn(ASSETS.trees[2], 6.8, [0.0, 0, -8.2], 0.2);  // Abedul blanco nórdico
+      await spawn(ASSETS.trees[1], 6.2, [-6.2, 0, -4.2], 0.5); // Arboleda de coníferas lateral
+      await spawn(ASSETS.trees[4], 5.2, [6.2, 0, -4.2], -0.5); // Alerce alpino
+
+      // Jardineras florales, cesta de provisiones y helechos (CERO bolas/círculos verdes en el suelo)
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [-5.0, 0, -0.6], 0.3); // Jardinera con flores junto al buffet
+      await spawn(ASSETS.bushes[0], 0.45, [-3.2, 0, 3.0], 0);   // Flores silvestres en el patio
+      await spawn(ASSETS.bushes[0], 0.45, [3.2, 0, 3.0], 0.3);  // Flores silvestres en el patio
+      await spawn(ASSETS.bushes[1], 0.65, [4.8, 0, -2.8], 0.2); // Helechos con frondas junto al horno de barro
+      await spawn(ASSETS.rocks[3], 0.85, [-5.8, 0, 1.8], 0.3);  // Tronco caído con musgo
+      await spawn(ASSETS.rocks[4], 0.50, [5.5, 0, 1.8], -0.3);  // Tocón de madera
+
+      // Granja viva y fauna animada activa (Variada y visible en cámara)
+      await spawn(ASSETS.animals.sheep, 0.95, [-5.2, 0, 0.5], 0.7);    // Oveja lanuda cerca del puesto de comida
+      await spawn(ASSETS.animals.chicken, 0.38, [4.2, 0, 0.2], 0.4);  // Gallina picoteando junto al horno de barro
+      await spawn(ASSETS.animals.chicken, 0.38, [4.8, 0, -0.6], -0.5); // Segunda gallina
+      await spawn(ASSETS.animals.chicken, 0.38, [3.8, 0, -1.0], 0.8);  // Tercera gallina
+      await spawn(ASSETS.animals.goat, 0.95, [5.5, 0, 1.2], -0.8);     // Cabra doméstica curioseando cerca de las mesas
+      await spawn(ASSETS.animals.rabbit, 0.35, [-2.8, 0, 2.6], 0.4);   // Conejito silvestre junto a la jardinera frontal
 
       // Kiosco digital de la App Humand interactivo con halo verde
       const humandTerminal = new THREE.Mesh(
@@ -3051,9 +3114,18 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // Cajas de suministros y herramientas en el lateral exterior
       await spawn(ASSETS.props.stackedBoxes, 1.1, [6.8, 0, -0.6], 0.3);
 
-      // 5. VEGETACIÓN PERIMETRAL BAJA (Sin árboles en accesos)
-      await spawn(ASSETS.bushes[0], 1.3, [-6.4, 0, 1.2], 0.4);
-      await spawn(ASSETS.bushes[1], 1.3, [7.8, 0, 1.6], -0.4);
+      // 5. VEGETACIÓN PERIMETRAL Y FAUNA VIGILANTE (CERO bolas verdes en el suelo)
+      await spawn(ASSETS.trees[3], 8.5, [-7.5, 0, -5.5], 0.3); // Pino alpino alto
+      await spawn(ASSETS.trees[1], 7.8, [8.2, 0, -5.5], -0.3); // Arboleda de coníferas
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [-6.2, 0, 1.2], 0.3); // Jardinera con flores
+      await spawn(ASSETS.bushes[1], 0.60, [7.5, 0, 1.5], -0.4); // Helechos con frondas en la orilla
+      await spawn(ASSETS.bushes[0], 0.45, [-3.5, 0, 2.8], 0);   // Flores silvestres
+      await spawn(ASSETS.bushes[0], 0.45, [3.5, 0, 2.8], 0.2);  // Flores silvestres
+
+      // Fauna temática de patrulla y resguardo
+      await spawn(ASSETS.animals.horse, 1.35, [6.8, 0, 0.2], -0.5);  // Caballo en el estacionamiento
+      await spawn(ASSETS.animals.wolf, 1.05, [-2.2, 0, 1.6], 0.4);   // Perro/lobo guardián en la garita
+      await spawn(ASSETS.animals.crow, 0.38, [0.1, 2.2, 2.0], 0);    // Cuervo vigía posado en el poste de señal
 
       // Baliza de emergencia luminosa sobre la torre de vigilancia
       const beaconGem = new THREE.Mesh(
@@ -3104,10 +3176,15 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.props.chest, 0.95, [4.8, 0, -1.2], -0.4);
       await spawn(ASSETS.props.stackedBoxes, 1.0, [-4.8, 0, -1.2], 0.4);
 
-      // Entorno perimetral verde
-      await spawn(ASSETS.trees[1], 6.8, [-8.2, 0, -4.5], 0.4);
-      await spawn(ASSETS.trees[3], 6.5, [8.2, 0, -4.5], -0.4);
-      await spawn(ASSETS.animals.deer, 1.1, [-7.5, 0, 1.0], 0.8);
+      // Entorno perimetral verde y fauna del mercado VIP
+      await spawn(ASSETS.trees[5], 5.6, [-7.8, 0, -4.5], 0.4); // Manzano con frutas
+      await spawn(ASSETS.trees[10], 6.8, [7.8, 0, -4.5], -0.4); // Arce templado
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [-4.5, 0, 1.8], 0.2);
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [4.5, 0, 1.8], -0.2);
+      await spawn(ASSETS.bushes[0], 0.45, [-2.5, 0, 2.5], 0);
+      await spawn(ASSETS.bushes[0], 0.45, [2.5, 0, 2.5], 0);
+      await spawn(ASSETS.animals.fox, 0.55, [-5.5, 0, 0.8], 0.8);    // Zorro rojo curioso
+      await spawn(ASSETS.animals.rabbit, 0.35, [5.2, 0, 0.8], -0.7);  // Conejito silvestre
       break;
     }
 
@@ -3144,10 +3221,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       await spawn(ASSETS.props.chest, 0.9, [-4.4, 0, -1.2], 0.4);
 
-      // Arboleda perimetral
-      await spawn(ASSETS.trees[0], 7.2, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[1], 7.0, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.animals.stag, 1.25, [-7.4, 0, 0.8], 0.7);
+      // Arboleda perimetral y fauna histórica
+      await spawn(ASSETS.trees[2], 7.2, [-8.5, 0, -4.5], 0.3); // Abedul nórdico
+      await spawn(ASSETS.trees[3], 8.5, [8.5, 0, -4.5], -0.3); // Pino alpino alto
+      await spawn(ASSETS.animals.deer, 1.20, [-7.4, 0, 0.8], 0.7); // Ciervo noble
+      await spawn(ASSETS.animals.crow, 0.40, [4.8, 1.6, 0.5], -0.5); // Cuervo del archivo histórico
       break;
     }
 
@@ -3178,10 +3256,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       protocolBoard.rotation.y = -0.35;
       g.add(protocolBoard);
 
-      // Arboleda perimetral
-      await spawn(ASSETS.trees[2], 7.2, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[4], 7.0, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.animals.fox, 1.1, [-7.6, 0, 1.2], 0.8);
+      // Arboleda perimetral y fauna pastoral
+      await spawn(ASSETS.trees[5], 5.8, [-8.5, 0, -4.5], 0.3); // Manzano
+      await spawn(ASSETS.trees[4], 7.0, [8.5, 0, -4.5], -0.3); // Alerce alpino
+      await spawn(ASSETS.animals.sheep, 0.95, [-7.2, 0, 1.2], 0.7); // Oveja de campo
+      await spawn(ASSETS.animals.chicken, 0.38, [5.5, 0, 1.2], -0.5); // Gallina picoteando
       break;
     }
 
@@ -3213,9 +3292,10 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       await spawn(ASSETS.props.chest, 0.95, [-4.2, 0, -1.2], 0.3);
 
-      await spawn(ASSETS.trees[1], 6.8, [-8.0, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[2], 6.5, [8.0, 0, -4.5], -0.3);
-      await spawn(ASSETS.animals.stag, 1.2, [-7.2, 0, 1.0], 0.6);
+      await spawn(ASSETS.trees[7], 7.8, [-8.0, 0, -4.5], 0.3); // Roble antiguo
+      await spawn(ASSETS.trees[2], 6.5, [8.0, 0, -4.5], -0.3);  // Abedul
+      await spawn(ASSETS.animals.crow, 0.42, [-3.8, 1.8, -1.0], 0.3); // Cuervo sabio
+      await spawn(ASSETS.animals.fox, 0.55, [6.5, 0, 1.0], -0.6);     // Zorro observador
       break;
     }
 
@@ -3261,9 +3341,10 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
         g.add(brazier);
       });
 
-      await spawn(ASSETS.trees[0], 7.0, [-8.5, 0, -4.2], 0.3);
-      await spawn(ASSETS.trees[3], 6.8, [8.5, 0, -4.2], -0.3);
-      await spawn(ASSETS.animals.deer, 1.15, [7.4, 0, 1.0], -0.7);
+      await spawn(ASSETS.trees[3], 8.5, [-8.5, 0, -4.2], 0.3); // Pino alto
+      await spawn(ASSETS.trees[6], 6.5, [8.5, 0, -4.2], -0.3); // Serbal
+      await spawn(ASSETS.animals.wolf, 1.10, [-6.8, 0, 1.0], 0.6); // Lobo guardián de la integridad
+      await spawn(ASSETS.animals.deer, 1.15, [7.4, 0, 1.0], -0.7); // Ciervo solemne
       break;
     }
 
@@ -3359,9 +3440,10 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       bonfire.rotation.y = -0.35;
       g.add(bonfire);
 
-      await spawn(ASSETS.trees[2], 6.6, [-7.8, 0, -4.0], 0.2);
-      await spawn(ASSETS.trees[4], 6.6, [7.8, 0, -4.0], -0.2);
-      await spawn(ASSETS.animals.fox, 1.0, [-6.8, 0, 1.5], 0.8);
+      await spawn(ASSETS.trees[10], 6.6, [-7.8, 0, -4.0], 0.2); // Arce
+      await spawn(ASSETS.trees[5], 5.6, [7.8, 0, -4.0], -0.2);  // Manzano
+      await spawn(ASSETS.animals.rabbit, 0.35, [-4.5, 0, 1.2], 0.6); // Conejito
+      await spawn(ASSETS.animals.chicken, 0.38, [5.2, 0, 1.2], -0.6); // Gallina comunitaria
       break;
     }
 
@@ -3382,9 +3464,10 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // 2. Mesa de campamento de integración en el lateral izquierdo
       await spawn(ASSETS.props.signingTable, 1.05, [-2.8, 0, 1.2], 0.3);
 
-      await spawn(ASSETS.animals.horse, 1.25, [5.2, 0, 0.5], -0.6);
-      await spawn(ASSETS.trees[0], 6.8, [-8.0, 0, -4.0], 0.3);
-      await spawn(ASSETS.trees[1], 6.8, [8.0, 0, -4.0], -0.3);
+      await spawn(ASSETS.animals.horse, 1.25, [5.2, 0, 0.5], -0.6); // Caballo de viaje
+      await spawn(ASSETS.animals.goat, 0.95, [-5.5, 0, 0.8], 0.6);   // Cabra montés
+      await spawn(ASSETS.trees[4], 7.0, [-8.0, 0, -4.0], 0.3); // Alerce
+      await spawn(ASSETS.trees[1], 6.8, [8.0, 0, -4.0], -0.3); // Coníferas
       break;
     }
 
@@ -3400,9 +3483,10 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       unionMonument.position.set(0, unY, -0.2);
       g.add(unionMonument);
 
-      await spawn(ASSETS.trees[1], 7.0, [-8.2, 0, -4.2], 0.3);
-      await spawn(ASSETS.trees[3], 7.0, [8.2, 0, -4.2], -0.3);
-      await spawn(ASSETS.animals.stag, 1.2, [-7.2, 0, 1.2], 0.7);
+      await spawn(ASSETS.trees[3], 8.5, [-8.2, 0, -4.2], 0.3); // Pino alto
+      await spawn(ASSETS.trees[2], 7.0, [8.2, 0, -4.2], -0.3);  // Abedul
+      await spawn(ASSETS.animals.stag, 1.25, [-7.2, 0, 1.2], 0.7);  // Íbice alpino
+      await spawn(ASSETS.animals.sheep, 0.95, [6.8, 0, 1.0], -0.6); // Oveja pacífica
       break;
     }
 
@@ -3423,8 +3507,15 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       victorySet.position.set(0, vicY, 0);
       g.add(victorySet);
 
-      await spawn(ASSETS.trees[7], 8.5, [-11.0, 0, -5.0], 0.2);
-      await spawn(ASSETS.trees[8], 8.5, [11.0, 0, -5.0], -0.2);
+      await spawn(ASSETS.trees[7], 8.5, [-11.0, 0, -5.0], 0.2); // Roble milenario
+      await spawn(ASSETS.trees[3], 9.5, [11.0, 0, -5.0], -0.2);  // Pino alto
+
+      // Bestias heráldicas y guardianes imperiales en la explanada de graduación
+      await spawn(ASSETS.animals.bear, 1.60, [-6.2, 0, 4.0], 0.4);   // Gran oso negro guardián del bastión
+      await spawn(ASSETS.animals.wolf, 1.15, [-3.2, 0, 1.8], 0.3);   // Lobo imperial flanqueando alfombra
+      await spawn(ASSETS.animals.wolf, 1.15, [3.2, 0, 1.8], -0.3);   // Segundo lobo imperial
+      await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2); // Cuervo sobre almena izquierda
+      await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2); // Cuervo sobre almena derecha
       break;
     }
   }
@@ -3548,13 +3639,13 @@ export class ProgressiveWorldStreamer {
   prepareEntities() {
     const isStationClearing = (x, z) => {
       for (const m of this.missions) {
-        const rad = (m.id === 4 || m.id === 5 || m.id === 13) ? 28.0 : 22.0;
+        const rad = (m.id === 4 || m.id === 5 || m.id === 13) ? 14.0 : 10.5;
         if (Math.hypot(x - m.x, z - m.z) < rad) return true;
       }
       if (this.trailPoints && this.trailPoints.length) {
         for (let i = 0; i < this.trailPoints.length; i++) {
           const pt = this.trailPoints[i];
-          if (Math.hypot(x - pt.x, z - pt.y) < 9.5) return true;
+          if (Math.hypot(x - pt.x, z - pt.y) < 5.0) return true;
         }
       }
       return false;
@@ -3570,17 +3661,20 @@ export class ProgressiveWorldStreamer {
 
     let seedIdx = 1;
 
-    // ── 1. Organic Multi-Species Oak & Broadleaf Groves (Across the 920x480 Continent) ──
+    // ── 1. Organic Multi-Species Groves (Robles, Abedules, Manzanos, Alerces, Arces) ──
     const oakModels = [
-      ASSETS.trees[0], ASSETS.trees[1], ASSETS.trees[2],
-      ASSETS.trees[3], ASSETS.trees[4], ASSETS.trees[5],
-      ASSETS.trees[9], ASSETS.trees[10]
+      ASSETS.trees[0],  // broadleaf-oak
+      ASSETS.trees[2],  // birch-tree (corteza blanca nórdica)
+      ASSETS.trees[4],  // windblown-larch (alerce alpino)
+      ASSETS.trees[5],  // apple-tree (manzano frondoso con frutos)
+      ASSETS.trees[6],  // bare-mountain-rowan (serbal)
+      ASSETS.trees[10]  // maple-tree (arce)
     ];
     const bushModels = ASSETS.bushes;
     const rockModels = ASSETS.rocks;
 
-    // 120 Organic Grove Centers
-    for (let g = 0; g < 120; g++) {
+    // 160 Organic Grove Centers (Bosques densos y variados)
+    for (let g = 0; g < 160; g++) {
       const gx = -340 + seeded(seedIdx++) * 820;
       const gz = -180 + seeded(seedIdx++) * 360;
       if (isStationClearing(gx, gz)) continue;
@@ -3589,7 +3683,7 @@ export class ProgressiveWorldStreamer {
 
       // Mother Ancient Tree in center
       const motherModel = oakModels[Math.floor(seeded(seedIdx++) * oakModels.length)];
-      const motherHeight = THREE.MathUtils.lerp(5.2, 7.5, seeded(seedIdx++));
+      const motherHeight = THREE.MathUtils.lerp(5.8, 8.2, seeded(seedIdx++));
       const motherScaleXZ = THREE.MathUtils.lerp(0.9, 1.25, seeded(seedIdx++));
       addInstance(motherModel, motherHeight, [gx, gy, gz], seeded(seedIdx++) * Math.PI * 2, motherScaleXZ, motherScaleXZ);
 
@@ -3605,15 +3699,15 @@ export class ProgressiveWorldStreamer {
         if (ty < -0.3 || ty > 28.0) continue;
 
         const childModel = oakModels[Math.floor(seeded(seedIdx++) * oakModels.length)];
-        const childHeight = THREE.MathUtils.lerp(2.4, 4.8, seeded(seedIdx++));
+        const childHeight = THREE.MathUtils.lerp(2.8, 5.2, seeded(seedIdx++));
         const childScaleXZ = THREE.MathUtils.lerp(0.85, 1.2, seeded(seedIdx++));
         const tiltX = (seeded(seedIdx++) - 0.5) * 0.08;
         const tiltZ = (seeded(seedIdx++) - 0.5) * 0.08;
         addInstance(childModel, childHeight, [tx, ty, tz], seeded(seedIdx++) * Math.PI * 2, childScaleXZ, childScaleXZ, tiltX, tiltZ);
       }
 
-      // Understory berry shrubs & mossy rocks at the base of the grove
-      for (let b = 0; b < 4; b++) {
+      // Understory berry shrubs, ferns & mossy rocks at the base of the grove
+      for (let b = 0; b < 5; b++) {
         const bAngle = seeded(seedIdx++) * Math.PI * 2;
         const bRad = 1.5 + seeded(seedIdx++) * 7.5;
         const bx = gx + Math.cos(bAngle) * bRad;
@@ -3622,12 +3716,12 @@ export class ProgressiveWorldStreamer {
         const by = this.getTerrainY(bx, bz);
         if (by > -0.3) {
           const bushModel = bushModels[Math.floor(seeded(seedIdx++) * bushModels.length)];
-          const bHeight = THREE.MathUtils.lerp(0.4, 0.9, seeded(seedIdx++));
+          const bHeight = THREE.MathUtils.lerp(0.45, 0.95, seeded(seedIdx++));
           addInstance(bushModel, bHeight, [bx, by, bz], seeded(seedIdx++) * Math.PI * 2);
         }
       }
 
-      if (seeded(seedIdx++) > 0.3) {
+      if (seeded(seedIdx++) > 0.25) {
         const rx = gx + (seeded(seedIdx++) - 0.5) * 6.5;
         const rz = gz + (seeded(seedIdx++) - 0.5) * 6.5;
         const ry = this.getTerrainY(rx, rz);
@@ -3639,14 +3733,17 @@ export class ProgressiveWorldStreamer {
       }
     }
 
-    // ── 2. Alpine Pines & Conifer Forests (Highlands, Ridges & Mountain Slopes) ──
+    // ── 2. Alpine Pines & Conifer Forests (Pinos altos, racimos, alerces y árboles retorcidos) ──
     const pineModels = [
-      ASSETS.trees[6], ASSETS.trees[7], ASSETS.trees[8],
-      ASSETS.trees[11], ASSETS.trees[12]
+      ASSETS.trees[1], // campground-pine-stand (arboleda de coníferas)
+      ASSETS.trees[3], // tall-pine-tree (pino alpino alto)
+      ASSETS.trees[4], // windblown-larch (alerce barrido)
+      ASSETS.trees[7], // twisted-dead-oak (roble retorcido)
+      ASSETS.trees[9]  // young-pine (pino cónico joven)
     ];
 
-    // 120 Alpine Pine Clusters
-    for (let p = 0; p < 120; p++) {
+    // 160 Alpine Pine Clusters
+    for (let p = 0; p < 160; p++) {
       const px = -350 + seeded(seedIdx++) * 840;
       const pz = -200 + seeded(seedIdx++) * 400;
       if (isStationClearing(px, pz)) continue;
@@ -3665,7 +3762,7 @@ export class ProgressiveWorldStreamer {
         if (y < -0.3 || y > 42.0) continue;
 
         const model = pineModels[Math.floor(seeded(seedIdx++) * pineModels.length)];
-        const height = THREE.MathUtils.lerp(3.5, 8.0, seeded(seedIdx++));
+        const height = THREE.MathUtils.lerp(4.0, 9.5, seeded(seedIdx++));
         const scaleXZ = THREE.MathUtils.lerp(0.85, 1.25, seeded(seedIdx++));
         const tiltX = (seeded(seedIdx++) - 0.5) * 0.10;
         const tiltZ = (seeded(seedIdx++) - 0.5) * 0.10;
@@ -3673,8 +3770,8 @@ export class ProgressiveWorldStreamer {
       }
     }
 
-    // ── 3. Scattered Nature: Boulders & Wildflower Glades ────────────────────
-    for (let i = 0; i < 180; i++) {
+    // ── 3. Scattered Nature: Boulders, Stumps, Fallen Logs & Wildflower Glades ──
+    for (let i = 0; i < 280; i++) {
       const x = -340 + seeded(seedIdx++) * 820;
       const z = -190 + seeded(seedIdx++) * 380;
       if (isStationClearing(x, z)) continue;
@@ -3686,7 +3783,7 @@ export class ProgressiveWorldStreamer {
       addInstance(rockModel, height, [x, y, z], seeded(seedIdx++) * Math.PI * 2);
     }
 
-    for (let i = 0; i < 240; i++) {
+    for (let i = 0; i < 420; i++) {
       const x = -330 + seeded(seedIdx++) * 800;
       const z = -180 + seeded(seedIdx++) * 360;
       if (isStationClearing(x, z)) continue;
@@ -3694,27 +3791,29 @@ export class ProgressiveWorldStreamer {
       if (y < -0.3 || y > 30.0) continue;
 
       const bushModel = bushModels[Math.floor(seeded(seedIdx++) * bushModels.length)];
-      const height = THREE.MathUtils.lerp(0.45, 1.1, seeded(seedIdx++));
+      const height = THREE.MathUtils.lerp(0.40, 0.95, seeded(seedIdx++));
       addInstance(bushModel, height, [x, y, z], seeded(seedIdx++) * Math.PI * 2);
     }
 
     // ── 4. Animated Wildlife Herds ───────────────────────────────────────────
     this.animalSpawns = [
-      { type: 'deer', pos: [-195, 45], height: 0.85 },
-      { type: 'stag', pos: [-140, -50], height: 1.05 },
-      { type: 'deer', pos: [-60, 40], height: 0.85 },
-      { type: 'deer', pos: [-75, 75], height: 0.85 },
-      { type: 'fox', pos: [-10, 85], height: 0.42 },
-      { type: 'horse', pos: [25, 35], height: 1.25 },
-      { type: 'horse', pos: [38, 48], height: 1.25 },
-      { type: 'horse', pos: [65, 40], height: 1.25 },
-      { type: 'alpaca', pos: [135, -60], height: 0.9 },
-      { type: 'alpaca', pos: [150, -75], height: 0.9 },
-      { type: 'deer', pos: [160, -45], height: 0.85 },
-      { type: 'wolf', pos: [245, 75], height: 0.65 },
-      { type: 'wolf', pos: [260, 60], height: 0.65 },
-      { type: 'stag', pos: [-240, 60], height: 1.05 },
-      { type: 'fox', pos: [205, 10], height: 0.42 }
+      { type: 'deer', pos: [-195, 45], height: 1.15 },
+      { type: 'stag', pos: [-140, -50], height: 1.20 },
+      { type: 'deer', pos: [-60, 40], height: 1.15 },
+      { type: 'rabbit', pos: [-75, 75], height: 0.35 },
+      { type: 'fox', pos: [-10, 85], height: 0.55 },
+      { type: 'horse', pos: [25, 35], height: 1.35 },
+      { type: 'horse', pos: [38, 48], height: 1.35 },
+      { type: 'chicken', pos: [65, 40], height: 0.35 },
+      { type: 'sheep', pos: [135, -60], height: 0.85 },
+      { type: 'goat', pos: [150, -75], height: 0.90 },
+      { type: 'deer', pos: [160, -45], height: 1.15 },
+      { type: 'wolf', pos: [245, 75], height: 0.80 },
+      { type: 'bear', pos: [260, 60], height: 1.30 },
+      { type: 'stag', pos: [-240, 60], height: 1.20 },
+      { type: 'fox', pos: [205, 10], height: 0.55 },
+      { type: 'rabbit', pos: [100, 20], height: 0.35 },
+      { type: 'crow', pos: [180, -20], height: 0.32 }
     ];
 
     // ── 5. Sky Birds in Panoramic Flight ─────────────────────────────────────
