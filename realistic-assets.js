@@ -202,10 +202,10 @@ const ASSETS = {
     './assets/polyfork/young-pine-0d7695.glb'            // 17: Pino silvestre joven verde
   ],
   bushes: [
-    './assets/stylized/nature/Bush_1_A_Color1.gltf',     // 0: Arbusto esférico verde vivo
-    './assets/stylized/nature/Bush_1_E_Color1.gltf',     // 1: Arbusto verde redondeado
-    './assets/stylized/nature/Bush_2_A_Color1.gltf',     // 2: Arbusto verde suave
-    './assets/stylized/nature/Bush_3_A_Color1.gltf',     // 3: Arbusto bajo taiga verde
+    './assets/polyfork/round-bush-cd2ac0.glb',          // 0: Arbusto globular verde vivo frondoso natural
+    './assets/polyfork/bush-8bb596.glb',                // 1: Arbusto silvestre verde denso con ramas
+    './assets/polyfork/fern-plant-1559b8.glb',           // 2: Helecho silvestre verde vivo 3D
+    './assets/polyfork/grass-tuft-a40a08.glb',          // 3: Mechón de hierba natural verde 3D
     './assets/polyfork/round-bush-cd2ac0.glb',          // 4: Arbusto globular verde vivo frondoso
     './assets/polyfork/bush-8bb596.glb',                // 5: Arbusto silvestre verde denso
     './assets/polyfork/fern-plant-1559b8.glb',           // 6: Helecho silvestre verde vivo 3D
@@ -2745,21 +2745,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.0, 0, 0.5], 0.8);
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.0, 0, 0.5], -0.8);
 
-      // 9. Naturaleza exuberante y arboleda estilizada verde enmarcando la taberna (100% verde y viva)
-      await spawn(ASSETS.trees[0], 8.0, [-4.5, 0, -7.5], 0.2); // Roble redondeado estilizado
-      await spawn(ASSETS.trees[1], 7.5, [0.0, 0, -8.2], 0.5);   // Roble mediano verde vivo
-      await spawn(ASSETS.trees[2], 8.2, [4.5, 0, -7.5], -0.3); // Roble extendido verde
-      await spawn(ASSETS.trees[9], 7.0, [-7.2, 0, -4.8], 0.3); // Árbol de copa ancha redondeada
-      await spawn(ASSETS.trees[3], 8.5, [7.2, 0, -4.8], -0.3); // Conífera estilizada verde
-
-      // Arbustos y rocas estilizadas en bordes
-      await spawn(ASSETS.bushes[0], 1.2, [-6.2, 0, 1.8], 0.2); // Arbusto esférico verde vivo
-      await spawn(ASSETS.bushes[1], 1.2, [6.2, 0, 1.8], -0.2); // Arbusto redondeado verde
-      await spawn(ASSETS.bushes[2], 1.0, [-3.2, 0, 3.2], 0);   // Arbusto suave
-      await spawn(ASSETS.bushes[2], 1.0, [3.2, 0, 3.2], 0.3);  // Arbusto suave
-      await spawn(ASSETS.rocks[0], 1.2, [-5.8, 0, 2.4], 0.4);  // Peñasco de roca estilizada
-      await spawn(ASSETS.rocks[1], 1.0, [5.6, 0, 1.2], 0.1);   // Roca redondeada estilizada
-
       // Guía rúnica flotante de bienvenida Vermelho Bradesco
       const guideGem = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.32, 0),
@@ -2806,19 +2791,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       g.add(campfire);
       await spawn(ASSETS.polyfork.campfireCookTripod, 1.30, [-0.5, 0, 1.8], 0);
       await spawn(ASSETS.polyfork.firewoodStack, 0.55, [-2.2, 0, 1.8], 0.1);
-
-      // 6. Arboleda 100% verde estilizada enmarcando el puesto militar (Idéntica a la referencia)
-      await spawn(ASSETS.trees[0], 8.2, [0.0, 0, -8.0], 0.2);    // Roble redondeado verde estilizado tras la atalaya (Tree_1_A)
-      await spawn(ASSETS.trees[3], 7.5, [-4.5, 0, -7.8], 0.1);   // Conífera verde estilizada a la izquierda (Tree_2_A)
-      await spawn(ASSETS.trees[9], 7.2, [4.5, 0, -7.5], -0.4);   // Árbol redondeado de copa ancha sabana (Tree_4_A)
-      await spawn(ASSETS.trees[2], 8.0, [-8.0, 0, -5.0], 0.3);   // Roble frondoso estilizado (Tree_1_C)
-      await spawn(ASSETS.trees[5], 8.5, [8.0, 0, -5.0], -0.3);   // Conífera alta verde estilizada (Tree_2_C)
-
-      // 7. Bordes exteriores: Arbustos esféricos verdes y rocas estilizadas (Plaza 100% limpia)
-      await spawn(ASSETS.bushes[0], 1.3, [-5.5, 0, 1.0], 0);    // Arbusto esférico verde vivo a la izquierda
-      await spawn(ASSETS.bushes[1], 1.3, [5.5, 0, 1.0], 0);     // Arbusto redondeado verde a la derecha
-      await spawn(ASSETS.rocks[0], 1.3, [-7.2, 0, 1.5], 0.3);   // Roca estilizada en la hierba izquierda
-      await spawn(ASSETS.rocks[2], 1.2, [7.2, 0, 1.5], -0.3);   // Roca estilizada en la hierba derecha
 
       const crystal = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.28, 0),
@@ -2879,21 +2851,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // 10. Faroles solemnes en el acceso frontal
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.4], 0.3);
       await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.4], -0.3);
-
-      // Entorno solemne arbolado estilizado (Robles y pinos verdes enmarcando la capilla)
-      await spawn(ASSETS.trees[0], 8.2, [-3.8, 0, -8.2], 0.3); // Roble frondoso estilizado A
-      await spawn(ASSETS.trees[3], 9.2, [3.2, 0, -8.2], -0.3); // Pino/abeto verde estilizado
-      await spawn(ASSETS.trees[6], 7.5, [-5.8, 0, -5.2], 0.4); // Árbol cónico alto verde
-      await spawn(ASSETS.trees[1], 7.5, [5.8, 0, -5.2], -0.4); // Roble frondoso estilizado B
-      await spawn(ASSETS.trees[4], 6.5, [0.0, 0, -9.0], 0);   // Pino cónico verde
-
-      // Arbustos y rocas estilizadas ceremoniales en bordes
-      await spawn(ASSETS.bushes[1], 1.2, [-3.8, 0, -3.2], 0.2); // Arbusto verde redondeado
-      await spawn(ASSETS.bushes[1], 1.2, [3.8, 0, -3.2], -0.2);
-      await spawn(ASSETS.bushes[0], 1.1, [-3.5, 0, 2.2], 0);   // Arbusto esférico verde
-      await spawn(ASSETS.bushes[0], 1.1, [3.5, 0, 2.2], 0);
-      await spawn(ASSETS.rocks[0], 1.2, [-5.5, 0, 1.2], 0.5);  // Gran peñasco de roca estilizada
-      await spawn(ASSETS.rocks[1], 1.0, [5.5, 0, 1.2], -0.5);  // Roca redondeada estilizada
 
       // Sello flotante místico del Pacto elevado sobre el altar
       const covenantSeal = new THREE.Mesh(
@@ -2959,28 +2916,10 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.goblet, 0.16, [3.15, 0.76, 0.62], 0);
       await spawn(ASSETS.polyfork.goblet, 0.16, [3.65, 0.76, 0.62], 0);
 
-      // 6. Arbustos verdes decorativos compactos enmarcando el paseo sin estorbar
-      await spawn(ASSETS.bushes[0], 1.0, [-5.2, 0, 2.2], 0);
-      await spawn(ASSETS.bushes[1], 1.0, [5.2, 0, 2.2], 0);
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.8], 0.3);
 
       // 7. Entrada: Tablón de Avisos de Humand (Turnos, menú diario y reglas del comedor)
       await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [2.0, 0, 2.6], -0.2);
-
-      // Entorno arbolado frondoso y estilizado del valle fértil
-      await spawn(ASSETS.trees[9], 7.0, [-4.2, 0, -7.5], 0.3);  // Árbol copa ancha estilizado
-      await spawn(ASSETS.trees[0], 7.5, [4.2, 0, -7.5], -0.4);  // Roble redondeado estilizado
-      await spawn(ASSETS.trees[1], 7.2, [0.0, 0, -8.2], 0.2);   // Roble verde vivo mediano
-      await spawn(ASSETS.trees[6], 7.0, [-6.5, 0, -4.5], 0.5);  // Árbol cónico estilizado
-      await spawn(ASSETS.trees[3], 6.5, [6.5, 0, -4.5], -0.5);  // Pino verde estilizado
-
-      // Arbustos y rocas estilizadas en orillas
-      await spawn(ASSETS.bushes[2], 0.9, [-5.0, 0, -0.6], 0.3); // Arbusto verde suave junto al buffet
-      await spawn(ASSETS.bushes[0], 1.0, [-3.2, 0, 3.0], 0);   // Arbusto esférico verde en el patio exterior
-      await spawn(ASSETS.bushes[0], 1.0, [3.2, 0, 3.0], 0.3);  // Arbusto esférico verde en el patio exterior
-      await spawn(ASSETS.bushes[1], 1.0, [4.8, 0, -2.8], 0.2); // Arbusto redondeado junto al horno de barro
-      await spawn(ASSETS.rocks[1], 1.0, [-5.8, 0, 1.8], 0.3);  // Roca redondeada estilizada
-      await spawn(ASSETS.rocks[2], 0.9, [5.5, 0, 1.8], -0.3);  // Roca mediana estilizada
 
       // Kiosco digital de la App Humand interactivo con halo verde
       const humandTerminal = new THREE.Mesh(
@@ -3076,14 +3015,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // Cajas de suministros y herramientas en el lateral exterior
       await spawn(ASSETS.props.stackedBoxes, 1.1, [6.8, 0, -0.6], 0.3);
 
-      // 5. VEGETACIÓN PERIMETRAL ESTILIZADA (100% verde y limpia)
-      await spawn(ASSETS.trees[3], 8.5, [-7.5, 0, -5.5], 0.3); // Pino/conífera estilizada
-      await spawn(ASSETS.trees[5], 8.8, [8.2, 0, -5.5], -0.3); // Conífera alta verde
-      await spawn(ASSETS.bushes[0], 1.2, [-6.2, 0, 1.2], 0.3); // Arbusto verde estilizado
-      await spawn(ASSETS.bushes[1], 1.2, [7.5, 0, 1.5], -0.4); // Arbusto verde estilizado
-      await spawn(ASSETS.bushes[2], 1.0, [-3.5, 0, 2.8], 0);   // Arbusto bajo
-      await spawn(ASSETS.bushes[2], 1.0, [3.5, 0, 2.8], 0.2);
-
       // Baliza de emergencia luminosa sobre la torre de vigilancia
       const beaconGem = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.35, 0),
@@ -3132,14 +3063,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       await spawn(ASSETS.props.chest, 0.95, [4.8, 0, -1.2], -0.4);
       await spawn(ASSETS.props.stackedBoxes, 1.0, [-4.8, 0, -1.2], 0.4);
-
-      // Entorno perimetral verde estilizado del mercado VIP
-      await spawn(ASSETS.trees[0], 7.5, [-7.8, 0, -4.5], 0.4); // Roble verde estilizado
-      await spawn(ASSETS.trees[9], 7.0, [7.8, 0, -4.5], -0.4); // Árbol copa ancha sabana
-      await spawn(ASSETS.bushes[0], 1.2, [-4.5, 0, 1.8], 0.2); // Arbusto verde estilizado
-      await spawn(ASSETS.bushes[1], 1.2, [4.5, 0, 1.8], -0.2); // Arbusto verde estilizado
-      await spawn(ASSETS.bushes[2], 0.9, [-2.5, 0, 2.5], 0);
-      await spawn(ASSETS.bushes[2], 0.9, [2.5, 0, 2.5], 0);
       break;
     }
 
@@ -3175,10 +3098,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       g.add(heritageMemorial);
 
       await spawn(ASSETS.props.chest, 0.9, [-4.4, 0, -1.2], 0.4);
-
-      // Arboleda perimetral estilizada verde
-      await spawn(ASSETS.trees[6], 7.5, [-8.5, 0, -4.5], 0.3); // Árbol cónico estilizado verde
-      await spawn(ASSETS.trees[3], 8.5, [8.5, 0, -4.5], -0.3); // Pino/conífera estilizada
       break;
     }
 
@@ -3208,10 +3127,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       protocolBoard.position.set(3.2, pbY, 0.9);
       protocolBoard.rotation.y = -0.35;
       g.add(protocolBoard);
-
-      // Arboleda perimetral estilizada verde
-      await spawn(ASSETS.trees[0], 7.5, [-8.5, 0, -4.5], 0.3); // Roble verde estilizado
-      await spawn(ASSETS.trees[5], 8.5, [8.5, 0, -4.5], -0.3); // Conífera alta verde estilizada
       break;
     }
 
@@ -3242,9 +3157,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       g.add(bookshelves);
 
       await spawn(ASSETS.props.chest, 0.95, [-4.2, 0, -1.2], 0.3);
-
-      await spawn(ASSETS.trees[2], 8.0, [-8.0, 0, -4.5], 0.3); // Roble frondoso estilizado
-      await spawn(ASSETS.trees[4], 8.0, [8.0, 0, -4.5], -0.3);  // Pino verde estilizado
       break;
     }
 
@@ -3289,9 +3201,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
         brazier.position.set(bx, bY, -1.8);
         g.add(brazier);
       });
-
-      await spawn(ASSETS.trees[3], 8.5, [-8.5, 0, -4.2], 0.3); // Pino verde estilizado
-      await spawn(ASSETS.trees[10], 7.5, [8.5, 0, -4.2], -0.3); // Árbol verde vivo estilizado
       break;
     }
 
@@ -3386,9 +3295,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       bonfire.position.set(3.2, bfY, 0.9);
       bonfire.rotation.y = -0.35;
       g.add(bonfire);
-
-      await spawn(ASSETS.trees[10], 7.5, [-7.8, 0, -4.0], 0.2); // Árbol verde vivo estilizado
-      await spawn(ASSETS.trees[0], 7.5, [7.8, 0, -4.0], -0.2);  // Roble verde estilizado
       break;
     }
 
@@ -3408,9 +3314,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       // 2. Mesa de campamento de integración en el lateral izquierdo
       await spawn(ASSETS.props.signingTable, 1.05, [-2.8, 0, 1.2], 0.3);
-
-      await spawn(ASSETS.trees[5], 8.5, [-8.0, 0, -4.0], 0.3); // Conífera alta verde
-      await spawn(ASSETS.trees[3], 7.5, [8.0, 0, -4.0], -0.3); // Pino estilizado
       break;
     }
 
@@ -3425,9 +3328,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       const unY = getTerrainY(mission.x, mission.z - 0.2);
       unionMonument.position.set(0, unY, -0.2);
       g.add(unionMonument);
-
-      await spawn(ASSETS.trees[3], 8.5, [-8.2, 0, -4.2], 0.3); // Pino verde estilizado
-      await spawn(ASSETS.trees[12], 8.5, [8.2, 0, -4.2], -0.3); // Árbol denso verde estilizado
       break;
     }
 
@@ -3447,9 +3347,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       const vicY = getTerrainY(mission.x, mission.z);
       victorySet.position.set(0, vicY, 0);
       g.add(victorySet);
-
-      await spawn(ASSETS.trees[2], 9.0, [-11.0, 0, -5.0], 0.2); // Roble extendido verde
-      await spawn(ASSETS.trees[5], 9.5, [11.0, 0, -5.0], -0.2);  // Conífera alta verde
 
       // Aves vigilantes en las almenas altas
       await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2); // Cuervo sobre almena izquierda
@@ -3580,7 +3477,7 @@ export class ProgressiveWorldStreamer {
 
     const isStationClearing = (x, z) => {
       for (const m of this.missions) {
-        const rad = (m.id === 13) ? 25.0 : 18.5;
+        const rad = (m.id === 13) ? 28.0 : 21.0;
         if (Math.hypot(x - m.x, z - m.z) < rad) return true;
       }
       return false;
@@ -3688,11 +3585,10 @@ export class ProgressiveWorldStreamer {
           ASSETS.trees[1]   // Roble joven
         ],
         understory: [
-          ASSETS.bushes[4], // round-bush-cd2ac0.glb (Arbusto globular frondoso verde)
-          ASSETS.bushes[0], // Bush_1_A_Color1.gltf (Arbusto esférico verde vivo)
-          ASSETS.bushes[5], // bush-8bb596.glb (Arbusto silvestre verde denso)
-          ASSETS.bushes[2], // Bush_2_A_Color1.gltf (Arbusto suave verde)
-          ASSETS.bushes[7]  // grass-tuft-a40a08.glb (Mechón de hierba verde)
+          ASSETS.bushes[0], // round-bush-cd2ac0.glb (Arbusto globular frondoso verde)
+          ASSETS.bushes[1], // bush-8bb596.glb (Arbusto silvestre verde denso)
+          ASSETS.bushes[2], // fern-plant-1559b8.glb (Helecho silvestre verde)
+          ASSETS.bushes[3]  // grass-tuft-a40a08.glb (Mechón de hierba)
         ],
         rocks: [ASSETS.rocks[0], ASSETS.rocks[1]] // Rock_1_A, Rock_1_E
       },
@@ -3719,10 +3615,10 @@ export class ProgressiveWorldStreamer {
           ASSETS.trees[8]
         ],
         understory: [
-          ASSETS.bushes[6], // fern-plant-1559b8.glb (Helecho silvestre verde vivo)
-          ASSETS.bushes[1], // Bush_1_E_Color1.gltf (Arbusto de ribera)
-          ASSETS.bushes[4], // round-bush
-          ASSETS.bushes[2]  // Bush_2_A
+          ASSETS.bushes[2], // fern-plant-1559b8.glb (Helecho silvestre verde vivo)
+          ASSETS.bushes[0], // round-bush-cd2ac0.glb (Arbusto globular)
+          ASSETS.bushes[1], // bush-8bb596.glb (Arbusto silvestre)
+          ASSETS.bushes[3]  // grass-tuft-a40a08.glb (Mechón de hierba)
         ],
         rocks: [ASSETS.rocks[1], ASSETS.rocks[3]] // Rock_1_E, Rock_3_A
       },
@@ -3747,10 +3643,9 @@ export class ProgressiveWorldStreamer {
           ASSETS.trees[3]
         ],
         understory: [
-          ASSETS.bushes[3], // Bush_3_A_Color1.gltf (Arbusto bajo taiga verde)
-          ASSETS.bushes[0], // Bush_1_A
-          ASSETS.bushes[7], // grass-tuft
-          ASSETS.bushes[5]  // bush-8bb596
+          ASSETS.bushes[0], // round-bush-cd2ac0.glb
+          ASSETS.bushes[1], // bush-8bb596.glb
+          ASSETS.bushes[3]  // grass-tuft-a40a08.glb
         ],
         rocks: [ASSETS.rocks[2], ASSETS.rocks[0]] // Rock_2_A, Rock_1_A
       },
@@ -3776,10 +3671,9 @@ export class ProgressiveWorldStreamer {
           ASSETS.trees[3]
         ],
         understory: [
-          ASSETS.bushes[3], // Bush_3_A
-          ASSETS.bushes[4], // round-bush
-          ASSETS.bushes[0], // Bush_1_A
-          ASSETS.bushes[7]  // grass-tuft
+          ASSETS.bushes[0], // round-bush-cd2ac0.glb
+          ASSETS.bushes[1], // bush-8bb596.glb
+          ASSETS.bushes[3]  // grass-tuft-a40a08.glb
         ],
         rocks: [ASSETS.rocks[4], ASSETS.rocks[2]] // Rock_5_A, Rock_2_A
       }
