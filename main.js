@@ -2,7 +2,7 @@ import * as THREE from './vendor/three/build/three.module.js';
 window.THREE = THREE;
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 import { Sky } from './vendor/three/examples/jsm/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=205.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=207.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);

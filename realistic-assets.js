@@ -185,30 +185,30 @@ const ASSETS = {
     './assets/stylized/nature/Tree_1_A_Color1.gltf',     // 0: Roble frondoso estilizado A (verde vivo y hojas densas)
     './assets/stylized/nature/Tree_1_B_Color1.gltf',     // 1: Roble frondoso estilizado B
     './assets/stylized/nature/Tree_1_C_Color1.gltf',     // 2: Roble frondoso estilizado C
-    './assets/stylized/nature/Tree_2_A_Color1.gltf',     // 3: Pino/abeto estilizado A (verde conífera siempreverde)
-    './assets/stylized/nature/Tree_2_B_Color1.gltf',     // 4: Pino/abeto estilizado B
-    './assets/stylized/nature/Tree_2_C_Color1.gltf',     // 5: Pino/abeto estilizado C
-    './assets/stylized/nature/Tree_3_A_Color1.gltf',     // 6: Árbol alto estilizado A
-    './assets/stylized/nature/Tree_3_B_Color1.gltf',     // 7: Árbol alto estilizado B
+    './assets/stylized/nature/Tree_2_A_Color1.gltf',     // 3: Pino/abeto verde estilizado A
+    './assets/stylized/nature/Tree_2_B_Color1.gltf',     // 4: Pino/abeto verde estilizado B
+    './assets/stylized/nature/Tree_2_C_Color1.gltf',     // 5: Pino/abeto verde estilizado C
+    './assets/stylized/nature/Tree_3_A_Color1.gltf',     // 6: Árbol alto estilizado verde A
+    './assets/stylized/nature/Tree_3_B_Color1.gltf',     // 7: Árbol alto estilizado verde B
     './assets/stylized/nature/Tree_4_A_Color1.gltf',     // 8: Árbol redondeado verde
-    './assets/polyfork/birch-tree-181b33.glb',          // 9: Abedul nórdico (corteza blanca y hojas verdes)
-    './assets/polyfork/apple-tree-ef0ba0.glb',          // 10: Manzano frondoso con manzanas rojas
-    './assets/polyfork/maple-tree-65fa12.glb',          // 11: Arce templado de copa frondosa
-    './assets/polyfork/campground-pine-stand-0bf4f2.glb',// 12: Arboleda de coníferas en grupo
-    './assets/polyfork/tall-pine-tree-ab4108.glb',      // 13: Pino alpino alto
-    './assets/polyfork/young-pine-0d7695.glb',          // 14: Pino joven cónico
-    './assets/polyfork/broadleaf-oak-997c22.glb',       // 15: Roble frondoso Polyfork
-    './assets/polyfork/tree-fern-78320e.glb',           // 16: Helecho arbóreo de ribera
-    './assets/polyfork/windblown-larch-abb99c.glb'       // 17: Alerce verde alpino
+    './assets/polyfork/birch-tree-181b33.glb',          // 9: Abedul nórdico (corteza blanca y hojas verdes frondosas)
+    './assets/polyfork/apple-tree-ef0ba0.glb',          // 10: Manzano verde frondoso con manzanas rojas
+    './assets/polyfork/maple-tree-65fa12.glb',          // 11: Arce templado de copa frondosa verde
+    './assets/polyfork/tall-pine-tree-ab4108.glb',      // 12: Pino alpino alto verde
+    './assets/polyfork/tall-pine-tree-ab4108.glb',      // 13: Pino alpino alto verde
+    './assets/polyfork/young-pine-0d7695.glb',          // 14: Pino joven cónico verde
+    './assets/polyfork/broadleaf-oak-997c22.glb',       // 15: Roble frondoso Polyfork de copa grande y verde
+    './assets/polyfork/tree-fern-78320e.glb',           // 16: Helecho arbóreo verde de ribera
+    './assets/stylized/nature/Tree_5_A_Color1.gltf'      // 17: Árbol verde vivo estilizado
   ],
   bushes: [
-    './assets/polyfork/wildflower-68d3a1.glb',          // 0: Ramillete de flores silvestres con tallos y pétalos (CERO bolas verdes)
-    './assets/polyfork/fern-plant-1559b8.glb',          // 1: Helecho silvestre con frondas de hojas reales
-    './assets/polyfork/flower-bed-708e73.glb',          // 2: Macizo de flores naturales de suelo
+    './assets/polyfork/wildflower-68d3a1.glb',          // 0: Ramillete de flores silvestres con tallos y pétalos
+    './assets/polyfork/fern-plant-1559b8.glb',          // 1: Helecho silvestre verde con frondas de hojas reales
+    './assets/polyfork/grass-tuft-a40a08.glb',          // 2: Mechón de hierba natural verde
     './assets/polyfork/wildflower-68d3a1.glb',          // 3: Flores silvestres
     './assets/polyfork/toadstool-257a4a.glb',           // 4: Setas mágicas de bosque con tallo
-    './assets/polyfork/grass-tuft-a40a08.glb',          // 5: Mechón de hierba con briznas
-    './assets/polyfork/flower-planter-500ed2.glb'       // 6: Jardinera de madera con flores de colores
+    './assets/polyfork/grass-tuft-a40a08.glb',          // 5: Mechón de hierba natural verde
+    './assets/polyfork/flower-planter-500ed2.glb'       // 6: Jardinera de madera con flores
   ],
   rocks: [
     './assets/polyfork/large-boulder-a29b99.glb',  // 0: Peñasco de granito
@@ -2760,12 +2760,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.rocks[3], 0.85, [-5.8, 0, 2.4], 0.4);  // Tronco caído con musgo en el borde
       await spawn(ASSETS.rocks[4], 0.50, [5.6, 0, 1.2], 0.1);   // Tocón de madera
 
-      // Fauna en el entorno circundante (Libre en las praderas exteriores, SIN colisionar con el escenario)
-      await spawn(ASSETS.animals.horse, 1.35, [-11.5, 0, 3.5], 0.8);   // Caballo pastando libre en la pradera oeste
-      await spawn(ASSETS.animals.deer, 1.15, [11.5, 0, 5.0], -0.7);    // Ciervo pastando en la pradera este
-      await spawn(ASSETS.animals.chicken, 0.35, [-9.2, 0, 7.5], 0.3);  // Gallinas picoteando en el césped exterior
-      await spawn(ASSETS.animals.rabbit, 0.35, [9.5, 0, -5.5], -0.5);  // Conejito en el linde del bosque
-
       // Guía rúnica flotante de bienvenida Vermelho Bradesco
       const guideGem = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.32, 0),
@@ -2781,61 +2775,50 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'camp': {
       // ═════════════════════════════════════════════════════════════════════════
       // ESTACIÓN 01: ARSENAL Y EQUIPOS (Puesto de Inicio / Armería)
-      // Escalas humanas reales + Intención espacial:
-      // - Torre de vigía al fondo centro vigilando el horizonte (6.5m)
-      // - Herrería y yunque a escala de trabajo real (yunque 0.82m, barril temple 0.7m)
-      // - Armero y maniquí de armadura a altura de guerrero (1.5m y 1.85m)
-      // - Fogata con trípode de cocción (1.3m) y pila de leña proporcionada (0.55m)
-      // - Carretas y tiendas en proporciones reales de expedición
+      // Escalas humanas reales + Plaza limpia y sin colisiones:
+      // - Torre de vigía al fondo centro custodiando el horizonte (6.5m)
+      // - Ala Izquierda: Cuartel de lona, carreta, baúl y víveres
+      // - Ala Derecha: Herrería funcional, yunque y barril de temple
+      // - Centro: Armero, maniquí de armadura y fogata de guardia con trípode
       // ═════════════════════════════════════════════════════════════════════════
 
-      // 1. Torre de Vigía del Arsenal custodiando el perímetro al fondo centro
+      // 1. Torre de Vigía del Arsenal al fondo centro
       await spawn(ASSETS.polyfork.watchtower, 6.5, [0, 0, -5.5], 0);
 
-      // 2. Ala Izquierda: Cuartel de lona de la guarnición y carreta de pertrechos
-      await spawn(ASSETS.polyfork.canvasWallTent, 2.7, [-4.8, 0, -2.5], 0.4);
-      await spawn(ASSETS.polyfork.woodenCart, 1.35, [-5.8, 0, 0.4], 0.3);
-      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.2, 0, 0.8], 0.2);
-      await spawn(ASSETS.polyfork.grainSack, 0.48, [-4.8, 0, 1.4], -0.4);
+      // 2. Ala Izquierda: Tienda de campaña cuartel y carreta de pertrechos
+      await spawn(ASSETS.polyfork.canvasWallTent, 2.7, [-5.2, 0, -2.5], 0.35);
+      await spawn(ASSETS.polyfork.woodenCart, 1.35, [-6.2, 0, 0.4], 0.3);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.4, 0, 0.8], 0.2);
+      await spawn(ASSETS.polyfork.grainSack, 0.48, [-5.0, 0, 1.4], -0.4);
 
-      // 3. Ala Derecha: Tienda de campaña de intendencia
-      await spawn(ASSETS.polyfork.canvasRidgeTent, 1.6, [4.8, 0, -2.5], -0.4);
+      // 3. Ala Derecha: Herrería de Campaña despejada (SIN carpa que colisione)
+      await spawn(ASSETS.polyfork.blacksmithForge, 2.4, [5.2, 0, -1.0], -1.2);
+      await spawn(ASSETS.polyfork.anvil, 0.82, [3.8, 0, 0.6], 0.3);
+      await spawn(ASSETS.polyfork.quenchBarrel, 0.70, [5.2, 0, 1.2], 0);
 
-      // 4. Sector de Herrería y Mantenimiento de Armas (Lateral derecho a escala humana)
-      await spawn(ASSETS.polyfork.blacksmithForge, 2.4, [4.6, 0, 0.4], -1.2);
-      await spawn(ASSETS.polyfork.anvil, 0.82, [3.4, 0, 1.0], 0.3);
-      await spawn(ASSETS.polyfork.quenchBarrel, 0.70, [4.8, 0, 1.4], 0);
-
-      // 5. Mostrador Central de Armería: Armero y soporte de armadura enmarcando el corredor
+      // 4. Mostrador Central de Armería: Armero y soporte de armadura
       await spawn(ASSETS.polyfork.weaponRack, 1.50, [-1.8, 0, -1.0], 0.3);
       await spawn(ASSETS.polyfork.armourStand, 1.85, [1.8, 0, -1.0], -0.3);
 
-      // 6. Vivac de Guardia al frente: Fogata con trípode y leña ordenada al lateral
+      // 5. Vivac de Guardia al frente: Fogata con trípode y leña ordenada al lateral
       const campfire = createCampfire();
       campfire.position.set(-0.5, getTerrainY(mission.x - 0.5, mission.z + 1.8), 1.8);
       g.add(campfire);
       await spawn(ASSETS.polyfork.campfireCookTripod, 1.30, [-0.5, 0, 1.8], 0);
       await spawn(ASSETS.polyfork.firewoodStack, 0.55, [-2.2, 0, 1.8], 0.1);
 
-      // Entorno natural verde y frondoso enmarcando el puesto militar (Árboles Polyfork frondosos y vivos)
-      await spawn(ASSETS.trees[15], 8.2, [0.0, 0, -8.2], 0.2);    // Roble frondoso Polyfork tras la atalaya
-      await spawn(ASSETS.trees[11], 7.5, [-3.8, 0, -8.0], 0.1);   // Arce templado frondoso
-      await spawn(ASSETS.trees[9], 7.2, [3.8, 0, -7.5], -0.4);    // Abedul nórdico con corteza blanca y hojas verdes
-      await spawn(ASSETS.trees[10], 5.8, [-7.2, 0, -5.2], 0.3);   // Manzano frondoso con frutos rojos
-      await spawn(ASSETS.trees[13], 8.5, [7.2, 0, -5.2], -0.3);   // Pino alpino alto en el flanco este
+      // 6. Arboleda 100% verde y frondosa enmarcando el puesto militar (CERO ramas secas ni nieve)
+      await spawn(ASSETS.trees[15], 8.2, [0.0, 0, -8.5], 0.2);    // Roble frondoso Polyfork verde tras la atalaya
+      await spawn(ASSETS.trees[11], 7.5, [-4.2, 0, -8.2], 0.1);   // Arce templado verde vivo
+      await spawn(ASSETS.trees[9], 7.2, [4.2, 0, -8.0], -0.4);    // Abedul nórdico frondoso con corteza blanca y hojas verdes
+      await spawn(ASSETS.trees[10], 6.0, [-8.0, 0, -5.0], 0.3);   // Manzano verde frondoso
+      await spawn(ASSETS.trees[13], 8.5, [8.0, 0, -5.0], -0.3);   // Pino alpino alto verde siempreverde
 
-      // Vegetación real en orillas exteriores (CERO colisiones en la plaza de trabajo y CERO cabezas de árboles)
-      await spawn(ASSETS.bushes[1], 0.65, [-6.2, 0, 1.8], 0.4); // Helecho silvestre con frondas en la orilla exterior
-      await spawn(ASSETS.bushes[1], 0.65, [6.2, 0, 1.8], -0.4); // Helecho silvestre en el borde
-      await spawn(ASSETS.bushes[0], 0.45, [-2.6, 0, 3.4], 0);   // Flores silvestres en el linde
-      await spawn(ASSETS.bushes[0], 0.45, [2.6, 0, 3.4], 0);    // Flores silvestres en el linde
-      await spawn(ASSETS.rocks[3], 0.85, [-6.2, 0, 2.6], 0.3);  // Tronco caído con musgo natural
-      await spawn(ASSETS.rocks[4], 0.50, [6.2, 0, 2.2], 0.1);   // Tocón de madera
-
-      // Fauna en el entorno circundante (Caminando libres por los prados exteriores, SIN colisionar con equipos)
-      await spawn(ASSETS.animals.stag, 1.25, [-11.5, 0, 6.5], 0.6);   // Íbice en la colina circundante noroeste
-      await spawn(ASSETS.animals.fox, 0.55, [11.5, 0, 4.0], -0.7);     // Zorro explorando el prado este
-      await spawn(ASSETS.animals.wolf, 1.10, [-7.5, 0, -11.5], 0.3);   // Lobo guardián en el linde del bosque norte
+      // 7. Bordes exteriores en el césped natural (Plaza de adoquines 100% limpia)
+      await spawn(ASSETS.bushes[1], 0.65, [-7.5, 0, 1.5], 0.4); // Helecho silvestre verde en el césped exterior
+      await spawn(ASSETS.bushes[1], 0.65, [7.5, 0, 1.5], -0.4); // Helecho silvestre verde
+      await spawn(ASSETS.rocks[3], 0.85, [-7.2, 0, 2.5], 0.3);  // Tronco caído con musgo en la hierba
+      await spawn(ASSETS.rocks[4], 0.50, [7.2, 0, 2.2], 0.1);   // Tocón de madera en la hierba
 
       const crystal = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.28, 0),
@@ -2913,11 +2896,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.bushes[0], 0.45, [3.5, 0, 2.2], 0);
       await spawn(ASSETS.rocks[0], 1.15, [-5.5, 0, 1.2], 0.5);  // Gran peñasco de granito en el borde
       await spawn(ASSETS.rocks[3], 0.85, [5.5, 0, 1.2], -0.5);  // Tronco caído con musgo
-
-      // Fauna en el entorno circundante (Pastando libres en los claros alrededor del templo)
-      await spawn(ASSETS.animals.deer, 1.25, [-11.5, 0, -3.5], 0.5);   // Ciervo reverente en el claro circundante
-      await spawn(ASSETS.animals.sheep, 0.95, [11.5, 0, 5.5], -0.6);   // Oveja pastando en la ladera este
-      await spawn(ASSETS.animals.rabbit, 0.35, [-8.5, 0, 4.5], 0.4);   // Conejito en el prado exterior
 
       // Sello flotante místico del Pacto elevado sobre el altar
       const covenantSeal = new THREE.Mesh(
@@ -3005,12 +2983,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.bushes[1], 0.65, [4.8, 0, -2.8], 0.2); // Helechos con frondas junto al horno de barro
       await spawn(ASSETS.rocks[3], 0.85, [-5.8, 0, 1.8], 0.3);  // Tronco caído con musgo
       await spawn(ASSETS.rocks[4], 0.50, [5.5, 0, 1.8], -0.3);  // Tocón de madera
-
-      // Fauna en el entorno circundante (Paseando en los prados exteriores, SIN colisionar con las mesas)
-      await spawn(ASSETS.animals.sheep, 0.95, [-11.5, 0, 3.5], 0.7);    // Oveja pastando en la pradera oeste
-      await spawn(ASSETS.animals.chicken, 0.38, [11.0, 0, 1.5], 0.4);  // Gallina picoteando en el césped este
-      await spawn(ASSETS.animals.chicken, 0.38, [11.8, 0, 0.8], -0.5); // Segunda gallina en el prado
-      await spawn(ASSETS.animals.rabbit, 0.35, [-8.5, 0, 6.0], 0.4);   // Conejito silvestre en el prado exterior
 
       // Kiosco digital de la App Humand interactivo con halo verde
       const humandTerminal = new THREE.Mesh(
@@ -3114,11 +3086,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.bushes[0], 0.45, [-3.5, 0, 2.8], 0);   // Flores silvestres
       await spawn(ASSETS.bushes[0], 0.45, [3.5, 0, 2.8], 0.2);  // Flores silvestres
 
-      // Fauna temática de patrulla y resguardo (Pastando libres en los prados circundantes)
-      await spawn(ASSETS.animals.horse, 1.35, [11.5, 0, 4.0], -0.5);  // Caballo en la pradera este
-      await spawn(ASSETS.animals.wolf, 1.05, [-11.2, 0, 3.5], 0.4);   // Perro/lobo guardián en la colina oeste
-      await spawn(ASSETS.animals.crow, 0.38, [0.1, 2.2, 2.0], 0);    // Cuervo vigía posado en el poste de señal
-
       // Baliza de emergencia luminosa sobre la torre de vigilancia
       const beaconGem = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.35, 0),
@@ -3175,8 +3142,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.flowerPlanter, 0.40, [4.5, 0, 1.8], -0.2);
       await spawn(ASSETS.bushes[0], 0.45, [-2.5, 0, 2.5], 0);
       await spawn(ASSETS.bushes[0], 0.45, [2.5, 0, 2.5], 0);
-      await spawn(ASSETS.animals.fox, 0.55, [-11.2, 0, 4.0], 0.8);    // Zorro rojo en el prado exterior
-      await spawn(ASSETS.animals.rabbit, 0.35, [11.5, 0, 3.8], -0.7);  // Conejito silvestre en la pradera este
       break;
     }
 
@@ -3213,11 +3178,9 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       await spawn(ASSETS.props.chest, 0.9, [-4.4, 0, -1.2], 0.4);
 
-      // Arboleda perimetral y fauna histórica
-      await spawn(ASSETS.trees[2], 7.2, [-8.5, 0, -4.5], 0.3); // Abedul nórdico
-      await spawn(ASSETS.trees[3], 8.5, [8.5, 0, -4.5], -0.3); // Pino alpino alto
-      await spawn(ASSETS.animals.deer, 1.20, [-11.5, 0, 4.2], 0.7); // Ciervo noble en el prado circundante
-      await spawn(ASSETS.animals.crow, 0.40, [4.8, 1.6, 0.5], -0.5); // Cuervo del archivo histórico
+      // Arboleda perimetral verde
+      await spawn(ASSETS.trees[9], 7.2, [-8.5, 0, -4.5], 0.3); // Abedul nórdico
+      await spawn(ASSETS.trees[13], 8.5, [8.5, 0, -4.5], -0.3); // Pino alpino alto
       break;
     }
 
@@ -3248,11 +3211,9 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       protocolBoard.rotation.y = -0.35;
       g.add(protocolBoard);
 
-      // Arboleda perimetral y fauna pastoral
-      await spawn(ASSETS.trees[5], 5.8, [-8.5, 0, -4.5], 0.3); // Manzano
-      await spawn(ASSETS.trees[4], 7.0, [8.5, 0, -4.5], -0.3); // Alerce alpino
-      await spawn(ASSETS.animals.sheep, 0.95, [-10.8, 0, 4.5], 0.7); // Oveja de campo en pradera oeste
-      await spawn(ASSETS.animals.chicken, 0.38, [11.2, 0, 4.0], -0.5); // Gallina picoteando en pradera este
+      // Arboleda perimetral verde
+      await spawn(ASSETS.trees[10], 6.0, [-8.5, 0, -4.5], 0.3); // Manzano verde
+      await spawn(ASSETS.trees[13], 7.5, [8.5, 0, -4.5], -0.3); // Pino alpino verde
       break;
     }
 
@@ -3284,10 +3245,8 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       await spawn(ASSETS.props.chest, 0.95, [-4.2, 0, -1.2], 0.3);
 
-      await spawn(ASSETS.trees[7], 7.8, [-8.0, 0, -4.5], 0.3); // Roble antiguo
-      await spawn(ASSETS.trees[2], 6.5, [8.0, 0, -4.5], -0.3);  // Abedul
-      await spawn(ASSETS.animals.crow, 0.42, [-3.8, 1.8, -1.0], 0.3); // Cuervo sabio
-      await spawn(ASSETS.animals.fox, 0.55, [11.5, 0, 4.5], -0.6);     // Zorro observador en pradera este
+      await spawn(ASSETS.trees[0], 7.8, [-8.0, 0, -4.5], 0.3); // Roble verde
+      await spawn(ASSETS.trees[9], 6.5, [8.0, 0, -4.5], -0.3);  // Abedul verde
       break;
     }
 
@@ -3333,10 +3292,8 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
         g.add(brazier);
       });
 
-      await spawn(ASSETS.trees[3], 8.5, [-8.5, 0, -4.2], 0.3); // Pino alto
-      await spawn(ASSETS.trees[6], 6.5, [8.5, 0, -4.2], -0.3); // Serbal
-      await spawn(ASSETS.animals.wolf, 1.10, [-11.2, 0, 4.5], 0.6); // Lobo guardián en la ladera oeste
-      await spawn(ASSETS.animals.deer, 1.15, [11.8, 0, 4.0], -0.7); // Ciervo solemne en pradera este
+      await spawn(ASSETS.trees[13], 8.5, [-8.5, 0, -4.2], 0.3); // Pino alto verde
+      await spawn(ASSETS.trees[11], 6.5, [8.5, 0, -4.2], -0.3); // Arce templado verde
       break;
     }
 
@@ -3432,10 +3389,8 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       bonfire.rotation.y = -0.35;
       g.add(bonfire);
 
-      await spawn(ASSETS.trees[10], 6.6, [-7.8, 0, -4.0], 0.2); // Arce
-      await spawn(ASSETS.trees[5], 5.6, [7.8, 0, -4.0], -0.2);  // Manzano
-      await spawn(ASSETS.animals.rabbit, 0.35, [-10.5, 0, 4.2], 0.6); // Conejito en el prado exterior
-      await spawn(ASSETS.animals.chicken, 0.38, [11.0, 0, 4.5], -0.6); // Gallina en la ladera este
+      await spawn(ASSETS.trees[11], 6.6, [-7.8, 0, -4.0], 0.2); // Arce verde
+      await spawn(ASSETS.trees[10], 5.6, [7.8, 0, -4.0], -0.2);  // Manzano verde
       break;
     }
 
@@ -3456,10 +3411,8 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // 2. Mesa de campamento de integración en el lateral izquierdo
       await spawn(ASSETS.props.signingTable, 1.05, [-2.8, 0, 1.2], 0.3);
 
-      await spawn(ASSETS.animals.horse, 1.25, [11.2, 0, 3.5], -0.6); // Caballo en la pradera este
-      await spawn(ASSETS.animals.goat, 0.95, [-11.0, 0, 4.0], 0.6);   // Cabra montés en la ladera oeste
-      await spawn(ASSETS.trees[4], 7.0, [-8.0, 0, -4.0], 0.3); // Alerce
-      await spawn(ASSETS.trees[1], 6.8, [8.0, 0, -4.0], -0.3); // Coníferas
+      await spawn(ASSETS.trees[13], 7.0, [-8.0, 0, -4.0], 0.3); // Pino alpino verde
+      await spawn(ASSETS.trees[3], 6.8, [8.0, 0, -4.0], -0.3); // Conífera verde
       break;
     }
 
@@ -3475,10 +3428,8 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       unionMonument.position.set(0, unY, -0.2);
       g.add(unionMonument);
 
-      await spawn(ASSETS.trees[3], 8.5, [-8.2, 0, -4.2], 0.3); // Pino alto
-      await spawn(ASSETS.trees[2], 7.0, [8.2, 0, -4.2], -0.3);  // Abedul
-      await spawn(ASSETS.animals.stag, 1.25, [-11.5, 0, 4.5], 0.7);  // Íbice alpino en la ladera oeste
-      await spawn(ASSETS.animals.sheep, 0.95, [11.2, 0, 4.0], -0.6); // Oveja pacífica en prado este
+      await spawn(ASSETS.trees[13], 8.5, [-8.2, 0, -4.2], 0.3); // Pino alto verde
+      await spawn(ASSETS.trees[9], 7.0, [8.2, 0, -4.2], -0.3);  // Abedul verde
       break;
     }
 
@@ -3499,13 +3450,10 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       victorySet.position.set(0, vicY, 0);
       g.add(victorySet);
 
-      await spawn(ASSETS.trees[7], 8.5, [-11.0, 0, -5.0], 0.2); // Roble milenario
-      await spawn(ASSETS.trees[3], 9.5, [11.0, 0, -5.0], -0.2);  // Pino alto
+      await spawn(ASSETS.trees[15], 8.5, [-11.0, 0, -5.0], 0.2); // Roble verde
+      await spawn(ASSETS.trees[13], 9.5, [11.0, 0, -5.0], -0.2);  // Pino alto verde
 
-      // Bestias heráldicas y guardianes imperiales en la explanada de graduación
-      await spawn(ASSETS.animals.bear, 1.60, [-6.2, 0, 4.0], 0.4);   // Gran oso negro guardián del bastión
-      await spawn(ASSETS.animals.wolf, 1.15, [-3.2, 0, 1.8], 0.3);   // Lobo imperial flanqueando alfombra
-      await spawn(ASSETS.animals.wolf, 1.15, [3.2, 0, 1.8], -0.3);   // Segundo lobo imperial
+      // Aves vigilantes en las almenas altas
       await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2); // Cuervo sobre almena izquierda
       await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2); // Cuervo sobre almena derecha
       break;
@@ -3634,21 +3582,21 @@ export class ProgressiveWorldStreamer {
 
     const isStationClearing = (x, z) => {
       for (const m of this.missions) {
-        const rad = (m.id === 4 || m.id === 5 || m.id === 13) ? 15.0 : 12.0;
+        const rad = (m.id === 13) ? 22.0 : 16.5;
         if (Math.hypot(x - m.x, z - m.z) < rad) return true;
       }
       return false;
     };
 
     const canSpawnAt = (x, z, radius = 2.0) => {
-      // 1. Never spawn inside stations
+      // 1. Never spawn inside or near stations (16.5m clear perimeter)
       if (isStationClearing(x, z)) return false;
 
       // 2. Keep clear of the walking trail path
       if (this.trailPoints && this.trailPoints.length) {
         for (let i = 0; i < this.trailPoints.length; i++) {
           const pt = this.trailPoints[i];
-          if (Math.hypot(x - pt.x, z - pt.y) < (radius + 4.2)) return false;
+          if (Math.hypot(x - pt.x, z - pt.y) < (radius + 5.0)) return false;
         }
       }
 
@@ -3715,35 +3663,35 @@ export class ProgressiveWorldStreamer {
       return 'highland_woods';
     };
 
-    // Paletas temáticas equilibradas (Árboles estilizados verdes originales + Polyfork frondosos)
+    // Paletas temáticas equilibradas (100% Árboles verdes y frondosos: Polyfork + estilizados originales)
     const SECTOR_PALETTES = {
-      // Sector 1: Robledal Frondoso (Árboles estilizados verdes originales + Roble y Arce Polyfork)
+      // Sector 1: Robledal Frondoso y Praderas (Oak Forest & Plains)
       oak_forest: {
-        mothers: [ASSETS.trees[0], ASSETS.trees[1], ASSETS.trees[2], ASSETS.trees[15], ASSETS.trees[11]], // Tree_1_A, B, C, broadleaf-oak, maple
-        children: [ASSETS.trees[0], ASSETS.trees[1], ASSETS.trees[6], ASSETS.trees[8]],                  // Tree_1, Tree_3_A, Tree_4_A
-        understory: [ASSETS.bushes[0], ASSETS.bushes[2], ASSETS.bushes[5]],                              // Flores silvestres, macizos, hierba
-        rocks: [ASSETS.rocks[4], ASSETS.rocks[2], ASSETS.rocks[1]]                                       // Tocones de madera, rocas suaves
+        mothers: [ASSETS.trees[15], ASSETS.trees[11], ASSETS.trees[0], ASSETS.trees[2]], // broadleaf-oak, maple, Tree_1_A, Tree_1_C
+        children: [ASSETS.trees[10], ASSETS.trees[1], ASSETS.trees[6], ASSETS.trees[8]], // apple, Tree_1_B, Tree_3_A, Tree_4_A
+        understory: [ASSETS.bushes[0], ASSETS.bushes[1], ASSETS.bushes[2]],              // Flores silvestres, helechos, hierba
+        rocks: [ASSETS.rocks[4], ASSETS.rocks[2], ASSETS.rocks[1]]                       // Tocones de madera, rocas suaves
       },
       // Sector 2: Bosque de Abedules y Riberas (Birch Woods & Orchard)
       river_wetland: {
-        mothers: [ASSETS.trees[9], ASSETS.trees[10], ASSETS.trees[8], ASSETS.trees[16]],                 // Birch, Apple, Tree_4_A, Tree-fern
-        children: [ASSETS.trees[9], ASSETS.trees[10], ASSETS.trees[8]],
-        understory: [ASSETS.bushes[1], ASSETS.bushes[4]],                                               // Helechos frondosos, setas de humedad
-        rocks: [ASSETS.rocks[3], ASSETS.rocks[1], ASSETS.rocks[2]]                                       // Troncos caídos con musgo, piedras de río
+        mothers: [ASSETS.trees[9], ASSETS.trees[10], ASSETS.trees[16], ASSETS.trees[15]], // Abedul nórdico, Manzano, Helecho arbóreo, Roble
+        children: [ASSETS.trees[9], ASSETS.trees[10], ASSETS.trees[8]],                  // Abedul, Manzano, Tree_4_A
+        understory: [ASSETS.bushes[1], ASSETS.bushes[4]],                                // Helechos frondosos, setas de humedad
+        rocks: [ASSETS.rocks[3], ASSETS.rocks[1], ASSETS.rocks[2]]                       // Troncos caídos con musgo, piedras de río
       },
-      // Sector 3: Gran Taiga de Pinos y Abetos (Pinos estilizados originales + Coníferas Polyfork)
+      // Sector 3: Gran Taiga de Pinos y Coníferas Verdes (Pine & Spruce Taiga)
       pine_taiga: {
-        mothers: [ASSETS.trees[3], ASSETS.trees[4], ASSETS.trees[12], ASSETS.trees[13]],                // Tree_2_A, B, campground-pine-stand, tall-pine
-        children: [ASSETS.trees[3], ASSETS.trees[5], ASSETS.trees[14], ASSETS.trees[9]],                 // Tree_2_C, young-pine, birch
-        understory: [ASSETS.bushes[4], ASSETS.bushes[1], ASSETS.bushes[5]],                              // Setas con tallo, helechos, hierba
-        rocks: [ASSETS.rocks[3], ASSETS.rocks[0], ASSETS.rocks[1]]                                       // Troncos caídos con musgo, peñascos
+        mothers: [ASSETS.trees[13], ASSETS.trees[3], ASSETS.trees[4], ASSETS.trees[5]],  // Tall pine, Tree_2_A, Tree_2_B, Tree_2_C
+        children: [ASSETS.trees[14], ASSETS.trees[3], ASSETS.trees[9]],                  // Young pine, Tree_2_A, birch
+        understory: [ASSETS.bushes[4], ASSETS.bushes[1], ASSETS.bushes[2]],              // Setas con tallo, helechos, hierba
+        rocks: [ASSETS.rocks[3], ASSETS.rocks[0], ASSETS.rocks[1]]                       // Troncos caídos con musgo, peñascos
       },
-      // Sector 4: Bosque de Montaña de Altura (Pinos altos estilizados + Alerces verdes)
+      // Sector 4: Bosque de Montaña de Altura (Highland Evergreen Woods)
       highland_woods: {
-        mothers: [ASSETS.trees[13], ASSETS.trees[5], ASSETS.trees[17], ASSETS.trees[7]],                // Tall pine, Tree_2_C, larch, Tree_3_B
+        mothers: [ASSETS.trees[13], ASSETS.trees[5], ASSETS.trees[17], ASSETS.trees[14]], // Tall pine, Tree_2_C, Tree_5_A, young pine
         children: [ASSETS.trees[13], ASSETS.trees[3], ASSETS.trees[14]],
-        understory: [ASSETS.bushes[0], ASSETS.bushes[1]],                                               // Flores de altura, helechos
-        rocks: [ASSETS.rocks[0], ASSETS.rocks[1], ASSETS.rocks[2]]                                       // Grandes peñascos de granito
+        understory: [ASSETS.bushes[0], ASSETS.bushes[1]],                                // Flores de altura, helechos
+        rocks: [ASSETS.rocks[0], ASSETS.rocks[1], ASSETS.rocks[2]]                       // Grandes peñascos de granito
       }
     };
 
@@ -3816,10 +3764,10 @@ export class ProgressiveWorldStreamer {
     // ── 2. El Gran Cinturón Perimetral (Mountain Rim Forest Wall) ────────────
     // Muralla densa de coníferas y robles colosales (8.5m a 12.0m) en los bordes
     const rimTrees = [
-      ASSETS.trees[13], // tall-pine-tree
-      ASSETS.trees[12], // campground-pine-stand
-      ASSETS.trees[5],  // Tree_2_C (pino alto estilizado)
-      ASSETS.trees[2]   // Tree_1_C (roble frondoso grande)
+      ASSETS.trees[13], // tall-pine-tree (pino alpino alto verde)
+      ASSETS.trees[15], // broadleaf-oak (gran roble verde Polyfork)
+      ASSETS.trees[5],  // Tree_2_C (pino alto verde siempreverde)
+      ASSETS.trees[2]   // Tree_1_C (roble frondoso verde grande)
     ];
 
     const perimeterPoints = [];
