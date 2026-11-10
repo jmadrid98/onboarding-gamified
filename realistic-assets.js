@@ -2965,83 +2965,35 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'observatory': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 04: PROTECCIÓN CIVIL Y ESTACIONAMIENTO (Altos de la Vigilancia)
-      // Versión limpia y medieval: Atalaya, módulo de protección civil (rack),
-      // cobertizo techado con 3 carrozas temáticas y pluma de acceso con señal "P".
-      // Cero árboles en entradas ni salidas.
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Gran Atalaya de vigilancia de piedra y madera (7.2m)
+      // - Área de carruajes y transporte: Carromato de 4 ruedas y carreta de madera
+      // - Puesto de Primeros Auxilios y Evacuación: Arcón de emergencias, barril, cajas
+      // - Tablón de Avisos con Protocolos de Protección Civil
+      // - Vallas de madera delimitando el área de acceso vehicular y peatonal
       // ═════════════════════════════════════════════════════════════════════════
 
-      // 1. TORRE DE VIGILANCIA (Atalaya de piedra con cono azul)
-      await spawn(ASSETS.buildings.tower, 9.2, [-4.5, 0, -1.8], 0);
+      // 1. Gran Atalaya de Vigilancia al fondo
+      await spawn(ASSETS.polyfork.watchtower, 7.2, [-4.2, 0, -3.2], 0.2);
 
-      // Torreta con sirena de emergencia
-      const siren = createEmergencySiren();
-      const sirenY = getTerrainY(mission.x - 6.5, mission.z - 1.8);
-      siren.position.set(-6.5, sirenY, -1.8);
-      g.add(siren);
+      // 2. Área de Transporte y Estacionamiento: Carromatos reales 3D
+      await spawn(ASSETS.polyfork.fourWheelWagon, 1.85, [3.8, 0, -1.2], -0.2); // Carromato de 4 ruedas cubierto
+      await spawn(ASSETS.polyfork.woodenCart, 1.35, [1.0, 0, -1.5], 0.35);     // Carreta de dos ruedas
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [5.8, 0, -0.2], 0.4);     // Valla delimitadora derecha
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [5.8, 0, -2.4], 0.4);
 
-      // 2. MÓDULO DE PROTECCIÓN CIVIL (Rack de madera rústica sin texto moderno)
-      const safetyRack = createSafetyStationRack();
-      const rackY = getTerrainY(mission.x - 1.8, mission.z - 0.2);
-      safetyRack.position.set(-1.8, rackY, -0.2);
-      g.add(safetyRack);
+      // 3. Módulo de Protocolos de Protección Civil & Evacuación
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [-1.5, 0, 1.6], -0.25);
 
-      // Hidrante clásico rojo y latón en la acera
-      const hydrant = createFireHydrant();
-      const hydY = getTerrainY(mission.x - 0.3, mission.z + 1.2);
-      hydrant.position.set(-0.3, hydY, 1.2);
-      g.add(hydrant);
+      // 4. Depósito de Emergencias y Primeros Auxilios
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-3.8, 0, 0.8], 0.2);   // Arcón acorazado de botiquín
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.5, 0, 0.2], 0.1);     // Cajas de suministros
+      await spawn(ASSETS.polyfork.polyforkBarrel, 0.75, [-4.8, 0, 1.4], 0);     // Barril de reserva
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [1.8, 0, 1.8], -0.2);    // Banco de descanso de brigadistas
 
-      // 3. ESTACIONAMIENTO TECHADO CON 3 CARROZAS
-      const parkX = 0.5;
-      const parkZ = -0.3;
-      const parkY = getTerrainY(mission.x + parkX + 2.7, mission.z + parkZ);
-
-      // Cobertizo de madera con tejado azul pizarra
-      const carport = createCarport(5.4, 3.4, 2.3);
-      carport.position.set(parkX, parkY, parkZ);
-      g.add(carport);
-
-      // 3 Cajones delimitados con líneas amarillas y números
-      const stalls = createParkingStalls();
-      stalls.position.set(parkX, parkY + 0.01, parkZ);
-      g.add(stalls);
-
-      // CARROZA #1: Azul Real en Cajón 1
-      const carriage1 = createCarriage({ color: 0x1f618d, roofColor: 0x154360, trimGold: true });
-      const c1Y = getTerrainY(mission.x + parkX + 0.9, mission.z + parkZ);
-      carriage1.position.set(parkX + 0.9, c1Y, parkZ);
-      carriage1.rotation.y = 0;
-      g.add(carriage1);
-
-      // CARROZA #2: Borgoña Noble en Cajón 2
-      const carriage2 = createCarriage({ color: 0x78281f, roofColor: 0x512e2b, trimGold: true });
-      const c2Y = getTerrainY(mission.x + parkX + 2.7, mission.z + parkZ);
-      carriage2.position.set(parkX + 2.7, c2Y, parkZ);
-      carriage2.rotation.y = 0;
-      g.add(carriage2);
-
-      // CARROZA #3: Verde Esmeralda en Cajón 3
-      const carriage3 = createCarriage({ color: 0x1e8449, roofColor: 0x145a32, trimGold: true });
-      const c3Y = getTerrainY(mission.x + parkX + 4.5, mission.z + parkZ);
-      carriage3.position.set(parkX + 4.5, c3Y, parkZ);
-      carriage3.rotation.y = 0;
-      g.add(carriage3);
-
-      // 4. CONTROL DE ACCESO VEHICULAR
-      // Pluma de acceso vehicular alzada a 45°
-      const barrier = createParkingBarrier({ isOpen: true });
-      const barrierY = getTerrainY(mission.x + 0.3, mission.z + 1.8);
-      barrier.position.set(0.3, barrierY, 1.8);
-      g.add(barrier);
-
-      // Señal oficial azul "P" de Estacionamiento
-      const pSign = createParkingSign();
-      const pSignY = getTerrainY(mission.x + 0.1, mission.z + 2.0);
-      pSign.position.set(0.1, pSignY, 2.0);
-      g.add(pSign);
-
-      // Cajas de suministros y herramientas en el lateral exterior
-      await spawn(ASSETS.props.stackedBoxes, 1.1, [6.8, 0, -0.6], 0.3);
+      // 5. Faroles de acceso a la estación
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.6], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.0, 0, 2.6], -0.3);
 
       // Arboleda de taiga enmarcando la atalaya y cochera (CERO colisión)
       await spawn(ASSETS.trees[14], 9.0, [-8.5, 0, -5.5], 0.3); // Pino alto natural
@@ -3053,8 +3005,8 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
         new THREE.OctahedronGeometry(0.35, 0),
         new THREE.MeshStandardMaterial({ color: 0x2ecc71, emissive: 0x27ae60, emissiveIntensity: 2.8, roughness: 0.2 })
       );
-      const beaconY = getTerrainY(mission.x - 4.5, mission.z - 1.8);
-      beaconGem.position.set(-4.5, beaconY + 9.6, -1.8);
+      const beaconY = getTerrainY(mission.x - 4.2, mission.z - 3.2);
+      beaconGem.position.set(-4.2, beaconY + 7.8, -3.2);
       g.add(beaconGem);
       g.userData.crystal = beaconGem;
       break;
@@ -3064,38 +3016,56 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'plaza': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 05: TARJETA COSMOS (Pabellón de Beneficios & Convenios VIP)
-      // Distribución abierta en herradura:
-      // - Edificio Bazar Comercial (Market) al fondo con fachada abierta
-      // - Centro: Gran Pedestal de Mármol & Terciopelo con Tarjeta Cosmos VIP giratoria
-      // - Flanco Izquierdo: Stand de Convenios & Descuentos (Restaurantes, Tiendas, Vouchers)
-      // - Flanco Derecho: Stand de Salud, Fitness, Farmacias & Puntos Cosmos
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Mercado/Pabellón al fondo
+      // - Centro: Altar de piedra con la Tarjeta Cosmos VIP giratoria flotante
+      // - Ala Izquierda: Puesto de mercado con toldo y cestas de convenios retail
+      // - Ala Derecha: Puesto de salud, bienestar y puntos de recompensa
+      // - Arcón de tesoros y recompensas Cosmos
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.market, 6.5, [0, 0, -5.6], 0);
 
-      // 1. Centro: Gran Pedestal VIP con la Tarjeta Cosmos flotante
-      const vipPedestal = createCosmosVIPPedestal();
-      const altY = getTerrainY(mission.x, mission.z - 0.4);
-      vipPedestal.position.set(0, altY, -0.4);
-      g.add(vipPedestal);
-      g.userData.cosmosCard = vipPedestal.userData.cardMesh;
-      g.userData.cosmosCardBaseY = 1.75;
+      // 1. Centro: Altar sagrado de piedra con la Tarjeta Cosmos flotante
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -0.6], 0);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [0, 0, 0.7], 0); // Arcón de tesoros y beneficios
 
-      // 2. Flanco Izquierdo: Mostrador de Convenios Comerciales (Alimentos, Moda, Catálogos)
-      const merchantsBooth = createCosmosMerchantsBooth();
-      const dtY = getTerrainY(mission.x - 3.6, mission.z + 0.4);
-      merchantsBooth.position.set(-3.6, dtY, 0.4);
-      merchantsBooth.rotation.y = 0.35;
-      g.add(merchantsBooth);
+      // Tarjeta Cosmos VIP Flotante sobre el altar
+      const cardGroup = new THREE.Group();
+      const cardBodyMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.2 });
+      const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.18 });
+      const cardMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.76, 0.035), cardBodyMat);
+      const cardGoldFrame = new THREE.Mesh(new THREE.BoxGeometry(1.23, 0.79, 0.028), goldMat);
+      cardGroup.add(cardMesh);
+      cardGroup.add(cardGoldFrame);
+      const cardChip = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.045), goldMat);
+      cardChip.position.set(-0.35, 0.10, 0.005);
+      cardGroup.add(cardChip);
+      const starCore = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.15, 0),
+        new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 3.2, roughness: 0.1 })
+      );
+      starCore.position.set(0.28, 0, 0.025);
+      cardGroup.add(starCore);
 
-      // 3. Flanco Derecho: Mostrador de Salud, Deporte y Recompensas Cosmos
-      const wellnessBooth = createCosmosWellnessRewardsBooth();
-      const trY = getTerrainY(mission.x + 3.6, mission.z + 0.4);
-      wellnessBooth.position.set(3.6, trY, 0.4);
-      wellnessBooth.rotation.y = -0.35;
-      g.add(wellnessBooth);
+      const cardY = getTerrainY(mission.x, mission.z - 0.6);
+      cardGroup.position.set(0, cardY + 1.85, -0.6);
+      g.add(cardGroup);
+      g.userData.cosmosCard = cardGroup;
+      g.userData.cosmosCardBaseY = cardY + 1.85;
 
-      await spawn(ASSETS.props.chest, 0.95, [4.8, 0, -1.2], -0.4);
-      await spawn(ASSETS.props.stackedBoxes, 1.0, [-4.8, 0, -1.2], 0.4);
+      // 2. Ala Izquierda: Puesto de Mercado Real 3D (Convenios Gastronomía, Tiendas y Viajes)
+      await spawn(ASSETS.polyfork.marketStall, 2.25, [-4.0, 0, 0.2], 0.35);
+      await spawn(ASSETS.polyfork.basketOfProduce, 0.45, [-3.4, 0, 1.4], 0.2);
+      await spawn(ASSETS.polyfork.grainSack, 0.48, [-4.8, 0, 1.5], -0.3);
+
+      // 3. Ala Derecha: Puesto de Mercado Real 3D (Salud, Fitness y Puntos Cosmos)
+      await spawn(ASSETS.polyfork.marketStall, 2.25, [4.0, 0, 0.2], -0.35);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [3.4, 0, 1.4], 0.3);
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.85, [4.8, 0, 1.5], 0);
+
+      // 4. Faroles de bienvenida
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.6], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.0, 0, 2.6], -0.3);
 
       // Arboleda enmarcando el pabellón comercial (CERO colisión)
       await spawn(ASSETS.trees[16], 8.0, [-8.5, 0, -4.5], 0.3); // Arce frondoso
@@ -3108,34 +3078,44 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'harbor': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 06: INTRODUCCIÓN A LA COMPAÑÍA (Gran Salón Consistorial & Museo)
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Ayuntamiento / Salón Consistorial al fondo (7.0m)
+      // - Centro: Altar de piedra con emblema místico y Atril con el Gran Tomo de Crónicas
+      // - Guardia de Honor: Estatuas de Caballeros Fundadores flanqueando el acceso
+      // - Tablón de la Historia y las 4 Eras corporativas
+      // - Braseros ceremoniales con el fuego de la tradición
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.townhall, 7.0, [0, 0, -4.8], 0);
 
-      // 1. Centro: Gran Astrolabio Solar del Tiempo y Esfera Armilar Dorada
-      const monument = createFoundationalMonument();
-      const monY = getTerrainY(mission.x, mission.z - 0.6);
-      monument.position.set(0, monY, -0.6);
-      g.add(monument);
-      if (monument.userData?.ring1 && monument.userData?.ring2) {
-        g.userData.armillaryRing1 = monument.userData.ring1;
-        g.userData.armillaryRing2 = monument.userData.ring2;
-      }
+      // 1. Centro: Altar de Piedra de la Fundación
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -1.4], 0);
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.30, [0, 0, 0.3], 0); // Gran Libro de Crónicas
 
-      // 2. Flanco Izquierdo: Galería de las 4 Eras (1998, 2008, 2018, Hoy) en arco abierto
-      const milestones = createHistoricalMilestonesGallery();
-      const msY = getTerrainY(mission.x - 3.4, mission.z + 0.9);
-      milestones.position.set(-3.4, msY, 0.9);
-      milestones.rotation.y = 0.35;
-      g.add(milestones);
+      // Emblema místico giratorio de Bradesco sobre el altar
+      const chronicleEmblem = new THREE.Mesh(
+        new THREE.TorusGeometry(0.38, 0.06, 12, 32),
+        new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.4, roughness: 0.25 })
+      );
+      const embY = getTerrainY(mission.x, mission.z - 1.4);
+      chronicleEmblem.position.set(0, embY + 1.85, -1.4);
+      g.add(chronicleEmblem);
+      g.userData.armillaryRing1 = chronicleEmblem;
 
-      // 3. Flanco Derecho: Memorial de Misión, Visión, Valores y Libro de Crónicas
-      const heritageMemorial = createCorporateHeritageMemorial();
-      const hmY = getTerrainY(mission.x + 3.4, mission.z + 0.9);
-      heritageMemorial.position.set(3.4, hmY, 0.9);
-      heritageMemorial.rotation.y = -0.35;
-      g.add(heritageMemorial);
+      // 2. Guardia de Honor: Estatuas de Caballeros de la Fundación
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-3.2, 0, -1.4], 0.2);
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [3.2, 0, -1.4], -0.2);
 
-      await spawn(ASSETS.props.chest, 0.9, [-4.4, 0, -1.2], 0.4);
+      // 3. Tablón de Avisos Históricos (Las 4 Eras, Misión, Visión y Valores)
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [-3.8, 0, 1.2], 0.35);
+
+      // 4. Flancos: Braseros ceremoniales y arcón de reliquias históricas
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-2.2, 0, 1.5], 0);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [2.2, 0, 1.5], 0);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [3.8, 0, 1.2], -0.35);
+
+      // 5. Faroles de acceso frontal
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.6], -0.3);
 
       // Arboleda enmarcando el salón consistorial (CERO colisión)
       await spawn(ASSETS.trees[6], 8.5, [-8.5, 0, -4.5], 0.3);
@@ -3148,28 +3128,42 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'archive': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 07: NPS (Satisfacción al Cliente & Semáforo de Calidad)
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Cabaña rústica de Atención al Cliente (5.5m)
+      // - Centro: Tablón oficial con la Escala NPS e indicador semáforo
+      // - Ala Izquierda: Mesa de escucha y entrevistas con bancos de descanso
+      // - Ala Derecha: Estantería de pergaminos con el protocolo Closed Loop
+      // - Jardinera de flores y faroles de cordialidad
       // ═════════════════════════════════════════════════════════════════════════
-      await spawn(ASSETS.buildings.home, 6.4, [0, 0, -4.6], 0);
+      await spawn(ASSETS.polyfork.thatchedCottage, 5.5, [0, 0, -4.8], 0);
 
-      // 1. Centro: Gran Barómetro Semáforo de la Escala NPS (Rojo, Ámbar, Verde Promotor)
-      const npsScale = createNPSScaleMonument();
-      const npsY = getTerrainY(mission.x, mission.z - 0.4);
-      npsScale.position.set(0, npsY, -0.4);
-      g.add(npsScale);
+      // 1. Centro: Tablón con la Escala NPS (Promotores, Pasivos, Detractores)
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.60, [0, 0, -0.6], 0);
 
-      // 2. Flanco Izquierdo: Módulo de Encuestas con Urna y Fichas Tricolor
-      const surveyDesk = createNPSSurveyDesk();
-      const sdY = getTerrainY(mission.x - 3.2, mission.z + 0.9);
-      surveyDesk.position.set(-3.2, sdY, 0.9);
-      surveyDesk.rotation.y = 0.35;
-      g.add(surveyDesk);
+      // Gema semáforo tricolor de calidad NPS flotando sobre el tablón
+      const npsGem = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.32, 0),
+        new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 2.6, roughness: 0.2 })
+      );
+      const npsY = getTerrainY(mission.x, mission.z - 0.6);
+      npsGem.position.set(0, npsY + 2.15, -0.6);
+      g.add(npsGem);
+      g.userData.crystal = npsGem;
 
-      // 3. Flanco Derecho: Muro del Protocolo Closed Loop
-      const protocolBoard = createNPSProtocolBoard();
-      const pbY = getTerrainY(mission.x + 3.2, mission.z + 0.9);
-      protocolBoard.position.set(3.2, pbY, 0.9);
-      protocolBoard.rotation.y = -0.35;
-      g.add(protocolBoard);
+      // 2. Ala Izquierda: Mesa de encuestas y diálogo de satisfacción
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [-3.4, 0, 0.6], 0.15);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-3.4, 0.76, 0.6], 0.2);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [-3.0, 0.76, 0.6], 0);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [-3.4, 0, 1.6], 0.15); // Banco de clientes
+
+      // 3. Ala Derecha: Estantería de pergaminos (Protocolo Closed Loop & Seguimiento)
+      await spawn(ASSETS.polyfork.scrollRack, 1.45, [3.4, 0, 0.6], -0.25);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [2.8, 0, 1.6], 0.2); // Urna de opiniones
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.85, [4.5, 0, 1.4], -0.3); // Jardinera floral
+
+      // 4. Faroles de acceso frontal
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.6], -0.3);
 
       // Arboleda enmarcando el pabellón NPS (CERO colisión)
       await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -4.5], 0.3);
@@ -3181,30 +3175,41 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'docmanager': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 08: GESTOR DOCUMENTAL (Archivo Central & Scriptorium Digital)
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Taller / Scriptorium de cantería al fondo (6.5m)
+      // - Centro: Atril de lectura con el Gran Índice de Archivos y orbe cian
+      // - Ala Izquierda: Batería de estanterías de pergaminos y documentos
+      // - Ala Derecha: Mesa de escriba con velas, tintero, baúl acorazado y cajas
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.workshop, 6.5, [0, 0, -4.8], 0);
 
-      // 1. Centro: Pedestal de lectura con Tomo Maestro y Orbe Cyan Holográfico
-      const docDisplay = createDocManagerArchiveDisplay();
-      const docY = getTerrainY(mission.x, mission.z - 0.4);
-      docDisplay.position.set(0, docY, -0.4);
-      g.add(docDisplay);
+      // 1. Centro: Atril con el Registro Maestro de Documentos
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.30, [0, 0, -0.6], 0);
 
-      // 2. Flanco Izquierdo: Pupitre de escriba con bandejas de 3 niveles, lupa y sellos
-      const filingDesk = createScriptoriumFilingDesk();
-      const fdY = getTerrainY(mission.x - 3.2, mission.z + 0.8);
-      filingDesk.position.set(-3.2, fdY, 0.8);
-      filingDesk.rotation.y = 0.35;
-      g.add(filingDesk);
+      // Orbe de indexación digital cian flotando sobre el atril
+      const docOrb = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.28, 0),
+        new THREE.MeshStandardMaterial({ color: 0x00d2ff, emissive: 0x0099cc, emissiveIntensity: 2.8, roughness: 0.15 })
+      );
+      const orbY = getTerrainY(mission.x, mission.z - 0.6);
+      docOrb.position.set(0, orbY + 1.85, -0.6);
+      g.add(docOrb);
+      g.userData.crystal = docOrb;
 
-      // 3. Flanco Derecho: 2 Altas Estanterías con libros de colores (rojo, verde, azul, cuero)
-      const bookshelves = createArchiveBookshelfUnits();
-      const bkY = getTerrainY(mission.x + 3.0, mission.z + 0.8);
-      bookshelves.position.set(3.0, bkY, 0.8);
-      bookshelves.rotation.y = -0.35;
-      g.add(bookshelves);
+      // 2. Ala Izquierda: Estanterías de pergaminos y expedientes clasificados
+      await spawn(ASSETS.polyfork.scrollRack, 1.48, [-3.2, 0, -0.4], 0.25);
+      await spawn(ASSETS.polyfork.scrollRack, 1.48, [-4.2, 0, 1.0], 0.45);
 
-      await spawn(ASSETS.props.chest, 0.95, [-4.2, 0, -1.2], 0.3);
+      // 3. Ala Derecha: Mesa de catalogación, velas y caja fuerte
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [3.4, 0, 0.4], -0.2);
+      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.60, [3.4, 0.76, 0.4], 0);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [3.8, 0.76, 0.4], 0.3); // Tintero
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [4.2, 0, 1.4], 0.2);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [2.6, 0, 1.4], -0.3); // Archivo confidencial
+
+      // 4. Faroles de acceso frontal
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.6], -0.3);
 
       // Arboleda de coníferas enmarcando el scriptorium (CERO colisión)
       await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -4.5], 0.3);
@@ -3216,44 +3221,48 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'ethics': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 09: CÓDIGO DE ÉTICA (Tribunal de Integridad & Principios)
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Capilla / Tribunal solemne al fondo (6.8m)
+      // - Muretes de piedra delimitando el atrio de justicia
+      // - Centro: Altar de la verdad y Atril con el Gran Tomo de Ética
+      // - Guardianes de honor: Estatua de caballero de la rectitud
+      // - Canal confidencial: Arcón con cerradura blindada y tablón de directrices
+      // - Braseros con la llama de la transparencia
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.church, 6.8, [0, 0, -4.8], 0);
 
-      // 1. Centro: Balanza Solar de la Justicia Ética en latón dorado con gema esmeralda
-      const ethicsMonument = createEthicsJusticeMonument();
-      const ethY = getTerrainY(mission.x, mission.z - 0.5);
-      ethicsMonument.position.set(0, ethY, -0.5);
-      g.add(ethicsMonument);
+      // 1. Muretes de piedra enmarcando el recinto sagrado
+      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [-4.2, 0, -2.5], 0.3);
+      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [4.2, 0, -2.5], -0.3);
 
-      // 2. Flanco Izquierdo: Gran Tomo del Código de Ética iluminado por vela en atril
-      const tome = createOpenTomeOfEthics();
-      const tmY = getTerrainY(mission.x - 3.2, mission.z + 0.85);
-      tome.position.set(-3.2, tmY, 0.85);
-      tome.rotation.y = 0.35;
-      g.add(tome);
+      // 2. Centro: Altar Solemne de la Verdad y Atril del Código
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -1.6], 0);
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, 0.2], 0); // Tomo del Código de Ética
 
-      // 3. Flanco Derecho: Buzón blindado del Canal Confidencial con candado y cartel
-      const whistleBox = createConfidentialWhistleblowerBox();
-      const wbY = getTerrainY(mission.x + 3.0, mission.z + 0.85);
-      whistleBox.position.set(3.0, wbY, 0.85);
-      whistleBox.rotation.y = -0.35;
-      g.add(whistleBox);
+      // Gema esmeralda de la rectitud flotando sobre el altar
+      const ethicsGem = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.32, 0),
+        new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 2.8, roughness: 0.18 })
+      );
+      const ethY = getTerrainY(mission.x, mission.z - 1.6);
+      ethicsGem.position.set(0, ethY + 2.05, -1.6);
+      g.add(ethicsGem);
+      g.userData.crystal = ethicsGem;
 
-      // 4. Pebeteros de fuego de la transparencia a los lados
-      const bMat = new THREE.MeshStandardMaterial({ color: 0x2b3038, metalness: 0.8, roughness: 0.3 });
-      const fMat = new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff4400, emissiveIntensity: 2.8 });
-      [-2.2, 2.2].forEach(bx => {
-        const brazier = new THREE.Group();
-        const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.14, 0.16, 8), bMat);
-        bowl.position.y = 0.55;
-        brazier.add(bowl);
-        const fl = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.35, 6), fMat);
-        fl.position.y = 0.78;
-        brazier.add(fl);
-        const bY = getTerrainY(mission.x + bx, mission.z - 1.8);
-        brazier.position.set(bx, bY, -1.8);
-        g.add(brazier);
-      });
+      // 3. Guardia de Honor: Caballero de la Justicia
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-2.8, 0, -0.6], 0.2);
+
+      // 4. Canal Confidencial: Arcón blindado de denuncias y Tablón de Principios
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-3.8, 0, 1.2], 0.3); // Buzón blindado
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [3.6, 0, 1.2], -0.3); // Tablón de normas éticas
+
+      // 5. Braseros ceremoniales con la llama de la integridad
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-2.0, 0, 1.6], 0);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [2.0, 0, 1.6], 0);
+
+      // 6. Faroles de acceso frontal
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.8], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.8], -0.3);
 
       // Arboleda enmarcando el tribunal de ética (CERO colisión)
       await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -4.5], 0.3);
@@ -3265,94 +3274,31 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'culture': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 10: CULTURA Y COMUNICACIÓN (Ágora de la Comunidad & Convivencia)
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Gran Taberna / Salón de Convivencia al fondo (6.4m)
+      // - Centro: Pozo del Pueblo en la plaza comunitaria (2.2m)
+      // - Ala Izquierda: Tablón de la Gaceta y Comunicación Interna con jardinera
+      // - Ala Derecha: Fogata comunitaria de piedra con trípode y bancos de troncos
       // ═════════════════════════════════════════════════════════════════════════
-      await spawn(ASSETS.buildings.tavern, 6.4, [0, 0, -4.8], 0);
+      await spawn(ASSETS.polyfork.villageTavern, 6.4, [0, 0, -4.8], 0);
 
-      // 1. Flanco Izquierdo: Mural de la Gaceta Comunitaria y avisos de colores
-      const board = new THREE.Group();
-      const oakMat = new THREE.MeshStandardMaterial({ color: 0x4a3018, roughness: 0.82 });
-      const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x301e10, roughness: 0.86 });
-      const slateMat = new THREE.MeshStandardMaterial({ color: 0x2b3844, roughness: 0.55 });
-      const parchmentMat = new THREE.MeshStandardMaterial({ color: 0xf4ecd8, roughness: 0.85 });
-      const pinColors = [0xf97316, 0xfbbf24, 0x3b82f6, 0xcc092f];
+      // 1. Centro: Pozo del Pueblo en el corazón de la plaza comunal
+      await spawn(ASSETS.polyfork.villageWell, 2.20, [0, 0, -0.6], 0);
 
-      const panel = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.25, 0.10), oakMat);
-      panel.position.y = 0.95;
-      panel.castShadow = true;
-      board.add(panel);
+      // 2. Ala Izquierda: Gaceta de Comunicación Interna y jardinera
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.60, [-3.8, 0, 0.8], 0.35);
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.85, [-4.6, 0, 1.8], 0.1);
 
-      const roof = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.08, 0.28), slateMat);
-      roof.position.set(0, 1.60, 0);
-      board.add(roof);
+      // 3. Ala Derecha: Fogonata de convivencia con bancos de troncos y asador
+      await spawn(ASSETS.polyfork.stoneCampfire, 1.00, [3.4, 0, 0.6], 0);
+      await spawn(ASSETS.polyfork.campfireCookTripod, 1.25, [3.4, 0, 0.6], 0);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [3.4, 0, -0.5], 0);     // Banco norte
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [2.2, 0, 1.2], 0.8);     // Banco oeste
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [4.6, 0, 1.2], -0.8);    // Banco este
 
-      [-0.85, 0.85].forEach(x => {
-        const post = new THREE.Mesh(new THREE.BoxGeometry(0.10, 1.5, 0.10), darkOakMat);
-        post.position.set(x, 0.75, 0);
-        board.add(post);
-      });
-
-      [-0.55, -0.18, 0.20, 0.55].forEach((x, idx) => {
-        const poster = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.48 + (idx % 2) * 0.12, 0.02), parchmentMat);
-        poster.position.set(x, 0.95 - (idx % 2) * 0.04, 0.06);
-        board.add(poster);
-
-        const pin = new THREE.Mesh(new THREE.SphereGeometry(0.018, 6, 6), new THREE.MeshStandardMaterial({ color: pinColors[idx % pinColors.length] }));
-        pin.position.set(x, 1.18, 0.08);
-        board.add(pin);
-      });
-
-      const bY = getTerrainY(mission.x - 3.4, mission.z + 0.8);
-      board.position.set(-3.4, bY, 0.8);
-      board.rotation.y = 0.35;
-      g.add(board);
-
-      // 2. Centro: Podio de orador con clarín de heraldo de latón
-      const podium = new THREE.Group();
-      const pBase = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.85, 0.55), oakMat);
-      pBase.position.y = 0.425;
-      pBase.castShadow = true;
-      podium.add(pBase);
-
-      const drapery = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.60, 0.03), new THREE.MeshStandardMaterial({ color: 0xcc092f, roughness: 0.65 }));
-      drapery.position.set(0, 0.48, 0.285);
-      podium.add(drapery);
-
-      const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, metalness: 0.85, roughness: 0.28 });
-      const tTube = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.48, 8), brassMat);
-      tTube.rotation.x = Math.PI / 2;
-      tTube.position.set(0, 0.92, 0.10);
-      podium.add(tTube);
-      const tBell = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.14, 8), brassMat);
-      tBell.rotation.x = -Math.PI / 2;
-      tBell.position.set(0, 0.92, 0.36);
-      podium.add(tBell);
-
-      const pdY = getTerrainY(mission.x, mission.z - 0.3);
-      podium.position.set(0, pdY, -0.3);
-      g.add(podium);
-
-      // 3. Flanco Derecho: Fogonata de convivencia con bancos de tronco y laúd
-      const bonfire = new THREE.Group();
-      const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6e685f, roughness: 0.9 });
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2;
-        const st = new THREE.Mesh(new THREE.DodecahedronGeometry(0.10, 0), stoneMat);
-        st.position.set(Math.cos(a) * 0.35, 0.06, Math.sin(a) * 0.35);
-        bonfire.add(st);
-      }
-      const flameMesh = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.38, 6), new THREE.MeshStandardMaterial({ color: 0xffa726, emissive: 0xff4400, emissiveIntensity: 2.8 }));
-      flameMesh.position.y = 0.20;
-      bonfire.add(flameMesh);
-
-      const bench = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.85, 6), darkOakMat);
-      bench.rotation.z = Math.PI / 2;
-      bench.position.set(0, 0.12, 0.55);
-      bonfire.add(bench);
-
-      const bfY = getTerrainY(mission.x + 3.2, mission.z + 0.9);
-      bonfire.position.set(3.2, bfY, 0.9);
-      bonfire.rotation.y = -0.35;
-      g.add(bonfire);
+      // 4. Faroles de acceso frontal
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.8], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.0, 0, 2.8], -0.3);
 
       // Arboleda enmarcando la taberna comunitaria (CERO colisión)
       await spawn(ASSETS.trees[14], 8.5, [-8.5, 0, -4.5], 0.3);
@@ -3388,14 +3334,36 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'union': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 12: SINDICATO (Foro de la Alianza Laboral & Mesa de Acuerdos)
+      // Escala humana con modelos 3D reales de la librería Polyfork:
+      // - Ayuntamiento / Sala de Plenos al fondo (6.8m)
+      // - Centro: Gran Mesa de Negociación Bilateral con bancos a ambos lados
+      // - Ala Izquierda: Atril del Contrato Colectivo y estantería de estatutos laborales
+      // - Ala Derecha: Caballero guardián de los derechos y tablón de asamblea
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.townhall, 6.8, [0, 0, -4.8], 0);
 
-      // 1. Centro: Gran Mesa Redonda con 4 sillas, pliego bilateral y escultura de manos unidas
-      const unionMonument = createUnionAllianceMonument();
-      const unY = getTerrainY(mission.x, mission.z - 0.2);
-      unionMonument.position.set(0, unY, -0.2);
-      g.add(unionMonument);
+      // 1. Centro: Mesa de Acuerdos Bilaterales y Pacto Colectivo
+      await spawn(ASSETS.polyfork.timberTable, 0.78, [0, 0, -0.6], 0);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [0, 0.78, -0.6], 0);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [-0.4, 0.78, -0.6], 0);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [0.4, 0.78, -0.6], 0);
+      // Asientos bilaterales (Representación Sindical y Liderazgo Empresarial)
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [-1.3, 0, -0.6], Math.PI / 2);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [1.3, 0, -0.6], Math.PI / 2);
+
+      // 2. Ala Izquierda: Registro del Contrato Colectivo y Estatutos
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [-3.2, 0, 0.6], 0.3);
+      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-4.2, 0, -0.4], 0.4);
+
+      // 3. Ala Derecha: Representante / Guardián de los Derechos y Tablón
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.1, [3.6, 0, -0.4], -0.3);
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [3.6, 0, 1.2], -0.35);
+
+      // 4. Vallas perimetrales y faroles
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [-6.5, 0, 0.2], 0.8);
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [6.5, 0, 0.2], -0.8);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.6], -0.3);
 
       // Arboleda de cumbres enmarcando el salón del sindicato (CERO colisión)
       await spawn(ASSETS.trees[12], 9.0, [-8.5, 0, -4.5], 0.3);
@@ -3407,6 +3375,12 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
     case 'castle': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 13: CIERRE (Gran Castillo & Bastión de Graduación)
+      // Escala heroica con modelos 3D reales de la librería Polyfork:
+      // - Gran Castillo Real al fondo (12.0m) y 4 torres defensivas
+      // - Calzada de Honor: Guardia de estatuas de caballeros y braseros triunfales
+      // - Centro: Gran Altar de Graduación con el Arcón Dorado de Logros y Corona
+      // - Ala de Celebración: Mesa de banquete con lechón, tarta rústica y jarras
+      // - Cuervos en las almenas altas
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.castle, 12.0, [0, 0, -4.0], 0);
       await spawn(ASSETS.buildings.cannonTower, 8.0, [-7.5, 0, 2.5], 0.3);
@@ -3414,16 +3388,37 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.buildings.tower, 7.0, [-7.5, 0, -8.0], 0);
       await spawn(ASSETS.buildings.tower, 7.0, [7.5, 0, -8.0], 0);
 
-      // Ceremonia de Graduación: Alfombra roja ceremonial, Podio con Diploma y Llave del Reino,
-      // Mesa de banquete con Trofeo Dorado y Braseros de llamas vivas
-      const victorySet = createCastleVictoryMonument();
-      const vicY = getTerrainY(mission.x, mission.z);
-      victorySet.position.set(0, vicY, 0);
-      g.add(victorySet);
+      // 1. Calzada de Honor: Caballeros de Guardia y Braseros de la Victoria
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.4, [-3.2, 0, -0.8], 0.2);
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.4, [3.2, 0, -0.8], -0.2);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.20, [-2.2, 0, 1.4], 0);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.20, [2.2, 0, 1.4], 0);
 
-      // Aves vigilantes en las almenas altas
-      await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2); // Cuervo sobre almena izquierda
-      await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2); // Cuervo sobre almena derecha
+      // 2. Centro: Gran Altar Sagrado de Graduación y Arcón Real de Recompensas
+      await spawn(ASSETS.polyfork.stoneAltar, 1.05, [0, 0, -1.2], 0);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.65, [0, 0, 0.4], 0);
+
+      // Emblema triunfal dorado flotando sobre el altar de graduación
+      const victoryCrown = new THREE.Mesh(
+        new THREE.TorusGeometry(0.42, 0.08, 12, 32),
+        new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffa500, emissiveIntensity: 2.8, metalness: 0.9, roughness: 0.15 })
+      );
+      const vicY = getTerrainY(mission.x, mission.z - 1.2);
+      victoryCrown.position.set(0, vicY + 2.2, -1.2);
+      g.add(victoryCrown);
+      g.userData.crystal = victoryCrown;
+
+      // 3. Ala de Celebración: Mesa de Banquete de Victoria
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [-5.2, 0, 0.8], 0.25);
+      await spawn(ASSETS.polyfork.roastMeat, 0.22, [-5.2, 0.76, 0.8], 0.1);
+      await spawn(ASSETS.polyfork.rusticPie, 0.10, [-5.6, 0.76, 0.8], 0.3);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-4.8, 0.76, 0.8], -0.2);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [-5.0, 0.76, 0.6], 0);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [-5.4, 0.76, 0.6], 0);
+
+      // 4. Aves vigilantes en las almenas altas
+      await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2);
+      await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2);
 
       // Arboleda regia enmarcando el Castillo (CERO colisión con murallas ni torres)
       await spawn(ASSETS.trees[12], 10.5, [-13.5, 0, -5.0], 0.2);
