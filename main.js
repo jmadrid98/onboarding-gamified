@@ -2,7 +2,7 @@ import * as THREE from './vendor/three/build/three.module.js';
 window.THREE = THREE;
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 import { Sky } from './vendor/three/examples/jsm/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=210.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=211.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -777,30 +777,20 @@ function createProceduralTile(drawFn) {
   return tex;
 }
 
-// 1. Lush Emerald Meadow with Realistic Organic Blades and Wildflowers
+// 1. Lush Emerald Meadow with Realistic Organic Blades
 const grassTile = createProceduralTile((ctx, size) => {
   ctx.fillStyle = '#5ca237';
   ctx.fillRect(0, 0, size, size);
-  for (let i = 0; i < 900; i++) {
+  for (let i = 0; i < 1100; i++) {
     const gx = Math.random() * size, gy = Math.random() * size;
     ctx.strokeStyle = Math.random() > 0.4 ? '#72c244' : '#498a28';
     ctx.lineWidth = 1.6; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + (Math.random() - 0.5) * 5, gy - 8); ctx.stroke();
   }
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 400; i++) {
     const cx = Math.random() * size, cy = Math.random() * size;
     ctx.fillStyle = Math.random() > 0.5 ? '#84de52' : '#3d7a22';
-    ctx.beginPath(); ctx.arc(cx, cy, 2.2, 0, Math.PI * 2); ctx.fill();
-  }
-  for (let i = 0; i < 50; i++) {
-    const fx = Math.random() * size, fy = Math.random() * size;
-    ctx.fillStyle = '#fffef4';
-    for (let p = 0; p < 5; p++) {
-      const pa = (p / 5) * Math.PI * 2;
-      ctx.beginPath(); ctx.arc(fx + Math.cos(pa) * 2.2, fy + Math.sin(pa) * 2.2, 1.4, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.fillStyle = '#ffd53d';
-    ctx.beginPath(); ctx.arc(fx, fy, 1.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 2.0, 0, Math.PI * 2); ctx.fill();
   }
 });
 
@@ -1071,22 +1061,34 @@ terrainMat.onBeforeCompile = shader => {
     vec4 grassSample2 = texture2D(uGrass, uvG2);
     vec4 baseGrass = mix(grassSample1, grassSample2, 0.42);
 
-    // Continental Organic Biome Noise (Valleys vs Sunny Meadows vs Highlands)
-    float macroA = sin(vWorldPos.x * 0.014 + cos(vWorldPos.z * 0.010) * 1.8);
-    float macroB = cos(vWorldPos.z * 0.012 + sin(vWorldPos.x * 0.008) * 1.6);
-    float biomeVal = macroA * 0.5 + macroB * 0.5;
+    // 4 Distinct Continental Biome Tints (Minecraft Biomes on the ground)
+    // Sector 1: Emerald Plains (West, Stations 00, 01, 02)
+    vec3 colPlains = vec3(0.32, 0.70, 0.22);
+    // Sector 2: Riverbank & Wetland (Deep Fertile Moss Green)
+    vec3 colWetland = vec3(0.18, 0.48, 0.22);
+    // Sector 3: Pine Taiga (Cold Evergreen Conifer Slate Green)
+    vec3 colTaiga = vec3(0.20, 0.44, 0.28);
+    // Sector 4: Alpine Highlands & Cumbres (Sunny Golden Alpine Mountain Green)
+    vec3 colHighlands = vec3(0.48, 0.58, 0.22);
 
-    // Organic Biome Palettes
-    vec3 colMossValley = vec3(0.18, 0.42, 0.20);
-    vec3 colFreshMeadow = vec3(0.28, 0.62, 0.25);
-    vec3 colHighlandSun = vec3(0.42, 0.60, 0.24);
+    // River and Lake proximity for wetland biome
+    float distToRiver = abs(vWorldPos.z - (-22.0 + sin(vWorldPos.x * 0.02) * 12.0));
+    float isWetland = smoothstep(32.0, 10.0, distToRiver) * smoothstep(-170.0, -135.0, vWorldPos.x) * smoothstep(115.0, 80.0, vWorldPos.x);
+    float distToLake = length(vec2((vWorldPos.x - 110.0) * 0.7, vWorldPos.z + 150.0));
+    float isLakeWetland = smoothstep(55.0, 18.0, distToLake);
+    float wetlandWeight = clamp(isWetland + isLakeWetland, 0.0, 1.0);
 
-    float slopeGrass = clamp((vWorldPos.y - 2.0) * 0.045 + biomeVal * 0.25, 0.0, 1.0);
-    vec3 grassBiomeTint = mix(colMossValley, colFreshMeadow, clamp(biomeVal * 0.5 + 0.5, 0.0, 1.0));
-    grassBiomeTint = mix(grassBiomeTint, colHighlandSun, slopeGrass);
+    // Continental transition along X axis
+    float wPlains = smoothstep(-80.0, -150.0, vWorldPos.x);
+    float wHighlands = smoothstep(265.0, 335.0, vWorldPos.x);
 
-    // Organic Living Meadow: breaks repetitive wallpaper look completely!
-    vec4 colG = vec4(baseGrass.rgb * (grassBiomeTint * 2.15), baseGrass.a);
+    vec3 groundBiomeCol = mix(colTaiga, colPlains, wPlains);
+    groundBiomeCol = mix(groundBiomeCol, colHighlands, wHighlands);
+    groundBiomeCol = mix(groundBiomeCol, colWetland, wetlandWeight * 0.85);
+
+    // Gentle terrain micro-variation that breathes life into the meadow
+    float microNoise = (texture2D(uGrass, vWorldPos.xz * 0.08).g - 0.5) * 0.12;
+    vec4 colG = vec4(baseGrass.rgb * ((groundBiomeCol + microNoise) * 2.2), baseGrass.a);
 
     vec2 uvR = vWorldPos.xz * 0.055;
     vec2 uvS = vWorldPos.xz * 0.075;

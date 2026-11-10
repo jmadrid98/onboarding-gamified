@@ -200,7 +200,10 @@ const ASSETS = {
     './assets/stylized/nature/Bush_1_A_Color1.gltf',     // 0: Arbusto esférico verde vivo
     './assets/stylized/nature/Bush_1_E_Color1.gltf',     // 1: Arbusto verde redondeado
     './assets/stylized/nature/Bush_2_A_Color1.gltf',     // 2: Arbusto verde suave
-    './assets/stylized/nature/Bush_3_A_Color1.gltf'      // 3: Arbusto bajo verde
+    './assets/stylized/nature/Bush_3_A_Color1.gltf',     // 3: Arbusto bajo verde
+    './assets/polyfork/grass-tuft-a40a08.glb',          // 4: Mechón 3D de hierba natural verde
+    './assets/polyfork/wildflower-68d3a1.glb',          // 5: Flores silvestres 3D con hojas
+    './assets/polyfork/fern-plant-1559b8.glb'           // 6: Helecho silvestre verde 3D
   ],
   rocks: [
     './assets/stylized/nature/Rock_1_A_Color1.gltf',     // 0: Peñasco de roca estilizada A
@@ -3652,14 +3655,14 @@ export class ProgressiveWorldStreamer {
       return 'highland_woods';
     };
 
-    // Paletas temáticas equilibradas (100% Árboles, arbustos y rocas estilizados originales)
+    // Paletas temáticas equilibradas (100% Árboles, sotobosque 3D real y rocas)
     const SECTOR_PALETTES = {
       // Sector 1: Robledal Frondoso y Praderas (Oak Forest & Plains - Stn 00, 01, 02)
       oak_forest: {
         mothers: [ASSETS.trees[0], ASSETS.trees[2], ASSETS.trees[9]], // Tree_1_A, Tree_1_C, Tree_4_A
         children: [ASSETS.trees[1], ASSETS.trees[6], ASSETS.trees[9], ASSETS.trees[0]], // Tree_1_B, Tree_3_A, Tree_4_A, Tree_1_A
         saplings: [ASSETS.trees[1], ASSETS.trees[0]],
-        understory: [ASSETS.bushes[0], ASSETS.bushes[2], ASSETS.bushes[1]],              // Bush_1_A, Bush_2_A, Bush_1_E
+        understory: [ASSETS.bushes[4], ASSETS.bushes[5], ASSETS.bushes[0], ASSETS.bushes[2]], // Hierba 3D, Flores silvestres 3D, Arbustos esféricos
         rocks: [ASSETS.rocks[0], ASSETS.rocks[1]]                       // Rock_1_A, Rock_1_E
       },
       // Sector 2: Bosque Templado y Riberas (River & Wetland - Stn 03, 05, 06, 07)
@@ -3667,7 +3670,7 @@ export class ProgressiveWorldStreamer {
         mothers: [ASSETS.trees[6], ASSETS.trees[7], ASSETS.trees[1], ASSETS.trees[9]],  // Tree_3_A, Tree_3_B, Tree_1_B, Tree_4_A
         children: [ASSETS.trees[8], ASSETS.trees[11], ASSETS.trees[0], ASSETS.trees[6]], // Tree_3_C, Tree_6_A, Tree_1_A, Tree_3_A
         saplings: [ASSETS.trees[8], ASSETS.trees[11]],
-        understory: [ASSETS.bushes[1], ASSETS.bushes[2]],              // Bush_1_E, Bush_2_A
+        understory: [ASSETS.bushes[6], ASSETS.bushes[4], ASSETS.bushes[1], ASSETS.bushes[2]], // Helechos 3D, Hierba 3D, Arbustos de ribera
         rocks: [ASSETS.rocks[1], ASSETS.rocks[3]]                       // Rock_1_E, Rock_3_A
       },
       // Sector 3: Gran Taiga de Pinos y Coníferas Verdes (Pine Taiga - Stn 04, 08, 09, 10)
@@ -3675,7 +3678,7 @@ export class ProgressiveWorldStreamer {
         mothers: [ASSETS.trees[5], ASSETS.trees[4], ASSETS.trees[3]],  // Tree_2_C, Tree_2_B, Tree_2_A
         children: [ASSETS.trees[3], ASSETS.trees[4], ASSETS.trees[5]], // Tree_2_A, Tree_2_B, Tree_2_C
         saplings: [ASSETS.trees[3]],
-        understory: [ASSETS.bushes[3], ASSETS.bushes[0]],              // Bush_3_A, Bush_1_A
+        understory: [ASSETS.bushes[4], ASSETS.bushes[3], ASSETS.bushes[0]],              // Hierba 3D, Arbusto bajo taiga, Arbusto verde
         rocks: [ASSETS.rocks[2], ASSETS.rocks[0]]                       // Rock_2_A, Rock_1_A
       },
       // Sector 4: Bosque de Altura y Cumbres (Highland Evergreen Woods - Stn 11, 12, 13)
@@ -3683,7 +3686,7 @@ export class ProgressiveWorldStreamer {
         mothers: [ASSETS.trees[10], ASSETS.trees[12], ASSETS.trees[5]], // Tree_5_A, Tree_7_A, Tree_2_C
         children: [ASSETS.trees[10], ASSETS.trees[3], ASSETS.trees[12]], // Tree_5_A, Tree_2_A, Tree_7_A
         saplings: [ASSETS.trees[10], ASSETS.trees[3]],
-        understory: [ASSETS.bushes[0], ASSETS.bushes[3]],              // Bush_1_A, Bush_3_A
+        understory: [ASSETS.bushes[4], ASSETS.bushes[3], ASSETS.bushes[0]],              // Hierba de altura 3D, Arbusto resistente
         rocks: [ASSETS.rocks[4], ASSETS.rocks[2]]                       // Rock_5_A, Rock_2_A
       }
     };
@@ -3825,17 +3828,17 @@ export class ProgressiveWorldStreamer {
       addInstance(rockModel, height, [x, y, z], seeded(seedIdx++) * Math.PI * 2);
     }
 
-    // ── 4. Tapiz de Flora y Flores Silvestres Adaptadas al Terreno ────────────
-    for (let i = 0; i < 420; i++) {
+    // ── 4. Tapiz de Vegetación 3D Viva y Flores Silvestres (680 Instancias) ──
+    for (let i = 0; i < 680; i++) {
       const x = -340 + seeded(seedIdx++) * 820;
       const z = -180 + seeded(seedIdx++) * 360;
       const y = this.getTerrainY(x, z);
-      if (y < -0.3 || y > 32.0 || !canSpawnAt(x, z, 0.8)) continue;
+      if (y < -0.3 || y > 32.0 || !canSpawnAt(x, z, 0.7)) continue;
 
       const sectorKey = getSectorAt(x, z, y);
       const palette = SECTOR_PALETTES[sectorKey];
       const floraModel = palette.understory[Math.floor(seeded(seedIdx++) * palette.understory.length)];
-      const height = THREE.MathUtils.lerp(0.35, 0.85, seeded(seedIdx++));
+      const height = THREE.MathUtils.lerp(0.45, 1.15, seeded(seedIdx++));
       addInstance(floraModel, height, [x, y, z], seeded(seedIdx++) * Math.PI * 2);
     }
 
