@@ -4051,7 +4051,12 @@ export class ProgressiveWorldStreamer {
 
       inst.position.set(s.pos[0], y, s.pos[1]);
       inst.rotation.y = Math.random() * Math.PI * 2;
+      inst.userData.baseY = y;
+      inst.userData.baseRotY = inst.rotation.y;
+      inst.userData.animPhase = Math.random() * 10;
       this.scene.add(inst);
+      this.roamingAnimals = this.roamingAnimals || [];
+      this.roamingAnimals.push(inst);
 
       if (inst.userData.animations?.length) {
         const animTarget = inst.children[0] || inst;
@@ -4102,6 +4107,13 @@ export class ProgressiveWorldStreamer {
   update(dt, elapsed, cameraPos = null) {
     for (const mixer of this.mixers) {
       mixer.update(dt);
+    }
+
+    for (const a of (this.roamingAnimals || [])) {
+      const ph = a.userData.animPhase;
+      // Gentle natural breathing / subtle idle sway in open meadow
+      a.position.y = a.userData.baseY + Math.sin(elapsed * 1.8 + ph) * 0.022;
+      a.rotation.y = a.userData.baseRotY + Math.sin(elapsed * 0.5 + ph) * 0.08;
     }
 
     for (const b of this.birds) {

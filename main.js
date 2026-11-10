@@ -2,7 +2,7 @@ import * as THREE from './vendor/three/build/three.module.js';
 window.THREE = THREE;
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 import { Sky } from './vendor/three/examples/jsm/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=212.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=213.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -1406,6 +1406,192 @@ function createRusticTrailDetails() {
     spawnThresholdGatepost(bx - 2.4, bz, new THREE.Vector3(1, 0, 0));
     spawnThresholdGatepost(bx + 2.4, bz, new THREE.Vector3(-1, 0, 0));
   });
+
+  // 3. Directional Wooden Signposts Between Checkpoints
+  function spawnDirectionalSignpost(targetMission, p, dir) {
+    const sg = new THREE.Group();
+    const wy = getTerrainY(p.x, p.z);
+
+    // Stone base plinth
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.30, 7), stonePlinthMat);
+    base.position.y = 0.15;
+    sg.add(base);
+
+    // Main timber post
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 2.1, 8), woodMat);
+    post.position.y = 1.20;
+    sg.add(post);
+
+    // Carved Arrow Signboard
+    const signCanvas = document.createElement('canvas');
+    signCanvas.width = 512;
+    signCanvas.height = 128;
+    const sCtx = signCanvas.getContext('2d');
+    sCtx.fillStyle = '#422817';
+    sCtx.fillRect(0, 0, 512, 128);
+    sCtx.strokeStyle = '#27170c';
+    sCtx.lineWidth = 6;
+    sCtx.strokeRect(3, 3, 506, 122);
+    // Gold lettering
+    sCtx.fillStyle = '#ffd166';
+    sCtx.font = 'bold 42px sans-serif';
+    sCtx.textAlign = 'center';
+    sCtx.textBaseline = 'middle';
+    const shortTitle = targetMission.name.split(' ')[0];
+    const label = `M${String(targetMission.id).padStart(2, '0')}: ${shortTitle} ➔`;
+    sCtx.fillText(label, 256, 64);
+
+    const signTex = new THREE.CanvasTexture(signCanvas);
+    signTex.colorSpace = THREE.SRGBColorSpace;
+    const signMat = new THREE.MeshStandardMaterial({ map: signTex, roughness: 0.8 });
+
+    const board = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.32, 0.08), signMat);
+    board.position.set(0.42, 1.82, 0);
+    sg.add(board);
+
+    // Small hanging lantern
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.06, 0.06), woodMat);
+    arm.position.set(-0.20, 2.05, 0);
+    sg.add(arm);
+
+    const lantern = new THREE.Mesh(new THREE.OctahedronGeometry(0.14, 0), lampMat);
+    lantern.position.set(-0.35, 1.90, 0);
+    sg.add(lantern);
+
+    const signLight = new THREE.PointLight(0xffb84d, 0.9, 6.0);
+    signLight.position.set(-0.35, 1.90, 0);
+    sg.add(signLight);
+
+    sg.position.set(p.x, wy, p.z);
+    sg.rotation.y = Math.atan2(dir.x, dir.z);
+    scene.add(sg);
+  }
+
+  for (let m = 0; m < missions.length - 1; m++) {
+    const cur = missions[m];
+    const nxt = missions[m + 1];
+
+    let curIdx = 0, nxtIdx = 0, minD1 = Infinity, minD2 = Infinity;
+    for (let k = 0; k < points.length; k++) {
+      const d1 = Math.hypot(points[k].x - cur.x, points[k].z - cur.z);
+      if (d1 < minD1) { minD1 = d1; curIdx = k; }
+      const d2 = Math.hypot(points[k].x - nxt.x, points[k].z - nxt.z);
+      if (d2 < minD2) { minD2 = d2; nxtIdx = k; }
+    }
+
+    if (nxtIdx > curIdx) {
+      const midIdx = Math.floor((curIdx + nxtIdx) * 0.5);
+      const p = points[midIdx];
+      const nextP = points[Math.min(points.length - 1, midIdx + 2)];
+      const dir = new THREE.Vector3().subVectors(nextP, p).normalize();
+      const side = new THREE.Vector3(-dir.z, 0, dir.x).normalize();
+      const signPos = new THREE.Vector3(p.x + side.x * 2.3, 0, p.z + side.z * 2.3);
+      spawnDirectionalSignpost(nxt, signPos, dir);
+    }
+  }
+
+  // 4. Organic Trail Curbing Stones & Boundary Bollards
+  const pebbleGeo1 = new THREE.DodecahedronGeometry(0.24, 1);
+  const pebbleGeo2 = new THREE.DodecahedronGeometry(0.18, 1);
+  const curbMat1 = new THREE.MeshStandardMaterial({ color: 0x7a7469, roughness: 0.9 });
+  const curbMat2 = new THREE.MeshStandardMaterial({ color: 0x635e54, roughness: 0.95 });
+  const bollardGeo = new THREE.CylinderGeometry(0.08, 0.10, 0.65, 7);
+
+  for (let i = 8; i < points.length - 8; i += 7) {
+    const p = points[i];
+    let insideStation = false;
+    for (const m of missions) {
+      if (Math.hypot(p.x - m.x, p.z - m.z) < 18.0) { insideStation = true; break; }
+    }
+    if (insideStation) continue;
+    if (Math.hypot(p.x - (-125), p.z - (-20)) < 16 || Math.hypot(p.x - 80, p.z - (-20)) < 16) continue;
+
+    const nextP = points[i + 1];
+    const dir = new THREE.Vector3().subVectors(nextP, p).normalize();
+    const side = new THREE.Vector3(-dir.z, 0, dir.x).normalize();
+
+    const sideSign = (i % 2 === 0) ? 1 : -1;
+    const curbDist = 1.85 + (Math.sin(i * 3.7) * 0.5 + 0.5) * 0.40;
+    const cx = p.x + side.x * (curbDist * sideSign);
+    const cz = p.z + side.z * (curbDist * sideSign);
+    const cy = getTerrainY(cx, cz);
+    if (cy < -0.2) continue;
+
+    const pick = (i * 17) % 10;
+    if (pick < 6) {
+      const stoneGroup = new THREE.Group();
+      const s1 = new THREE.Mesh(pebbleGeo1, curbMat1);
+      s1.scale.set(1.1, 0.65, 0.95);
+      s1.position.y = 0.08;
+      stoneGroup.add(s1);
+
+      const s2 = new THREE.Mesh(pebbleGeo2, curbMat2);
+      s2.scale.set(0.9, 0.6, 1.2);
+      s2.position.set(0.22, 0.06, 0.18);
+      stoneGroup.add(s2);
+
+      stoneGroup.position.set(cx, cy, cz);
+      stoneGroup.rotation.y = (i * 1.3);
+      scene.add(stoneGroup);
+    } else {
+      const bollard = new THREE.Mesh(bollardGeo, woodMat);
+      bollard.position.set(cx, cy + 0.32, cz);
+      bollard.rotation.y = i * 0.7;
+      scene.add(bollard);
+    }
+  }
+
+  // 5. Wayfarer Rest Nooks along Long Wilderness Corridors
+  function spawnRestVignette(wx, wz, facingDir) {
+    const vg = new THREE.Group();
+    const wy = getTerrainY(wx, wz);
+
+    // Split-log rustic bench
+    const benchSeat = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.22, 1.8, 8, 1, false, 0, Math.PI), woodMat);
+    benchSeat.rotation.z = Math.PI / 2;
+    benchSeat.position.set(0, 0.38, 0);
+    vg.add(benchSeat);
+
+    [-0.65, 0.65].forEach(bx => {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.38, 7), woodMat);
+      leg.position.set(bx, 0.19, 0);
+      vg.add(leg);
+    });
+
+    // Wooden supply crate
+    const crateMat = new THREE.MeshStandardMaterial({ color: 0x6e4a2a, roughness: 0.85 });
+    const crate = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.65, 0.65), crateMat);
+    crate.position.set(1.2, 0.32, -0.2);
+    crate.rotation.y = 0.25;
+    vg.add(crate);
+
+    // Small water cask on crate
+    const caskMat = new THREE.MeshStandardMaterial({ color: 0x4a321d, roughness: 0.8 });
+    const cask = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.25, 0.55, 9), caskMat);
+    cask.position.set(1.2, 0.92, -0.2);
+    vg.add(cask);
+
+    // Flat resting stone with travel lantern
+    const stoneTable = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 0.40, 7), stonePlinthMat);
+    stoneTable.position.set(-1.15, 0.20, -0.15);
+    vg.add(stoneTable);
+
+    const waysideLantern = new THREE.Mesh(new THREE.OctahedronGeometry(0.14, 0), lampMat);
+    waysideLantern.position.set(-1.15, 0.52, -0.15);
+    vg.add(waysideLantern);
+
+    const softGlow = new THREE.PointLight(0xffb040, 0.9, 6.0);
+    softGlow.position.set(-1.15, 0.52, -0.15);
+    vg.add(softGlow);
+
+    vg.position.set(wx, wy, wz);
+    vg.rotation.y = Math.atan2(facingDir.x, facingDir.z);
+    scene.add(vg);
+  }
+
+  spawnRestVignette(-135, 32, new THREE.Vector3(1, 0, 0.4));
+  spawnRestVignette(28, 108, new THREE.Vector3(0.3, 0, -1));
+  spawnRestVignette(238, -78, new THREE.Vector3(-0.8, 0, -0.6));
 }
 createRusticTrailDetails();
 
@@ -1487,28 +1673,44 @@ const anim = { water: [], poi: [], players: [], clouds: [], motes: null, streame
 }
 
 {
-  const moteCount = 180;
+  const moteCount = 360;
   const motePos = new Float32Array(moteCount * 3);
+  const moteColors = new Float32Array(moteCount * 3);
   const motePhases = new Float32Array(moteCount);
+  const moteSpeeds = new Float32Array(moteCount);
+
+  const colGold = new THREE.Color(0xffe28a);
+  const colLeaf = new THREE.Color(0x7ec842);
+  const colAmber = new THREE.Color(0xdf983a);
+
   for (let i = 0; i < moteCount; i++) {
-    motePos[i * 3] = rnd(-100, 105);
-    motePos[i * 3 + 1] = rnd(1.5, 12);
-    motePos[i * 3 + 2] = rnd(-55, 60);
-    motePhases[i] = rnd(0, Math.PI * 2);
+    motePos[i * 3] = (Math.random() - 0.5) * 140;
+    motePos[i * 3 + 1] = 1.0 + Math.random() * 22;
+    motePos[i * 3 + 2] = (Math.random() - 0.5) * 140;
+    motePhases[i] = Math.random() * Math.PI * 2;
+    moteSpeeds[i] = 0.5 + Math.random() * 0.9;
+
+    const c = (i % 3 === 0) ? colGold : ((i % 3 === 1) ? colLeaf : colAmber);
+    moteColors[i * 3] = c.r;
+    moteColors[i * 3 + 1] = c.g;
+    moteColors[i * 3 + 2] = c.b;
   }
+
   const moteGeo = new THREE.BufferGeometry();
   moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3));
+  moteGeo.setAttribute('color', new THREE.BufferAttribute(moteColors, 3));
+
   const moteMat = new THREE.PointsMaterial({
-    color: 0xffea9f,
-    size: 0.22,
+    vertexColors: true,
+    size: 0.28,
     transparent: true,
-    opacity: 0.75,
+    opacity: 0.80,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
   const moteSystem = new THREE.Points(moteGeo, moteMat);
   scene.add(moteSystem);
-  anim.motes = { system: moteSystem, phases: motePhases, count: moteCount };
+  anim.motes = { system: moteSystem, phases: motePhases, speeds: moteSpeeds, count: moteCount };
 }
 
 function cloud() {
@@ -4074,14 +4276,30 @@ function loop() {
     if (s) s.uniforms.uTime.value = t;
   });
 
-  if (anim.motes) {
+  if (anim.motes && camera) {
     const pos = anim.motes.system.geometry.attributes.position;
+    const cx = camera.position.x;
+    const cz = camera.position.z;
+    const range = 70.0;
+
     for (let i = 0; i < anim.motes.count; i++) {
       const ph = anim.motes.phases[i];
-      let y = pos.getY(i) + Math.sin(t * 1.5 + ph) * 0.008;
-      let x = pos.getX(i) + Math.cos(t * 0.8 + ph) * 0.006;
-      pos.setY(i, y);
-      pos.setX(i, x);
+      const spd = anim.motes.speeds[i];
+
+      // Drift gently along wind vector with natural organic sway
+      let x = pos.getX(i) + spd * dt * 2.2 + Math.sin(t * 1.2 + ph) * 0.018;
+      let y = pos.getY(i) - dt * 0.40 + Math.sin(t * 1.8 + ph) * 0.014;
+      let z = pos.getZ(i) + Math.cos(t * 0.9 + ph) * 0.016;
+
+      // Wrap around camera box so atmosphere is always alive around the player
+      if (x > cx + range) x = cx - range;
+      if (x < cx - range) x = cx + range;
+      if (z > cz + range) z = cz - range;
+      if (z < cz - range) z = cz + range;
+      if (y < 0.5) y = 18.0 + Math.random() * 8.0;
+      if (y > 26.0) y = 0.8;
+
+      pos.setXYZ(i, x, y, z);
     }
     pos.needsUpdate = true;
   }
