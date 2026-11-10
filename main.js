@@ -2,7 +2,7 @@ import * as THREE from './vendor/three/build/three.module.js';
 window.THREE = THREE;
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 import { Sky } from './vendor/three/examples/jsm/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=211.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=212.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -777,20 +777,26 @@ function createProceduralTile(drawFn) {
   return tex;
 }
 
-// 1. Lush Emerald Meadow with Realistic Organic Blades
+// 1. Lush Painterly Meadow Grass (Smooth, Organic, Cel-Shaded)
 const grassTile = createProceduralTile((ctx, size) => {
-  ctx.fillStyle = '#5ca237';
+  // Rich, velvety emerald foundation
+  ctx.fillStyle = '#56a634';
   ctx.fillRect(0, 0, size, size);
-  for (let i = 0; i < 1100; i++) {
-    const gx = Math.random() * size, gy = Math.random() * size;
-    ctx.strokeStyle = Math.random() > 0.4 ? '#72c244' : '#498a28';
-    ctx.lineWidth = 1.6; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + (Math.random() - 0.5) * 5, gy - 8); ctx.stroke();
-  }
-  for (let i = 0; i < 400; i++) {
-    const cx = Math.random() * size, cy = Math.random() * size;
-    ctx.fillStyle = Math.random() > 0.5 ? '#84de52' : '#3d7a22';
-    ctx.beginPath(); ctx.arc(cx, cy, 2.0, 0, Math.PI * 2); ctx.fill();
+
+  // Soft, smooth painterly watercolor / foliage blooms (zero repeating dots or harsh dashes)
+  for (let i = 0; i < 48; i++) {
+    const rx = Math.random() * size;
+    const ry = Math.random() * size;
+    const rad = 45 + Math.random() * 65;
+    const grad = ctx.createRadialGradient(rx, ry, 0, rx, ry, rad);
+    const isLighter = Math.random() > 0.45;
+    grad.addColorStop(0, isLighter ? 'rgba(114, 202, 64, 0.22)' : 'rgba(60, 128, 32, 0.20)');
+    grad.addColorStop(0.65, isLighter ? 'rgba(96, 180, 52, 0.08)' : 'rgba(52, 114, 28, 0.07)');
+    grad.addColorStop(1, 'rgba(86, 166, 52, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(rx, ry, rad, 0, Math.PI * 2);
+    ctx.fill();
   }
 });
 
@@ -1054,22 +1060,22 @@ terrainMat.onBeforeCompile = shader => {
   ).replace(
     '#include <map_fragment>',
     `
-    // 1. Dual-Frequency Natural Grass Sampling (breaks repeating grid pattern)
-    vec2 uvG1 = vWorldPos.xz * 0.075;
-    vec2 uvG2 = vec2(vWorldPos.z * 0.707 - vWorldPos.x * 0.707, vWorldPos.x * 0.707 + vWorldPos.z * 0.707) * 0.024;
+    // 1. Dual-Frequency Painterly Grass Sampling (Soft, organic, zero tiling artifacts)
+    vec2 uvG1 = vWorldPos.xz * 0.040;
+    vec2 uvG2 = vec2(vWorldPos.z * 0.707 - vWorldPos.x * 0.707, vWorldPos.x * 0.707 + vWorldPos.z * 0.707) * 0.015;
     vec4 grassSample1 = texture2D(uGrass, uvG1);
     vec4 grassSample2 = texture2D(uGrass, uvG2);
-    vec4 baseGrass = mix(grassSample1, grassSample2, 0.42);
+    vec4 baseGrass = mix(grassSample1, grassSample2, 0.50);
 
     // 4 Distinct Continental Biome Tints (Minecraft Biomes on the ground)
-    // Sector 1: Emerald Plains (West, Stations 00, 01, 02)
-    vec3 colPlains = vec3(0.32, 0.70, 0.22);
-    // Sector 2: Riverbank & Wetland (Deep Fertile Moss Green)
-    vec3 colWetland = vec3(0.18, 0.48, 0.22);
-    // Sector 3: Pine Taiga (Cold Evergreen Conifer Slate Green)
-    vec3 colTaiga = vec3(0.20, 0.44, 0.28);
-    // Sector 4: Alpine Highlands & Cumbres (Sunny Golden Alpine Mountain Green)
-    vec3 colHighlands = vec3(0.48, 0.58, 0.22);
+    // Sector 1: Emerald Plains (West, Stations 00, 01, 02) - Radiant lively emerald meadow
+    vec3 colPlains = vec3(0.35, 0.76, 0.22);
+    // Sector 2: Riverbank & Wetland - Deep fertile river moss green
+    vec3 colWetland = vec3(0.18, 0.46, 0.20);
+    // Sector 3: Pine Taiga - Cool deep conifer slate green
+    vec3 colTaiga = vec3(0.20, 0.48, 0.30);
+    // Sector 4: Alpine Highlands & Cumbres - Warm golden sunny alpine mountain grass
+    vec3 colHighlands = vec3(0.48, 0.62, 0.22);
 
     // River and Lake proximity for wetland biome
     float distToRiver = abs(vWorldPos.z - (-22.0 + sin(vWorldPos.x * 0.02) * 12.0));
@@ -1086,9 +1092,9 @@ terrainMat.onBeforeCompile = shader => {
     groundBiomeCol = mix(groundBiomeCol, colHighlands, wHighlands);
     groundBiomeCol = mix(groundBiomeCol, colWetland, wetlandWeight * 0.85);
 
-    // Gentle terrain micro-variation that breathes life into the meadow
-    float microNoise = (texture2D(uGrass, vWorldPos.xz * 0.08).g - 0.5) * 0.12;
-    vec4 colG = vec4(baseGrass.rgb * ((groundBiomeCol + microNoise) * 2.2), baseGrass.a);
+    // Gentle terrain micro-variation that breathes painterly life into the meadow
+    float microNoise = (texture2D(uGrass, vWorldPos.xz * 0.035).g - 0.5) * 0.08;
+    vec4 colG = vec4(baseGrass.rgb * ((groundBiomeCol + microNoise) * 2.0), baseGrass.a);
 
     vec2 uvR = vWorldPos.xz * 0.055;
     vec2 uvS = vWorldPos.xz * 0.075;
