@@ -3571,21 +3571,21 @@ export class ProgressiveWorldStreamer {
 
     const isStationClearing = (x, z) => {
       for (const m of this.missions) {
-        const rad = (m.id === 13) ? 22.0 : 16.5;
+        const rad = (m.id === 13) ? 25.0 : 18.5;
         if (Math.hypot(x - m.x, z - m.z) < rad) return true;
       }
       return false;
     };
 
     const canSpawnAt = (x, z, radius = 2.0) => {
-      // 1. Never spawn inside or near stations (16.5m clear perimeter)
+      // 1. Never spawn inside or near stations (18.5m clear perimeter, 25m en Bastión)
       if (isStationClearing(x, z)) return false;
 
       // 2. Keep clear of the walking trail path
       if (this.trailPoints && this.trailPoints.length) {
         for (let i = 0; i < this.trailPoints.length; i++) {
           const pt = this.trailPoints[i];
-          if (Math.hypot(x - pt.x, z - pt.y) < (radius + 5.0)) return false;
+          if (Math.hypot(x - pt.x, z - pt.y) < (radius + 5.5)) return false;
         }
       }
 
@@ -3657,21 +3657,24 @@ export class ProgressiveWorldStreamer {
       // Sector 1: Robledal Frondoso y Praderas (Oak Forest & Plains - Stn 00, 01, 02)
       oak_forest: {
         mothers: [ASSETS.trees[0], ASSETS.trees[2], ASSETS.trees[9]], // Tree_1_A, Tree_1_C, Tree_4_A
-        children: [ASSETS.trees[1], ASSETS.trees[6], ASSETS.trees[9]], // Tree_1_B, Tree_3_A, Tree_4_A
-        understory: [ASSETS.bushes[0], ASSETS.bushes[2]],              // Bush_1_A, Bush_2_A
+        children: [ASSETS.trees[1], ASSETS.trees[6], ASSETS.trees[9], ASSETS.trees[0]], // Tree_1_B, Tree_3_A, Tree_4_A, Tree_1_A
+        saplings: [ASSETS.trees[1], ASSETS.trees[0]],
+        understory: [ASSETS.bushes[0], ASSETS.bushes[2], ASSETS.bushes[1]],              // Bush_1_A, Bush_2_A, Bush_1_E
         rocks: [ASSETS.rocks[0], ASSETS.rocks[1]]                       // Rock_1_A, Rock_1_E
       },
       // Sector 2: Bosque Templado y Riberas (River & Wetland - Stn 03, 05, 06, 07)
       river_wetland: {
-        mothers: [ASSETS.trees[6], ASSETS.trees[7], ASSETS.trees[1]],  // Tree_3_A, Tree_3_B, Tree_1_B
-        children: [ASSETS.trees[8], ASSETS.trees[11], ASSETS.trees[0]], // Tree_3_C, Tree_6_A, Tree_1_A
+        mothers: [ASSETS.trees[6], ASSETS.trees[7], ASSETS.trees[1], ASSETS.trees[9]],  // Tree_3_A, Tree_3_B, Tree_1_B, Tree_4_A
+        children: [ASSETS.trees[8], ASSETS.trees[11], ASSETS.trees[0], ASSETS.trees[6]], // Tree_3_C, Tree_6_A, Tree_1_A, Tree_3_A
+        saplings: [ASSETS.trees[8], ASSETS.trees[11]],
         understory: [ASSETS.bushes[1], ASSETS.bushes[2]],              // Bush_1_E, Bush_2_A
         rocks: [ASSETS.rocks[1], ASSETS.rocks[3]]                       // Rock_1_E, Rock_3_A
       },
       // Sector 3: Gran Taiga de Pinos y Coníferas Verdes (Pine Taiga - Stn 04, 08, 09, 10)
       pine_taiga: {
-        mothers: [ASSETS.trees[3], ASSETS.trees[4], ASSETS.trees[5]],  // Tree_2_A, Tree_2_B, Tree_2_C
+        mothers: [ASSETS.trees[5], ASSETS.trees[4], ASSETS.trees[3]],  // Tree_2_C, Tree_2_B, Tree_2_A
         children: [ASSETS.trees[3], ASSETS.trees[4], ASSETS.trees[5]], // Tree_2_A, Tree_2_B, Tree_2_C
+        saplings: [ASSETS.trees[3]],
         understory: [ASSETS.bushes[3], ASSETS.bushes[0]],              // Bush_3_A, Bush_1_A
         rocks: [ASSETS.rocks[2], ASSETS.rocks[0]]                       // Rock_2_A, Rock_1_A
       },
@@ -3679,35 +3682,36 @@ export class ProgressiveWorldStreamer {
       highland_woods: {
         mothers: [ASSETS.trees[10], ASSETS.trees[12], ASSETS.trees[5]], // Tree_5_A, Tree_7_A, Tree_2_C
         children: [ASSETS.trees[10], ASSETS.trees[3], ASSETS.trees[12]], // Tree_5_A, Tree_2_A, Tree_7_A
+        saplings: [ASSETS.trees[10], ASSETS.trees[3]],
         understory: [ASSETS.bushes[0], ASSETS.bushes[3]],              // Bush_1_A, Bush_3_A
         rocks: [ASSETS.rocks[4], ASSETS.rocks[2]]                       // Rock_5_A, Rock_2_A
       }
     };
 
-    // ── 1. Arboledas Orgánicas Zonificadas por Sector (Sin colisiones) ──────
-    for (let g = 0; g < 190; g++) {
+    // ── 1. Arboledas Orgánicas Zonificadas por Sector (Sin colisiones, 3 estratos) ──
+    for (let g = 0; g < 235; g++) {
       const gx = -350 + seeded(seedIdx++) * 840;
       const gz = -190 + seeded(seedIdx++) * 380;
       const gy = this.getTerrainY(gx, gz);
       if (gy < -0.3 || gy > 36.0) continue;
 
-      // Validación estricta anticolisión para el árbol madre
-      if (!canSpawnAt(gx, gz, 2.8)) continue;
+      // Validación estricta anticolisión para el árbol patriarca
+      if (!canSpawnAt(gx, gz, 3.0)) continue;
 
       const sectorKey = getSectorAt(gx, gz, gy);
       const palette = SECTOR_PALETTES[sectorKey];
 
-      // Árbol Madre Central del grupo (Verde, frondoso y vivo)
+      // Estrato 1: Árbol Patriarca / Madre Central (8.5m a 11.2m, porte majestuoso y verde)
       const motherModel = palette.mothers[Math.floor(seeded(seedIdx++) * palette.mothers.length)];
-      const motherHeight = THREE.MathUtils.lerp(6.5, 9.5, seeded(seedIdx++));
-      const motherScaleXZ = THREE.MathUtils.lerp(0.9, 1.25, seeded(seedIdx++));
+      const motherHeight = THREE.MathUtils.lerp(8.5, 11.2, seeded(seedIdx++));
+      const motherScaleXZ = THREE.MathUtils.lerp(0.95, 1.30, seeded(seedIdx++));
       addInstance(motherModel, motherHeight, [gx, gy, gz], seeded(seedIdx++) * Math.PI * 2, motherScaleXZ, motherScaleXZ);
 
-      // 4 a 6 Árboles hijos orbitando con validación anticolisión individual
-      const childCount = 4 + Math.floor(seeded(seedIdx++) * 3);
+      // Estrato 2: 3 a 5 Árboles Jóvenes orbitando (4.5m a 6.8m)
+      const childCount = 3 + Math.floor(seeded(seedIdx++) * 3);
       for (let c = 0; c < childCount; c++) {
         const angle = seeded(seedIdx++) * Math.PI * 2;
-        const rad = 3.6 + seeded(seedIdx++) * 8.5;
+        const rad = 3.8 + seeded(seedIdx++) * 8.0;
         const tx = gx + Math.cos(angle) * rad;
         const tz = gz + Math.sin(angle) * rad;
         const ty = this.getTerrainY(tx, tz);
@@ -3716,35 +3720,54 @@ export class ProgressiveWorldStreamer {
         if (!canSpawnAt(tx, tz, 2.2)) continue; // Evita superposición entre árboles
 
         const childModel = palette.children[Math.floor(seeded(seedIdx++) * palette.children.length)];
-        const childHeight = THREE.MathUtils.lerp(3.5, 6.0, seeded(seedIdx++));
-        const childScaleXZ = THREE.MathUtils.lerp(0.85, 1.2, seeded(seedIdx++));
+        const childHeight = THREE.MathUtils.lerp(4.5, 6.8, seeded(seedIdx++));
+        const childScaleXZ = THREE.MathUtils.lerp(0.85, 1.18, seeded(seedIdx++));
         const tiltX = (seeded(seedIdx++) - 0.5) * 0.08;
         const tiltZ = (seeded(seedIdx++) - 0.5) * 0.08;
         addInstance(childModel, childHeight, [tx, ty, tz], seeded(seedIdx++) * Math.PI * 2, childScaleXZ, childScaleXZ, tiltX, tiltZ);
       }
 
-      // Sotobosque natural al pie del grupo (Con validación anticolisión)
-      for (let b = 0; b < 4; b++) {
+      // Estrato 3: 1 a 2 Arbolitos Retoños / Árboles pequeños (2.4m a 3.6m) en el linde
+      const saplingCount = 1 + Math.floor(seeded(seedIdx++) * 2);
+      for (let s = 0; s < saplingCount; s++) {
+        const sAngle = seeded(seedIdx++) * Math.PI * 2;
+        const sRad = 5.5 + seeded(seedIdx++) * 5.0;
+        const sx = gx + Math.cos(sAngle) * sRad;
+        const sz = gz + Math.sin(sAngle) * sRad;
+        const sy = this.getTerrainY(sx, sz);
+        if (sy < -0.3 || sy > 38.0) continue;
+
+        if (!canSpawnAt(sx, sz, 1.6)) continue;
+
+        const saplingModel = palette.saplings[Math.floor(seeded(seedIdx++) * palette.saplings.length)];
+        const saplingHeight = THREE.MathUtils.lerp(2.4, 3.6, seeded(seedIdx++));
+        const saplingScaleXZ = THREE.MathUtils.lerp(0.80, 1.10, seeded(seedIdx++));
+        addInstance(saplingModel, saplingHeight, [sx, sy, sz], seeded(seedIdx++) * Math.PI * 2, saplingScaleXZ, saplingScaleXZ);
+      }
+
+      // Sotobosque natural al pie del grupo (Arbustos esféricos verdes de 0.8m a 1.4m)
+      const bushCount = 4 + Math.floor(seeded(seedIdx++) * 3);
+      for (let b = 0; b < bushCount; b++) {
         const bAngle = seeded(seedIdx++) * Math.PI * 2;
-        const bRad = 1.8 + seeded(seedIdx++) * 6.5;
+        const bRad = 1.6 + seeded(seedIdx++) * 6.5;
         const bx = gx + Math.cos(bAngle) * bRad;
         const bz = gz + Math.sin(bAngle) * bRad;
         const by = this.getTerrainY(bx, bz);
-        if (by > -0.3 && canSpawnAt(bx, bz, 0.8)) {
+        if (by > -0.3 && canSpawnAt(bx, bz, 0.9)) {
           const bushModel = palette.understory[Math.floor(seeded(seedIdx++) * palette.understory.length)];
-          const bHeight = THREE.MathUtils.lerp(0.40, 0.85, seeded(seedIdx++));
+          const bHeight = THREE.MathUtils.lerp(0.80, 1.45, seeded(seedIdx++));
           addInstance(bushModel, bHeight, [bx, by, bz], seeded(seedIdx++) * Math.PI * 2);
         }
       }
 
-      // Rocas o tocones sin colisionar
-      if (seeded(seedIdx++) > 0.35) {
-        const rx = gx + (seeded(seedIdx++) - 0.5) * 6.0;
-        const rz = gz + (seeded(seedIdx++) - 0.5) * 6.0;
+      // Rocas estilizadas del bioma (50% probabilidad)
+      if (seeded(seedIdx++) > 0.50) {
+        const rx = gx + (seeded(seedIdx++) - 0.5) * 7.0;
+        const rz = gz + (seeded(seedIdx++) - 0.5) * 7.0;
         const ry = this.getTerrainY(rx, rz);
         if (ry > -0.3 && canSpawnAt(rx, rz, 1.4)) {
           const rockModel = palette.rocks[Math.floor(seeded(seedIdx++) * palette.rocks.length)];
-          const rHeight = THREE.MathUtils.lerp(0.6, 1.5, seeded(seedIdx++));
+          const rHeight = THREE.MathUtils.lerp(0.7, 1.6, seeded(seedIdx++));
           addInstance(rockModel, rHeight, [rx, ry, rz], seeded(seedIdx++) * Math.PI * 2);
         }
       }
@@ -3819,33 +3842,43 @@ export class ProgressiveWorldStreamer {
     // ── 5. Fauna Silvestre Itinerante en el Entorno Circundante ──────────────
     // Ubicados en claros naturales y praderas abiertas (CERO colisiones con escenarios ni caminos)
     this.animalSpawns = [
-      // Sector 1: Praderas y Valle Oeste
-      { type: 'deer', pos: [-305, 95], height: 1.15 },    // Ciervo pastando en la pradera oeste
-      { type: 'horse', pos: [-265, 25], height: 1.35 },   // Caballo libre en el prado
-      { type: 'rabbit', pos: [-225, 115], height: 0.35 }, // Conejito en las flores
-      { type: 'fox', pos: [-185, 75], height: 0.55 },     // Zorro en el linde
-      { type: 'deer', pos: [-145, -75], height: 1.15 },   // Ciervo en el claro
+      // ════ Sector 1: Praderas y Valle de Robles (Oeste) ════
+      { type: 'deer', pos: [-315, 85], height: 1.25 },     // Ciervo pastando en la pradera oeste
+      { type: 'deer', pos: [-290, 105], height: 1.15 },    // Segundo ciervo
+      { type: 'horse', pos: [-260, 20], height: 1.45 },    // Caballo salvaje en el prado
+      { type: 'horse', pos: [-240, 15], height: 1.35 },    // Segundo caballo
+      { type: 'fox', pos: [-210, 105], height: 0.60 },     // Zorro en el linde
+      { type: 'deer', pos: [-175, 65], height: 1.20 },     // Ciervo en el claro
+      { type: 'fox', pos: [-145, -75], height: 0.55 },     // Zorro explorador
 
-      // Sector 2: Ribera Fluvial y Cuenca del Lago
-      { type: 'sheep', pos: [-110, -50], height: 0.90 },  // Ovejas bebiendo en la ribera
-      { type: 'sheep', pos: [-100, -60], height: 0.85 },  // Segunda oveja
-      { type: 'chicken', pos: [-70, 50], height: 0.35 },  // Gallina en la orilla
-      { type: 'goat', pos: [70, -40], height: 0.95 },     // Cabra en la orilla cerca del puente
-      { type: 'crow', pos: [115, -140], height: 0.35 },   // Cuervo en las rocas del lago
+      // ════ Sector 2: Ribera Fluvial y Cuenca del Lago (Centro-Norte) ════
+      { type: 'alpaca', pos: [-115, -45], height: 1.10 },  // Alpaca en la ribera
+      { type: 'alpaca', pos: [-95, -55], height: 1.05 },   // Segunda alpaca
+      { type: 'deer', pos: [-40, -45], height: 1.20 },     // Ciervo bebiendo
+      { type: 'deer', pos: [15, -40], height: 1.15 },      // Ciervo en la vega
+      { type: 'horse', pos: [65, -35], height: 1.40 },     // Caballo en el pastizal fluvial
+      { type: 'horse', pos: [90, -45], height: 1.35 },     // Segundo caballo
+      { type: 'crow', pos: [120, -145], height: 0.38 },    // Cuervo sobre rocas del lago
+      { type: 'crow', pos: [140, -125], height: 0.38 },    // Segundo cuervo
 
-      // Sector 3: Gran Taiga de Pinos
-      { type: 'wolf', pos: [20, 105], height: 0.95 },     // Lobo en el claro de coníferas
-      { type: 'stag', pos: [95, 55], height: 1.25 },      // Íbice en la espesura
-      { type: 'fox', pos: [155, -70], height: 0.55 },     // Zorro en la taiga
-      { type: 'deer', pos: [200, -95], height: 1.15 },    // Ciervo solemne
-      { type: 'rabbit', pos: [245, -55], height: 0.35 },  // Conejito en el prado de pinos
+      // ════ Sector 3: Gran Taiga de Coníferas (Centro-Sur) ════
+      { type: 'wolf', pos: [25, 95], height: 1.05 },       // Lobo en claro de pinos
+      { type: 'wolf', pos: [60, 115], height: 0.95 },      // Segundo lobo
+      { type: 'stag', pos: [100, 50], height: 1.35 },      // Ciervo solemne en la taiga
+      { type: 'fox', pos: [150, -75], height: 0.60 },      // Zorro en las colinas
+      { type: 'deer', pos: [210, -90], height: 1.20 },     // Ciervo en el bosque
+      { type: 'wolf', pos: [180, 85], height: 1.00 },      // Lobo vigía
+      { type: 'fox', pos: [250, -50], height: 0.55 },      // Zorro en pradera de pinos
+      { type: 'stag', pos: [280, 20], height: 1.30 },      // Ciervo en claro este
 
-      // Sector 4: Tierras Altas de Montaña
-      { type: 'bear', pos: [335, 35], height: 1.45 },     // Gran oso negro en el paso rocoso
-      { type: 'wolf', pos: [390, -30], height: 1.05 },    // Lobo de cumbre
-      { type: 'stag', pos: [445, 30], height: 1.25 },     // Íbice alpino en cornisa escarpada
-      { type: 'goat', pos: [480, -75], height: 0.95 },    // Cabra montés en risco
-      { type: 'crow', pos: [510, 85], height: 0.38 }      // Cuervo sobre las rocas del bastión
+      // ════ Sector 4: Tierras Altas de Montaña (Este) ════
+      { type: 'stag', pos: [340, 30], height: 1.40 },      // Gran íbice de montaña
+      { type: 'stag', pos: [380, -35], height: 1.35 },     // Íbice en cornisa rocosa
+      { type: 'wolf', pos: [410, -25], height: 1.05 },     // Lobo de cumbre
+      { type: 'alpaca', pos: [440, 25], height: 1.10 },    // Alpaca de altura
+      { type: 'wolf', pos: [465, -60], height: 1.00 },     // Lobo en risco
+      { type: 'crow', pos: [505, 80], height: 0.38 },      // Cuervo sobre risco del bastión
+      { type: 'crow', pos: [525, -30], height: 0.38 }      // Cuervo en cumbre este
     ];
 
     // ── 6. Bandadas de Aves en Vuelo Panorámico ─────────────────────────────
