@@ -3447,12 +3447,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2); // Cuervo sobre almena derecha
       break;
     }
-
-      // Aves vigilantes en las almenas altas
-      await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2); // Cuervo sobre almena izquierda
-      await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2); // Cuervo sobre almena derecha
-      break;
-    }
   }
 
   g.userData.mixers = stationMixers;
