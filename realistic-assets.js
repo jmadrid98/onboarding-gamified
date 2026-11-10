@@ -2745,6 +2745,13 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.0, 0, 0.5], 0.8);
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.0, 0, 0.5], -0.8);
 
+      // 9. Arboleda de fondo y flancos (Enmarcan la taberna a distancia segura, CERO colisión)
+      await spawn(ASSETS.trees[13], 8.2, [-8.2, 0, -4.5], 0.3); // Abedul blanco en el flanco izquierdo
+      await spawn(ASSETS.trees[14], 8.5, [8.2, 0, -4.5], -0.3); // Pino verde alto en el flanco derecho
+      await spawn(ASSETS.trees[15], 8.0, [-5.2, 0, -12.5], 0.2); // Roble frondoso tras el alero izquierdo
+      await spawn(ASSETS.trees[13], 8.2, [5.2, 0, -12.5], -0.2); // Abedul blanco tras el alero derecho
+      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -14.0], 0.1);   // Roble majestuoso elevándose tras la cumbrera
+
       // Guía rúnica flotante de bienvenida Vermelho Bradesco
       const guideGem = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.32, 0),
@@ -2791,6 +2798,13 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       g.add(campfire);
       await spawn(ASSETS.polyfork.campfireCookTripod, 1.30, [-0.5, 0, 1.8], 0);
       await spawn(ASSETS.polyfork.firewoodStack, 0.55, [-2.2, 0, 1.8], 0.1);
+
+      // 6. Arboleda de fondo y flancos enmarcando el puesto militar (CERO colisión con tiendas o atalaya)
+      await spawn(ASSETS.trees[13], 8.5, [0.0, 0, -12.5], 0.2);  // Abedul blanco majestuoso en el fondo central
+      await spawn(ASSETS.trees[14], 8.5, [-8.5, 0, -6.5], 0.1);  // Pino alto tras la atalaya
+      await spawn(ASSETS.trees[5], 8.8, [8.5, 0, -6.5], -0.3);   // Conífera alta tras la forja
+      await spawn(ASSETS.trees[6], 7.5, [-8.2, 0, 1.5], 0.3);   // Ciprés cónico en el flanco izquierdo
+      await spawn(ASSETS.trees[15], 7.8, [8.2, 0, 1.5], -0.3);  // Roble frondoso en el flanco derecho
 
       const crystal = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.28, 0),
@@ -2851,6 +2865,13 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // 10. Faroles solemnes en el acceso frontal
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.4], 0.3);
       await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.4], -0.3);
+
+      // Arboleda solemne enmarcando la capilla (CERO colisión)
+      await spawn(ASSETS.trees[6], 8.5, [-8.0, 0, -4.5], 0.3);  // Ciprés alto en el flanco izquierdo
+      await spawn(ASSETS.trees[6], 8.5, [8.0, 0, -4.5], -0.3);  // Ciprés alto en el flanco derecho
+      await spawn(ASSETS.trees[13], 8.2, [-5.2, 0, -12.5], 0.2); // Abedul tras el alero
+      await spawn(ASSETS.trees[14], 9.0, [5.2, 0, -12.5], -0.2); // Pino alto tras el alero
+      await spawn(ASSETS.trees[0], 9.2, [0.0, 0, -13.8], 0);    // Roble majestuoso tras el ábside
 
       // Sello flotante místico del Pacto elevado sobre el altar
       const covenantSeal = new THREE.Mesh(
@@ -2920,6 +2941,13 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       // 7. Entrada: Tablón de Avisos de Humand (Turnos, menú diario y reglas del comedor)
       await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [2.0, 0, 2.6], -0.2);
+
+      // Arboleda frondosa del valle enmarcando el granero comedor (CERO colisión con techos o mesas)
+      await spawn(ASSETS.trees[11], 8.2, [-8.2, 0, -4.5], 0.4); // Sauce llorón en el flanco izquierdo
+      await spawn(ASSETS.trees[16], 8.0, [8.2, 0, -4.5], -0.4); // Arce frondoso en el flanco derecho
+      await spawn(ASSETS.trees[13], 8.5, [-5.5, 0, -12.8], 0.2); // Abedul ribereño tras el alero izquierdo
+      await spawn(ASSETS.trees[7], 8.5, [5.5, 0, -12.8], -0.2);  // Álamo cónico tras el alero derecho
+      await spawn(ASSETS.trees[0], 9.5, [0.0, 0, -14.0], 0.1);   // Roble colosal elevándose tras la cumbrera
 
       // Kiosco digital de la App Humand interactivo con halo verde
       const humandTerminal = new THREE.Mesh(
@@ -3015,6 +3043,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // Cajas de suministros y herramientas en el lateral exterior
       await spawn(ASSETS.props.stackedBoxes, 1.1, [6.8, 0, -0.6], 0.3);
 
+      // Arboleda de taiga enmarcando la atalaya y cochera (CERO colisión)
+      await spawn(ASSETS.trees[14], 9.0, [-8.5, 0, -5.5], 0.3); // Pino alto natural
+      await spawn(ASSETS.trees[5], 9.2, [8.5, 0, -5.5], -0.3);  // Pino estilizado alto
+      await spawn(ASSETS.trees[4], 8.2, [0.0, 0, -13.5], 0.1);  // Conífera tras el edificio
+
       // Baliza de emergencia luminosa sobre la torre de vigilancia
       const beaconGem = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.35, 0),
@@ -3063,6 +3096,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       await spawn(ASSETS.props.chest, 0.95, [4.8, 0, -1.2], -0.4);
       await spawn(ASSETS.props.stackedBoxes, 1.0, [-4.8, 0, -1.2], 0.4);
+
+      // Arboleda enmarcando el pabellón comercial (CERO colisión)
+      await spawn(ASSETS.trees[16], 8.0, [-8.5, 0, -4.5], 0.3); // Arce frondoso
+      await spawn(ASSETS.trees[11], 8.0, [8.5, 0, -4.5], -0.3); // Sauce llorón
+      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -13.5], 0.2);  // Roble de fondo
       break;
     }
 
@@ -3098,6 +3136,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       g.add(heritageMemorial);
 
       await spawn(ASSETS.props.chest, 0.9, [-4.4, 0, -1.2], 0.4);
+
+      // Arboleda enmarcando el salón consistorial (CERO colisión)
+      await spawn(ASSETS.trees[6], 8.5, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[13], 8.5, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[16], 9.0, [0.0, 0, -13.0], 0.1);
       break;
     }
 
@@ -3127,6 +3170,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       protocolBoard.position.set(3.2, pbY, 0.9);
       protocolBoard.rotation.y = -0.35;
       g.add(protocolBoard);
+
+      // Arboleda enmarcando el pabellón NPS (CERO colisión)
+      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[7], 8.2, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -13.0], 0.2);
       break;
     }
 
@@ -3157,6 +3205,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       g.add(bookshelves);
 
       await spawn(ASSETS.props.chest, 0.95, [-4.2, 0, -1.2], 0.3);
+
+      // Arboleda de coníferas enmarcando el scriptorium (CERO colisión)
+      await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[5], 8.8, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[4], 8.5, [0.0, 0, -13.0], 0.1);
       break;
     }
 
@@ -3201,6 +3254,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
         brazier.position.set(bx, bY, -1.8);
         g.add(brazier);
       });
+
+      // Arboleda enmarcando el tribunal de ética (CERO colisión)
+      await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[3], 8.5, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[5], 9.0, [0.0, 0, -13.0], 0.1);
       break;
     }
 
@@ -3295,6 +3353,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       bonfire.position.set(3.2, bfY, 0.9);
       bonfire.rotation.y = -0.35;
       g.add(bonfire);
+
+      // Arboleda enmarcando la taberna comunitaria (CERO colisión)
+      await spawn(ASSETS.trees[14], 8.5, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[0], 8.5, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[10], 9.0, [0.0, 0, -13.0], 0.2);
       break;
     }
 
@@ -3314,6 +3377,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       // 2. Mesa de campamento de integración en el lateral izquierdo
       await spawn(ASSETS.props.signingTable, 1.05, [-2.8, 0, 1.2], 0.3);
+
+      // Arboleda de montaña enmarcando la Ruta 90 (CERO colisión)
+      await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[5], 8.8, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[10], 9.0, [0.0, 0, -13.0], 0.1);
       break;
     }
 
@@ -3328,6 +3396,11 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       const unY = getTerrainY(mission.x, mission.z - 0.2);
       unionMonument.position.set(0, unY, -0.2);
       g.add(unionMonument);
+
+      // Arboleda de cumbres enmarcando el salón del sindicato (CERO colisión)
+      await spawn(ASSETS.trees[12], 9.0, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[14], 9.0, [8.5, 0, -4.5], -0.3);
+      await spawn(ASSETS.trees[10], 9.2, [0.0, 0, -13.0], 0.1);
       break;
     }
 
@@ -3351,6 +3424,13 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // Aves vigilantes en las almenas altas
       await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2); // Cuervo sobre almena izquierda
       await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2); // Cuervo sobre almena derecha
+
+      // Arboleda regia enmarcando el Castillo (CERO colisión con murallas ni torres)
+      await spawn(ASSETS.trees[12], 10.5, [-13.5, 0, -5.0], 0.2);
+      await spawn(ASSETS.trees[14], 10.5, [13.5, 0, -5.0], -0.2);
+      await spawn(ASSETS.trees[10], 11.0, [-8.0, 0, -16.5], 0.3);
+      await spawn(ASSETS.trees[5], 11.0, [8.0, 0, -16.5], -0.3);
+      await spawn(ASSETS.trees[0], 12.0, [0.0, 0, -18.0], 0);
       break;
     }
   }
@@ -3477,14 +3557,14 @@ export class ProgressiveWorldStreamer {
 
     const isStationClearing = (x, z) => {
       for (const m of this.missions) {
-        const rad = (m.id === 13) ? 28.0 : 21.0;
+        const rad = (m.id === 13) ? 18.0 : 11.5;
         if (Math.hypot(x - m.x, z - m.z) < rad) return true;
       }
       return false;
     };
 
     const canSpawnAt = (x, z, radius = 2.0) => {
-      // 1. Never spawn inside or near stations (18.5m clear perimeter, 25m en Bastión)
+      // 1. Never spawn inside or near stations (11.5m clear perimeter, 18m en Bastión)
       if (isStationClearing(x, z)) return false;
 
       // 2. Keep clear of the walking trail path
