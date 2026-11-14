@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=192.0.0">
+  <link rel="stylesheet" href="styles.css?v=193.0.0">
   <script type="importmap">
   {
     "imports": {
@@ -605,35 +605,63 @@
     </div>
   </dialog>
 
-  <!-- Modal de Selección de Personaje Directo -->
+  <!-- Modal Reconstruido de Selección y Personalización de Personaje 3D -->
   <dialog id="heroSelectionModal" class="hero-modal-dialog">
     <div class="hero-modal-container">
       <header class="hero-modal-header">
-        <h2 class="hero-modal-title">Selecciona tu Personaje</h2>
+        <div class="hero-modal-header-info">
+          <span class="hero-modal-eyebrow">Estudio de Personajes 3D · Bradesco Expedición</span>
+          <h2 class="hero-modal-title">Constructor de Aventurero</h2>
+        </div>
         <button type="button" class="hero-modal-close" onclick="window.closeHeroSelectionModal()" title="Cerrar ventana">✕</button>
       </header>
 
       <div class="hero-modal-body">
-        <!-- Columna Izquierda: Rejilla de los 8 Arquetipos -->
+        <!-- Columna Izquierda: Arquetipos + Color de Aura -->
         <div class="hero-roster-column">
+          <div class="hero-section-label">
+            <span>1. Elige tu Protagonista</span>
+            <small id="heroRosterCount">8 arquetipos</small>
+          </div>
           <div class="hero-roster-grid" id="modalHeroRosterGrid">
-            <!-- Dynamic 8 Avatar Cards -->
+            <!-- Dynamic 8 Protagonist Cards -->
+          </div>
+
+          <div class="hero-color-section">
+            <div class="hero-section-label">
+              <span>2. Color de Distintivo y Aura</span>
+            </div>
+            <div class="hero-color-grid" id="modalHeroColorGrid">
+              <!-- Dynamic Color Swatches -->
+            </div>
           </div>
         </div>
 
-        <!-- Columna Derecha: Previsualización 3D y Nombre -->
+        <!-- Columna Derecha: Visor 3D Interactivo + Controles de Animación + Registro -->
         <div class="hero-preview-column">
           <div class="hero-preview-box">
             <div class="hero-preview-canvas-wrap" id="heroCanvasWrap">
+              <div class="hero-preview-badge" id="heroPreviewBadge">
+                <strong id="heroPreviewName">Explorador Ágil</strong>
+                <span id="heroPreviewRole">Agilidad & Campo</span>
+              </div>
               <canvas id="heroPreviewCanvas"></canvas>
+              <div class="hero-preview-hint">⟳ Arrastra para girar 360°</div>
             </div>
+
+            <div class="hero-anim-bar" id="heroAnimControls">
+              <button type="button" class="hero-anim-btn active" data-anim="idle" onclick="window.setPreviewAnim('idle')">Reposar</button>
+              <button type="button" class="hero-anim-btn" data-anim="run" onclick="window.setPreviewAnim('run')">Correr</button>
+              <button type="button" class="hero-anim-btn" data-anim="jump" onclick="window.setPreviewAnim('jump')">Saltar</button>
+            </div>
+            <p class="hero-preview-desc" id="heroPreviewDesc">Dinámico, veloz y siempre listo para recorrer nuevas rutas.</p>
           </div>
 
           <!-- Formulario de Registro -->
           <div class="hero-creation-form">
-            <input type="text" id="modalHeroNameInput" class="hero-name-input" placeholder="Nombre de tu Aventurero..." maxlength="24" autocomplete="off" onkeydown="if(event.key==='Enter')window.confirmHeroCreation()">
+            <input type="text" id="modalHeroNameInput" class="hero-name-input" placeholder="Escribe el nombre de tu Aventurero..." maxlength="24" autocomplete="off" onkeydown="if(event.key==='Enter')window.confirmHeroCreation()">
             <button type="button" id="modalConfirmHeroBtn" class="hero-confirm-btn" onclick="window.confirmHeroCreation()">
-              <span>Elegir Personaje</span>
+              <span>Agregar Aventurero al Mapa</span>
             </button>
           </div>
         </div>
@@ -641,7 +669,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="main.js?v=216.0.0"></script>
+  <script type="module" src="main.js?v=218.0.0"></script>
 </body>
 </html>
 

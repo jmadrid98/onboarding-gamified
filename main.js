@@ -2,7 +2,7 @@ import * as THREE from './vendor/three/build/three.module.js';
 window.THREE = THREE;
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 import { Sky } from './vendor/three/examples/jsm/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=216.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=218.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -2627,6 +2627,8 @@ renderer.domElement.addEventListener('pointerup', e => {
 });
 
 let selectedRegisterAvatar = 'ranger';
+let selectedRegisterColor = '#cc092f';
+let modalPreviewAnimName = 'idle';
 
 function renderAvatarPickerGrid() {
   const container = document.getElementById('avatarPickerGrid');
@@ -2656,6 +2658,7 @@ let modalPreviewCamera = null;
 let modalPreviewHero = null;
 let modalPreviewPlinth = null;
 let modalPreviewAnimId = null;
+let modalPreviewLastTime = 0;
 let modalUserDragging = false;
 let modalDragStartX = 0;
 let modalManualAngle = 0;
@@ -2664,8 +2667,8 @@ function initModalHeroPreview3D() {
   const canvas = document.getElementById('heroPreviewCanvas');
   if (!canvas) return;
 
-  const width = canvas.parentElement?.clientWidth || 320;
-  const height = canvas.parentElement?.clientHeight || 230;
+  const width = canvas.parentElement?.clientWidth || 360;
+  const height = canvas.parentElement?.clientHeight || 268;
 
   if (!modalPreviewRenderer) {
     modalPreviewRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
@@ -2677,30 +2680,30 @@ function initModalHeroPreview3D() {
     modalPreviewScene = new THREE.Scene();
 
     modalPreviewCamera = new THREE.PerspectiveCamera(28, width / height, 0.1, 20);
-    modalPreviewCamera.position.set(0, 0.68, 2.6);
-    modalPreviewCamera.lookAt(0, 0.58, 0);
+    modalPreviewCamera.position.set(0, 0.78, 2.75);
+    modalPreviewCamera.lookAt(0, 0.60, 0);
 
     // Studio Quality Multi-Point Lighting
-    const amb = new THREE.AmbientLight(0xffffff, 1.8);
-    const key = new THREE.DirectionalLight(0xffffff, 2.5);
-    key.position.set(2, 4, 3);
-    const fillFront = new THREE.DirectionalLight(0xfff5ea, 1.6);
+    const amb = new THREE.AmbientLight(0xffffff, 1.85);
+    const key = new THREE.DirectionalLight(0xffffff, 2.4);
+    key.position.set(2.2, 4, 3);
+    const fillFront = new THREE.DirectionalLight(0xfff5ea, 1.5);
     fillFront.position.set(0, 2, 4);
-    const rim = new THREE.DirectionalLight(0x00f0ff, 2.0);
+    const rim = new THREE.DirectionalLight(0x38bdf8, 1.8);
     rim.position.set(-3, 3, -2);
-    const warmBounce = new THREE.PointLight(0xff8844, 1.2, 6);
+    const warmBounce = new THREE.PointLight(0xff8844, 1.0, 6);
     warmBounce.position.set(0, 0.2, 1.8);
 
     modalPreviewScene.add(amb, key, fillFront, rim, warmBounce);
 
     // Ornate Pedestal
-    const plinthMat = new THREE.MeshStandardMaterial({ color: 0x242b35, roughness: 0.85 });
-    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.50, 0.08, 28), plinthMat);
+    const plinthMat = new THREE.MeshStandardMaterial({ color: 0x242b35, roughness: 0.82, metalness: 0.15 });
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.54, 0.08, 32), plinthMat);
     plinth.position.y = 0.04;
     modalPreviewScene.add(plinth);
 
-    const runeRingMat = new THREE.MeshStandardMaterial({ color: 0xcc092f, emissive: 0xcc092f, emissiveIntensity: 2.8 });
-    modalPreviewPlinth = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.016, 8, 36), runeRingMat);
+    const runeRingMat = new THREE.MeshStandardMaterial({ color: 0xcc092f, emissive: 0xcc092f, emissiveIntensity: 2.6 });
+    modalPreviewPlinth = new THREE.Mesh(new THREE.TorusGeometry(0.48, 0.018, 10, 40), runeRingMat);
     modalPreviewPlinth.rotation.x = Math.PI / 2;
     modalPreviewPlinth.position.y = 0.082;
     modalPreviewScene.add(modalPreviewPlinth);
@@ -2740,11 +2743,21 @@ function initModalHeroPreview3D() {
   }
 }
 
+function updateModalPreviewInfo(preset) {
+  const nameEl = document.getElementById('heroPreviewName');
+  const roleEl = document.getElementById('heroPreviewRole');
+  const descEl = document.getElementById('heroPreviewDesc');
+  if (nameEl) nameEl.textContent = preset.name;
+  if (roleEl) roleEl.textContent = preset.role;
+  if (descEl) descEl.textContent = preset.desc || '';
+}
+
 function updateModalHeroPreview3D(avatarId) {
   initModalHeroPreview3D();
   if (!modalPreviewScene) return;
 
   const preset = AVATAR_PRESETS.find(a => a.id === avatarId) || AVATAR_PRESETS[0];
+  updateModalPreviewInfo(preset);
 
   // Swap 3D Model
   if (modalPreviewHero) {
@@ -2752,36 +2765,42 @@ function updateModalHeroPreview3D(avatarId) {
     modalPreviewHero = null;
   }
 
-  modalManualAngle = 0; // Reset angle to face forward
+  modalManualAngle = 0;
 
-  modalPreviewHero = createHeroModel(preset.id, preset.primaryColor || '#cc092f');
+  modalPreviewHero = createHeroModel(preset.id, selectedRegisterColor || preset.primaryColor || '#cc092f', {
+    targetHeight: 1.15,
+    initialAnim: modalPreviewAnimName
+  });
   modalPreviewHero.position.set(0, 0.08, 0);
   modalPreviewHero.rotation.y = 0;
   modalPreviewScene.add(modalPreviewHero);
 
   if (modalPreviewPlinth && modalPreviewPlinth.material) {
-    const col = new THREE.Color(preset.primaryColor || '#cc092f');
-    modalPreviewPlinth.material.color = col;
-    modalPreviewPlinth.material.emissive = col;
+    const col = new THREE.Color(selectedRegisterColor || preset.primaryColor || '#cc092f');
+    modalPreviewPlinth.material.color.copy(col);
+    modalPreviewPlinth.material.emissive.copy(col);
   }
 
-  // Animation Loop with Interactive Drag + Front-Facing Heroic Sway
+  // Animation Loop with real FBX AnimationMixer + Interactive Drag
   if (!modalPreviewAnimId) {
+    modalPreviewLastTime = performance.now();
     function animatePreview(time) {
+      const dt = Math.min(0.05, Math.max(0.001, (time - modalPreviewLastTime) * 0.001));
+      modalPreviewLastTime = time;
       const sec = time * 0.001;
+
       if (modalPreviewHero) {
         if (modalUserDragging) {
           modalPreviewHero.rotation.y = modalManualAngle;
         } else {
-          // Gentle heroic front-facing sway showcase
-          modalPreviewHero.rotation.y = modalManualAngle + Math.sin(sec * 1.0) * 0.35;
+          modalPreviewHero.rotation.y = modalManualAngle + Math.sin(sec * 0.85) * 0.28;
         }
         if (modalPreviewHero.userData && typeof modalPreviewHero.userData.update === 'function') {
-          modalPreviewHero.userData.update(sec, false);
+          modalPreviewHero.userData.update(dt);
         }
       }
       if (modalPreviewPlinth) {
-        modalPreviewPlinth.rotation.z = -sec * 0.4;
+        modalPreviewPlinth.rotation.z = -sec * 0.45;
       }
       if (modalPreviewRenderer && modalPreviewScene && modalPreviewCamera) {
         modalPreviewRenderer.render(modalPreviewScene, modalPreviewCamera);
@@ -2797,6 +2816,16 @@ function updateModalHeroPreview3D(avatarId) {
   }
 }
 
+window.setPreviewAnim = function(animName) {
+  modalPreviewAnimName = animName || 'idle';
+  document.querySelectorAll('#heroAnimControls .hero-anim-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.anim === modalPreviewAnimName);
+  });
+  if (modalPreviewHero?.userData?.playAnimation) {
+    modalPreviewHero.userData.playAnimation(modalPreviewAnimName);
+  }
+};
+
 function renderModalHeroRoster() {
   const container = document.getElementById('modalHeroRosterGrid');
   if (!container) return;
@@ -2804,17 +2833,47 @@ function renderModalHeroRoster() {
     const isSelected = preset.id === selectedRegisterAvatar;
     return `
       <div class="hero-roster-card ${isSelected ? 'active' : ''}" onclick="window.selectModalHero('${preset.id}')" title="${preset.name}">
-        <span class="hero-roster-avatar">${preset.iconSvg || ''}</span>
-        <span class="hero-roster-name">${preset.name}</span>
+        <span class="hero-roster-avatar" style="border-color:${preset.primaryColor}66;background:${preset.primaryColor}22;color:${preset.primaryColor}">${preset.iconSvg || ''}</span>
+        <div class="hero-roster-info">
+          <span class="hero-roster-name">${preset.name}</span>
+          <span class="hero-roster-role">${preset.role}</span>
+        </div>
       </div>
     `;
   }).join('');
 }
 
+function renderModalHeroColorPicker() {
+  const container = document.getElementById('modalHeroColorGrid');
+  if (!container) return;
+  const palette = ['#cc092f', ...colors];
+  container.innerHTML = palette.map(hex => {
+    const isSelected = hex.toLowerCase() === (selectedRegisterColor || '').toLowerCase();
+    return `<button type="button" class="hero-color-swatch ${isSelected ? 'active' : ''}" style="background:${hex}" onclick="window.selectModalHeroColor('${hex}')" title="Color ${hex}"></button>`;
+  }).join('');
+}
+
+window.selectModalHeroColor = function(colorHex) {
+  selectedRegisterColor = colorHex;
+  renderModalHeroColorPicker();
+  if (modalPreviewPlinth && modalPreviewPlinth.material) {
+    const col = new THREE.Color(colorHex);
+    modalPreviewPlinth.material.color.copy(col);
+    modalPreviewPlinth.material.emissive.copy(col);
+  }
+};
+
 window.openHeroSelectionModal = function() {
   const modal = document.getElementById('heroSelectionModal');
   if (!modal) return;
+  const preset = AVATAR_PRESETS.find(a => a.id === selectedRegisterAvatar) || AVATAR_PRESETS[0];
+  if (!selectedRegisterColor) selectedRegisterColor = preset.primaryColor || '#cc092f';
+  modalPreviewAnimName = 'idle';
+  document.querySelectorAll('#heroAnimControls .hero-anim-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.anim === 'idle');
+  });
   renderModalHeroRoster();
+  renderModalHeroColorPicker();
   if (typeof modal.showModal === 'function') {
     modal.showModal();
   } else {
@@ -2844,7 +2903,12 @@ window.closeHeroSelectionModal = function() {
 
 window.selectModalHero = function(avatarId) {
   selectedRegisterAvatar = avatarId;
+  const preset = AVATAR_PRESETS.find(a => a.id === avatarId);
+  if (preset?.primaryColor) {
+    selectedRegisterColor = preset.primaryColor;
+  }
   renderModalHeroRoster();
+  renderModalHeroColorPicker();
   updateModalHeroPreview3D(avatarId);
   renderAvatarPickerGrid();
 };
@@ -2858,11 +2922,11 @@ window.confirmHeroCreation = function() {
     return;
   }
   inp.value = '';
-  addParticipant(val, selectedRegisterAvatar);
+  addParticipant(val, selectedRegisterAvatar, selectedRegisterColor);
   window.closeHeroSelectionModal();
 };
 
-function addParticipant(name, avatarId = null) {
+function addParticipant(name, avatarId = null, customColor = null) {
   const n = String(name || '').trim();
   if (!n) {
     alert('Por favor escribe el nombre de un participante.');
@@ -2875,7 +2939,7 @@ function addParticipant(name, avatarId = null) {
     id,
     name: n,
     initials: initials(n),
-    color: colors[(id - 1) % colors.length],
+    color: customColor || colors[(id - 1) % colors.length],
     avatarId: chosenAvatar,
     points: 0,
     missionId: current
@@ -4333,22 +4397,13 @@ function loop() {
     }
   });
 
-  // Idle organic animation, rotating plinth ring & crystals
+  // Animated Kenney FBX characters, rotating plinth ring & team crystals
   anim.players.forEach(a => {
     const u = a.userData;
     if (!u) return;
 
-    // Organic breathing bob
-    if (u.bodyBob) {
-      u.bodyBob.position.y = 0.88 + Math.sin(t * 2.8 + (u.phase || 0)) * 0.025;
-    }
-    // Cape gentle sway
-    if (u.capeGroup) {
-      u.capeGroup.rotation.x = -0.14 + Math.sin(t * 3.2 + (u.phase || 0)) * 0.06;
-    }
-    // Feather plume flutter
-    if (u.plumeGroup) {
-      u.plumeGroup.rotation.z = Math.sin(t * 4.0 + (u.phase || 0)) * 0.08;
+    if (u.heroModel?.userData?.update) {
+      u.heroModel.userData.update(dt);
     }
     // Rotating magic team rune ring on plinth
     if (u.runeRing) {
@@ -4357,7 +4412,7 @@ function loop() {
     // Floating team gem rotation & pulse
     if (u.gem) {
       u.gem.rotation.y += dt * 1.6;
-      u.gem.position.y = 1.30 + Math.sin(t * 3.0 + (u.phase || 0)) * 0.03;
+      u.gem.position.y = 1.28 + Math.sin(t * 3.0 + (u.phase || 0)) * 0.03;
     }
   });
 
