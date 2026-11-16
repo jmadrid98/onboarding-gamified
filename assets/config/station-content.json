@@ -1,0 +1,226 @@
+{
+  "stations": {
+    "1": {
+      "items": [
+        {
+          "id": "cap_1_1",
+          "order": 1,
+          "type": "video",
+          "title": "Orientación del Onboarding",
+          "file": "assets/media/station_01/01_Introduccion.mp4",
+          "desc": "Cápsula de Video · Bienvenida y ruta general de la aventura",
+          "badge": "Video",
+          "xp": 40
+        },
+        {
+          "id": "cap_1_2",
+          "order": 2,
+          "type": "video",
+          "title": "Ruta y Metas de la Expedición",
+          "file": "assets/media/station_01/02_Detalles.mp4",
+          "desc": "Cápsula de Video · Dinámicas, puntuación y estaciones",
+          "badge": "Video",
+          "xp": 40
+        },
+        {
+          "id": "eval_1_mid",
+          "type": "eval",
+          "isEval": true,
+          "evalType": "mid",
+          "title": "Evaluación Intermedia: Orientación Onboarding",
+          "question": "¿Cuál es el objetivo principal de este recorrido gamificado de Onboarding?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Conocer de manera dinámica la cultura, herramientas, procesos y equipo de Bradesco México."
+            },
+            {
+              "id": "B",
+              "text": "Completar tareas sin leer las instrucciones del facilitador."
+            },
+            {
+              "id": "C",
+              "text": "Competir individualmente sin colaborar con los compañeros de expedición."
+            },
+            {
+              "id": "D",
+              "text": "Evitar el uso de las plataformas corporativas."
+            }
+          ],
+          "correct": "A",
+          "explanation": "El onboarding gamificado permite familiarizarse con todos los aspectos clave de Bradesco de forma colaborativa y memorable.",
+          "xp": 50
+        }
+      ]
+    },
+    "2": {
+      "items": [
+        {
+          "id": "ensala_2_1",
+          "order": 1,
+          "type": "ensala",
+          "title": "Entrega de Equipos en Sala",
+          "desc": "Entrega presencial del kit tecnológico corporativo y credencial",
+          "badge": "En Sala",
+          "protocol": "El facilitador y el equipo de IT harán entrega formal de tus herramientas de trabajo en la sala. Por favor verifica que tu laptop encienda correctamente, que tu credencial física funcione en los accesos y que recibas tu cargador y kit de bienvenida.",
+          "keypoints": [
+            "Laptop corporativa configurada con antivirus y perfil de seguridad",
+            "Credencial física de acceso al edificio y oficinas corporativas",
+            "Periféricos tech (cargador de corriente, mouse y adaptadores)",
+            "Kit de bienvenida institucional Bradesco"
+          ],
+          "xp": 50
+        },
+        {
+          "id": "chk_2_1",
+          "order": 2,
+          "type": "checklist",
+          "isChecklist": true,
+          "title": "Checklist de Verificación de Equipos",
+          "subtitle": "Comprobación de herramientas recibidas",
+          "desc": "Valida junto al facilitador cada uno de los elementos entregados en sala.",
+          "xp": 40,
+          "items": [
+            {
+              "key": "eq_lap",
+              "num": "01",
+              "title": "Laptop Corporativa",
+              "desc": "Equipo encendido y acceso al sistema operativo comprobado",
+              "checkText": "Laptop verificada y funcionando"
+            },
+            {
+              "key": "eq_cred",
+              "num": "02",
+              "title": "Credencial Física",
+              "desc": "Tarjeta de acceso corporativa probada en lectores del edificio",
+              "checkText": "Credencial activa y asignada"
+            },
+            {
+              "key": "eq_peri",
+              "num": "03",
+              "title": "Periféricos Tech",
+              "desc": "Cargador de corriente original y cables de conexión",
+              "checkText": "Periféricos completos en estuche"
+            },
+            {
+              "key": "eq_kit",
+              "num": "04",
+              "title": "Kit de Bienvenida",
+              "desc": "Material institucional, libreta, pluma y distintivos",
+              "checkText": "Kit de bienvenida recibido"
+            }
+          ]
+        }
+      ]
+    },
+    "3": {
+      "items": [
+        {
+          "id": "ensala_3_1",
+          "order": 1,
+          "type": "ensala",
+          "title": "Firma de Contrato y Beneficios",
+          "desc": "Formalización legal del pacto laboral y alta de expediente en sala",
+          "badge": "En Sala",
+          "protocol": "Revisión y firma física autógrafa de los documentos contractuales con el equipo de Recursos Humanos. Se entregará copia de tu contrato individual de trabajo y se detallará la póliza de seguro de gastos médicos mayores, vales de despensa y prestaciones superiores a la ley.",
+          "keypoints": [
+            "Firma física autógrafa del contrato individual de trabajo por tiempo indeterminado",
+            "Alta formal ante el IMSS y conformación de expediente laboral corporativo",
+            "Explicación a detalle del paquete de beneficios y prestaciones superiores",
+            "Póliza de seguro de gastos médicos mayores, seguro de vida y vales de despensa"
+          ],
+          "xp": 60
+        },
+        {
+          "id": "doc_3_1",
+          "order": 2,
+          "type": "image",
+          "title": "Catálogo de Beneficios y Prestaciones",
+          "file": "assets/media/station_01/03_Descrubre los beneficios.png",
+          "desc": "Infografía Visual · Resumen de prestaciones corporativas",
+          "badge": "Infografía",
+          "xp": 40
+        }
+      ]
+    },
+    "4": {
+      "items": [
+        {
+          "id": "ensala_4_1",
+          "order": 1,
+          "type": "ensala",
+          "title": "Círculo de Bienvenida & Integración",
+          "desc": "Dinámica grupal de presentación e integración en sala",
+          "badge": "En Sala",
+          "protocol": "Dinámica presencial en sala con todo el grupo: ronda de bienvenida, presentación de cada nuevo aventurero compartiendo su rol y lo que más le entusiasma de integrarse a Bradesco, seguido de la explicación detallada de la agenda del día.",
+          "keypoints": [
+            "Bienvenida formal al grupo y rompehielos de integración",
+            "Presentaciones breves: nombre, área, rol y aficiones personales",
+            "Conversación guiada: ¿Qué es lo que más te entusiasma de tu nueva etapa?",
+            "Explicación de la agenda del día y resolución de dudas iniciales"
+          ],
+          "xp": 50
+        }
+      ]
+    },
+    "5": {
+      "items": [
+        {
+          "id": "cap_5_1",
+          "order": 1,
+          "type": "video",
+          "title": "Historia y Propósito de Bradesco",
+          "file": "assets/media/station_01/01_Introduccion.mp4",
+          "desc": "Cápsula de Video · Origen, trayectoria y pilares estratégicos",
+          "badge": "Video",
+          "xp": 45
+        },
+        {
+          "id": "ensala_5_1",
+          "order": 2,
+          "type": "ensala",
+          "title": "Cultura, Valores y Diálogo en Sala",
+          "desc": "Sesión presencial de profundización cultural con el facilitador",
+          "badge": "En Sala",
+          "protocol": "Espacio presencial conducido por el facilitador en sala para profundizar en la cultura corporativa, los pilares estratégicos de la compañía y responder preguntas sobre nuestra visión compartida.",
+          "keypoints": [
+            "Pilares estratégicos y valores que orientan nuestro trabajo diario",
+            "Trayectoria y liderazgo de Bradesco en el sector financiero",
+            "Compromiso con la experiencia de nuestros clientes y el talento interno",
+            "Sesión de diálogo abierto y preguntas con el facilitador en sala"
+          ],
+          "xp": 45
+        },
+        {
+          "id": "eval_5_mid",
+          "type": "eval",
+          "isEval": true,
+          "evalType": "mid",
+          "title": "Evaluación: Pilares y Cultura Bradesco",
+          "question": "¿Qué valor refleja de manera prioritaria el actuar ético y el compromiso con nuestros clientes?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Integridad, transparencia y enfoque centrado en las personas."
+            },
+            {
+              "id": "B",
+              "text": "Buscar atajos sin considerar las políticas de cumplimiento."
+            },
+            {
+              "id": "C",
+              "text": "Trabajar de forma aislada sin comunicación con el equipo."
+            },
+            {
+              "id": "D",
+              "text": "Desatender los comentarios y necesidades de los usuarios."
+            }
+          ],
+          "correct": "A",
+          "explanation": "La integridad y el enfoque en las personas son los pilares fundamentales que guían cada decisión en Bradesco México.",
+          "xp": 50
+        }
+      ]
+    }
+  }
+}

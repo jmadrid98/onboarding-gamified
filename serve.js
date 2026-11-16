@@ -32,6 +32,138 @@ const MIME = {
 const server = http.createServer((req, res) => {
   let reqPath = decodeURIComponent(req.url.split('?')[0]);
   if (reqPath === '/' || reqPath === '') reqPath = '/index.html';
+
+  // API Content: GET /api/content
+  if (reqPath === '/api/content' && req.method === 'GET') {
+    const configPath = path.join(ROOT, 'assets', 'config', 'station-content.json');
+    if (fs.existsSync(configPath)) {
+      const data = fs.readFileSync(configPath, 'utf8');
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end(data);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end(JSON.stringify({ success: true, custom: false, stations: {} }));
+    }
+  }
+
+  // API Content Save: POST /api/content/save
+  if (reqPath === '/api/content/save' && (req.method === 'POST' || req.method === 'PUT')) {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const parsed = JSON.parse(body);
+        const configDir = path.join(ROOT, 'assets', 'config');
+        if (!fs.existsSync(configDir)) {
+          fs.mkdirSync(configDir, { recursive: true });
+        }
+        const configPath = path.join(configDir, 'station-content.json');
+        fs.writeFileSync(configPath, JSON.stringify(parsed, null, 2), 'utf8');
+        res.writeHead(200, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Access-Control-Allow-Origin': '*'
+        });
+        return res.end(JSON.stringify({ success: true, message: 'Configuración guardada exitosamente en disco' }));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Access-Control-Allow-Origin': '*'
+        });
+        return res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // API Media Catalog: GET /api/media/catalog
+  if (reqPath === '/api/media/catalog' && req.method === 'GET') {
+    const mediaRoot = path.join(ROOT, 'assets', 'media');
+    const catalog = [];
+    if (fs.existsSync(mediaRoot)) {
+      const scanDir = (dir, relPath = '') => {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.name.startsWith('.') || entry.name.toLowerCase() === 'desktop.ini') continue;
+          const fullEntryPath = path.join(dir, entry.name);
+          const currentRelPath = relPath ? `${relPath}/${entry.name}` : entry.name;
+          if (entry.isDirectory()) {
+            scanDir(fullEntryPath, currentRelPath);
+          } else if (entry.isFile()) {
+            const ext = path.extname(entry.name).toLowerCase();
+            let type = 'file';
+            if (['.mp4', '.webm', '.mov', '.m4v'].includes(ext)) type = 'video';
+            else if (['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg'].includes(ext)) type = 'image';
+            else if (ext === '.pdf') type = 'pdf';
+            catalog.push({
+              name: entry.name,
+              relativePath: `assets/media/${currentRelPath}`,
+              folder: relPath || 'raiz',
+              type,
+              ext
+            });
+          }
+        }
+      };
+      scanDir(mediaRoot);
+    }
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Access-Control-Allow-Origin': '*'
+    });
+    return res.end(JSON.stringify(catalog, null, 2));
+  }
+
+  // API Media Upload: POST /api/media/upload
+  if (reqPath === '/api/media/upload' && req.method === 'POST') {
+    const rawFileName = req.headers['x-filename'] || 'archivo_cargado.mp4';
+    const decodedFileName = decodeURIComponent(rawFileName).replace(/[^a-zA-Z0-9._\-]/g, '_');
+    const stationIdNum = parseInt(req.headers['x-station-id'] || '1', 10) || 1;
+    const stationFolder = 'station_' + String(stationIdNum).padStart(2, '0');
+    const targetDir = path.join(ROOT, 'assets', 'media', stationFolder);
+
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    const targetFilePath = path.join(targetDir, decodedFileName);
+    const writeStream = fs.createWriteStream(targetFilePath);
+
+    req.pipe(writeStream);
+
+    writeStream.on('finish', () => {
+      const relPath = 'assets/media/' + stationFolder + '/' + decodedFileName;
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(JSON.stringify({
+        success: true,
+        relativePath: relPath,
+        name: decodedFileName,
+        stationId: stationIdNum
+      }));
+    });
+
+    writeStream.on('error', (err) => {
+      res.writeHead(500, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(JSON.stringify({ success: false, error: err.message }));
+    });
+    return;
+  }
+
+  // API Station Media: GET /api/media
   if (reqPath === '/api/media') {
     const mediaRoot = path.join(ROOT, 'assets', 'media');
     const result = {};
@@ -51,8 +183,7 @@ const server = http.createServer((req, res) => {
         for (const file of files) {
           const ext = path.extname(file).toLowerCase();
           let type = 'file';
-          let badge = '📄 Archivo';
-          let icon = '📄';
+          let badge = 'Archivo';
           let category = 'Documento';
 
           if (['.mp4', '.webm', '.mov', '.m4v'].includes(ext)) {

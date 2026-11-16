@@ -1,93 +1,52 @@
 import * as THREE from './vendor/three/build/three.module.js';
 import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
-import { FBXLoader } from './vendor/three/examples/jsm/loaders/FBXLoader.js';
 import { clone as cloneSkeleton } from './vendor/three/examples/jsm/utils/SkeletonUtils.js';
 
 const loader = new GLTFLoader();
-const fbxLoader = new FBXLoader();
 const modelCache = new Map();
 
-let cachedCharacterFBX = null;
-const cachedCharacterAnims = { idle: null, run: null, jump: null };
-const skinTextureMap = new Map();
+const POLYFORK_CHAR_BASE = './assets/polyfork';
+const POLYFORK_CHAR_FILES = {
+  knight: `${POLYFORK_CHAR_BASE}/armoured-knight-hero-07121f.glb`,
+  mage: `${POLYFORK_CHAR_BASE}/hooded-cultist-8a488f.glb`,
+  barbarian: `${POLYFORK_CHAR_BASE}/dragon-slayer-91ab39.glb`,
+  rogue: `${POLYFORK_CHAR_BASE}/forest-ranger-6906b0.glb`,
+  guard: `${POLYFORK_CHAR_BASE}/village-guard-5f0f6f.glb`,
+  merchant: `${POLYFORK_CHAR_BASE}/merchant-6f606b.glb`,
+  tradesman: `${POLYFORK_CHAR_BASE}/tradesman-1707b9.glb`,
+  mountaineer: `${POLYFORK_CHAR_BASE}/mountaineer-13df29.glb`
+};
+
+const cachedPolyforkChars = new Map();
 let characterLoadPromise = null;
 
 export const BRAND_PALETTE = {
   red: 0xcc092f,
-  darkRed: 0x8a0620,
+  darkRed: 0x900f15,
   silver: 0xe2e8f0,
   white: 0xffffff
 };
 
-const KENNEY_CHAR_BASE = './assets/library/kenney_animated_characters_protagonists';
-
-const SKIN_FILES = {
-  skaterMale: `${KENNEY_CHAR_BASE}/Skins/skaterMaleA.png`,
-  skaterFemale: `${KENNEY_CHAR_BASE}/Skins/skaterFemaleA.png`,
-  cyborgFemale: `${KENNEY_CHAR_BASE}/Skins/cyborgFemaleA.png`,
-  criminalMale: `${KENNEY_CHAR_BASE}/Skins/criminalMaleA.png`
-};
-
-function loadFbxSafe(path) {
+function loadGltfCharSafe(path) {
   return new Promise(resolve => {
-    fbxLoader.load(path, resolve, undefined, err => {
-      console.warn('Error cargando FBX:', path, err);
+    loader.load(path, resolve, undefined, err => {
+      console.warn('Error cargando personaje Polyfork:', path, err);
       resolve(null);
     });
   });
-}
-
-function loadTextureSafe(path) {
-  return new Promise(resolve => {
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(
-      path,
-      tex => {
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.flipY = true;
-        resolve(tex);
-      },
-      undefined,
-      err => {
-        console.warn('Error cargando textura de skin:', path, err);
-        resolve(null);
-      }
-    );
-  });
-}
-
-function pickMainAnimClip(fbx, preferredName) {
-  const clips = fbx?.animations || [];
-  if (!clips.length) return null;
-  return (
-    clips.find(c => c.name.toLowerCase().includes(preferredName) && c.duration > 0.1) ||
-    clips.find(c => !c.name.toLowerCase().includes('targeting') && c.duration > 0.1) ||
-    clips.reduce((best, c) => (c.duration > best.duration ? c : best), clips[0])
-  );
 }
 
 export function loadCharacterModel() {
   if (characterLoadPromise) return characterLoadPromise;
 
   characterLoadPromise = (async () => {
-    const [fbx, idleFbx, runFbx, jumpFbx, ...loadedSkins] = await Promise.all([
-      loadFbxSafe(`${KENNEY_CHAR_BASE}/Model/characterMedium.fbx`),
-      loadFbxSafe(`${KENNEY_CHAR_BASE}/Animations/idle.fbx`),
-      loadFbxSafe(`${KENNEY_CHAR_BASE}/Animations/run.fbx`),
-      loadFbxSafe(`${KENNEY_CHAR_BASE}/Animations/jump.fbx`),
-      ...Object.entries(SKIN_FILES).map(async ([key, path]) => [key, await loadTextureSafe(path)])
-    ]);
-
-    if (fbx) cachedCharacterFBX = fbx;
-    cachedCharacterAnims.idle = pickMainAnimClip(idleFbx, 'idle');
-    cachedCharacterAnims.run = pickMainAnimClip(runFbx, 'run');
-    cachedCharacterAnims.jump = pickMainAnimClip(jumpFbx, 'jump');
-
-    loadedSkins.forEach(([key, tex]) => {
-      if (tex) skinTextureMap.set(key, tex);
+    const entries = await Promise.all(
+      Object.entries(POLYFORK_CHAR_FILES).map(async ([key, path]) => [key, await loadGltfCharSafe(path)])
+    );
+    entries.forEach(([key, gltf]) => {
+      if (gltf) cachedPolyforkChars.set(key, gltf);
     });
-
-    return { model: cachedCharacterFBX, anims: cachedCharacterAnims };
+    return cachedPolyforkChars;
   })();
 
   return characterLoadPromise;
@@ -239,10 +198,9 @@ const ASSETS = {
     './assets/polyfork/bush-8bb596.glb',                // 1: Arbusto silvestre verde denso con ramas
     './assets/polyfork/fern-plant-1559b8.glb',           // 2: Helecho silvestre verde vivo 3D
     './assets/polyfork/grass-tuft-a40a08.glb',          // 3: Mechón de hierba natural verde 3D
-    './assets/polyfork/round-bush-cd2ac0.glb',          // 4: Arbusto globular verde vivo frondoso
-    './assets/polyfork/bush-8bb596.glb',                // 5: Arbusto silvestre verde denso
-    './assets/polyfork/fern-plant-1559b8.glb',           // 6: Helecho silvestre verde vivo 3D
-    './assets/polyfork/grass-tuft-a40a08.glb'           // 7: Mechón de hierba natural verde 3D
+    './assets/polyfork/wildflower-68d3a1.glb',          // 4: Flores silvestres campestres 3D
+    './assets/polyfork/azalea-bush-7bb14d.glb',         // 5: Arbusto en flor azalea 3D
+    './assets/polyfork/berry-bush-ee4812.glb'           // 6: Arbusto silvestre con bayas rojas 3D
   ],
   rocks: [
     './assets/stylized/nature/Rock_1_A_Color1.gltf',     // 0: Peñasco de roca estilizada A
@@ -693,7 +651,7 @@ function createFireHoseCabinet() {
   sctx.fillStyle = '#ffffff';
   sctx.fillRect(0, 0, 256, 48);
   sctx.fillStyle = '#c0392b';
-  sctx.font = 'bold 22px sans-serif';
+  sctx.font = 'bold 22px BradescoSans, sans-serif';
   sctx.textAlign = 'center';
   sctx.fillText('INCENDIO / HOSE', 128, 32);
   const signTex = new THREE.CanvasTexture(signCanvas);
@@ -754,7 +712,7 @@ function createParkingSign() {
   ctx.stroke();
 
   ctx.fillStyle = '#ffffff';
-  ctx.font = '900 160px sans-serif';
+  ctx.font = '900 160px BradescoSans, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('P', 128, 128);
@@ -791,10 +749,10 @@ function createSpeedLimitSign() {
   ctx.stroke();
 
   ctx.fillStyle = '#2c3e50';
-  ctx.font = '900 90px sans-serif';
+  ctx.font = '900 90px BradescoSans, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('10', 128, 130);
-  ctx.font = 'bold 30px sans-serif';
+  ctx.font = 'bold 30px BradescoSans, sans-serif';
   ctx.fillText('km/h', 128, 175);
 
   const tex = new THREE.CanvasTexture(canvas);
@@ -828,7 +786,7 @@ function createFireExtinguisher() {
   sctx.fillStyle = '#c0392b';
   sctx.fillRect(0, 0, 128, 40);
   sctx.fillStyle = '#ffffff';
-  sctx.font = 'bold 18px sans-serif';
+  sctx.font = 'bold 18px BradescoSans, sans-serif';
   sctx.textAlign = 'center';
   sctx.fillText('EXTINTOR', 64, 26);
   const signTex = new THREE.CanvasTexture(signCanvas);
@@ -1035,7 +993,7 @@ function createParkingStalls() {
     numCanvas.height = 128;
     const nctx = numCanvas.getContext('2d');
     nctx.fillStyle = '#f1c40f';
-    nctx.font = 'bold 90px sans-serif';
+    nctx.font = 'bold 90px BradescoSans, sans-serif';
     nctx.textAlign = 'center';
     nctx.textBaseline = 'middle';
     nctx.fillText(String(i + 1), 64, 64);
@@ -1195,62 +1153,6 @@ function createCosmosVIPPedestal() {
     rope.rotation.y = -ang;
     g.add(rope);
   }
-
-  // 2. Tarjeta Cosmos VIP Flotante (Emblema de Beneficios Corporativos)
-  const cardGroup = new THREE.Group();
-  cardGroup.position.y = 1.70;
-
-  // Tarjeta principal (proporción ID-1 85.6mm x 54mm -> 1.45 x 0.92)
-  const cardMesh = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.92, 0.04), cardBodyMat);
-  cardMesh.castShadow = true;
-  cardGroup.add(cardMesh);
-
-  // Borde perimetral en oro pulido
-  const cardGoldFrame = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.95, 0.032), goldMat);
-  cardGroup.add(cardGoldFrame);
-
-  // Chip EMV inteligente con micro-relieve dorado
-  const chip = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.22, 0.05), cardChipMat);
-  chip.position.set(-0.44, 0.12, 0.005);
-  cardGroup.add(chip);
-
-  // Símbolo Cosmos: Estrella de 8 puntas dorada con núcleo de zafiro cian
-  const starCore = new THREE.Mesh(new THREE.OctahedronGeometry(0.18, 0), cyanGlowMat);
-  starCore.position.set(0.24, 0.14, 0.035);
-  cardGroup.add(starCore);
-
-  const starRing = new THREE.Mesh(new THREE.TorusGeometry(0.30, 0.02, 6, 20), goldMat);
-  starRing.rotation.x = 0.75;
-  starRing.position.set(0.24, 0.14, 0.035);
-  cardGroup.add(starRing);
-
-  // Banda de contactless / ondas Wi-Fi en oro
-  for (let w = 1; w <= 3; w++) {
-    const wave = new THREE.Mesh(new THREE.TorusGeometry(w * 0.06, 0.008, 4, 12, Math.PI * 0.6), goldMat);
-    wave.rotation.z = -Math.PI * 0.3;
-    wave.position.set(-0.16, 0.12, 0.025);
-    cardGroup.add(wave);
-  }
-
-  // Franja de nombre del colaborador y código de barras / bloques de números en relieve
-  for (let b = 0; b < 4; b++) {
-    const num = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.05, 0.05), goldMat);
-    num.position.set(-0.48 + b * 0.32, -0.22, 0.005);
-    cardGroup.add(num);
-  }
-
-  // QR Code VIP badge en la esquina
-  const qrBadge = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.05), goldMat);
-  qrBadge.position.set(0.52, 0.30, 0.005);
-  cardGroup.add(qrBadge);
-
-  // Luz dorada cálida envolvente
-  const light = new THREE.PointLight(0xf59e0b, 2.8, 5.5);
-  light.position.set(0, 0.2, 0.45);
-  cardGroup.add(light);
-
-  g.add(cardGroup);
-  g.userData.cardMesh = cardGroup;
 
   return g;
 }
@@ -1594,14 +1496,10 @@ function createHistoricalMilestonesGallery() {
       spyglass.position.set(0.10, 1.42, 0.02);
       col.add(spyglass);
     } else if (m.type === 'digital') {
-      // 2018: Engranaje de relojería de bronce y gema
+      // 2018: Engranaje de relojería de bronce
       const gear = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.05, 8), brassMat);
       gear.position.set(0, 1.39, 0);
       col.add(gear);
-
-      const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.08, 0), new THREE.MeshStandardMaterial({ color: 0x00d2ff, emissive: 0x0088cc, emissiveIntensity: 2.2 }));
-      gem.position.set(0, 1.48, 0);
-      col.add(gem);
     } else {
       // Presente: Corona de laureles dorados sobre cojín carmesí
       const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.26), velvetRedMat);
@@ -1777,14 +1675,6 @@ function createNPSScaleMonument() {
     const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.04, 8), brassMat);
     cap.position.y = colHeight + 0.02;
     colGroup.add(cap);
-
-    let cMat = rubyMat;
-    if (i >= 9) cMat = emeraldMat;
-    else if (i >= 7) cMat = amberMat;
-
-    const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(0.09, 0), cMat);
-    crystal.position.y = colHeight + 0.14;
-    colGroup.add(crystal);
 
     // Chapa con el número (0-10)
     const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.11, 0.02), brassMat);
@@ -1988,27 +1878,6 @@ function createDocManagerArchiveDisplay() {
   spine.position.set(0, 1.11, 0.05);
   g.add(spine);
 
-  // 3. Orbe Crystalline de Búsqueda y Nube Digital flotando sobre el libro
-  const orbGroup = new THREE.Group();
-  orbGroup.position.set(0, 1.68, 0);
-
-  const orb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), cyanOrbMat);
-  orbGroup.add(orb);
-
-  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.016, 6, 24), brassMat);
-  ring1.rotation.x = Math.PI / 3;
-  orbGroup.add(ring1);
-
-  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.014, 6, 24), brassMat);
-  ring2.rotation.y = Math.PI / 4;
-  orbGroup.add(ring2);
-
-  const orbLight = new THREE.PointLight(0x00d2ff, 2.5, 5.0);
-  orbGroup.add(orbLight);
-
-  g.add(orbGroup);
-  g.userData.orbGroup = orbGroup;
-
   return g;
 }
 
@@ -2163,10 +2032,6 @@ function createEthicsJusticeMonument() {
     const pan = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.18, 0.04, 12), brassMat);
     pan.position.set(x, 1.32, 0);
     g.add(pan);
-
-    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.09, 0), emeraldMat);
-    gem.position.set(x, 1.41, 0);
-    g.add(gem);
   });
 
   const ethLight = new THREE.PointLight(0x10b981, 2.0, 4.5);
@@ -2409,10 +2274,6 @@ function createRoute90Monument() {
     cap.position.y = 0.18 + m.h + 0.03;
     col.add(cap);
 
-    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.12, 0), m.color);
-    gem.position.set(0, 0.18 + m.h + 0.18, 0);
-    col.add(gem);
-
     const plaque = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.15, 0.025), brassMat);
     plaque.position.set(0, 0.18 + m.h * 0.65, 0.19);
     col.add(plaque);
@@ -2452,7 +2313,7 @@ function createRoute90Monument() {
   post.position.y = 0.9;
   signpost.add(post);
 
-  ['30 DÍAS ➔', '60 DÍAS ➔', '90 DÍAS ★'].forEach((lbl, idx) => {
+  ['30 DÍAS', '60 DÍAS', '90 DÍAS (META)'].forEach((lbl, idx) => {
     const arrow = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.03), oakMat);
     arrow.position.set(0.18, 1.1 + idx * 0.22, 0);
     arrow.rotation.y = 0.15 * idx;
@@ -2736,196 +2597,187 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
   }
 
   switch (mission.type) {
+    case 'welcome':
     case 'lobby': {
-      // ═════════════════════════════════════════════════════════════════════════
-      // ESTACIÓN 00: CAMPAMENTO BASE & BIENVENIDA (Lobby de Expedición)
-      // Escalas recalibradas a proporción humana real + Intención espacial
-      // ═════════════════════════════════════════════════════════════════════════
+      // =========================================================================
+      // ESTACIÓN 01: PUNTO DE PARTIDA (Portal de Orientación)
+      // 100% Polyfork · Espacio central de aventureros limpio (CERO colisiones):
+      // - Tienda cuartel de expedición al fondo centro (3.2m, z: -6.5)
+      // - Tienda auxiliar de campaña en ala izquierda (-5.8m, -3.5m)
+      // - Mesa de planeación con mapa, pergaminos y provisiones en ala derecha
+      // - Tablón oficial con el mapa de la ruta de onboarding (4.5m, -1.0m)
+      // - Área de fogata de descanso con bancos en flanco izquierdo
+      // - Faroles perimetrales y vallas delimitadoras en accesos laterales
+      // =========================================================================
 
-      // 1. Cuartel General de la Expedición al fondo (Acceso frontal despejado)
-      await spawn(ASSETS.polyfork.villageTavern, 5.8, [0, 0, -5.2], 0);
+      // 1. Tienda Cuartel de Expedición al fondo centro (retirada a z: -6.5)
+      await spawn(ASSETS.polyfork.canvasWallTent, 3.2, [0, 0, -6.5], 0);
 
-      // 2. Círculo Central de Bienvenida: Hoguera con bancos de tronco a escala real (0.45m asiento)
+      // 2. Ala Izquierda: Tienda auxiliar y fogata de campamento con bancos
+      await spawn(ASSETS.polyfork.canvasRidgeTent, 2.3, [-5.8, 0, -3.5], 0.35);
       const campWelcomeFire = createCampfire();
-      campWelcomeFire.position.set(0, getTerrainY(mission.x, mission.z + 0.4), 0.4);
+      campWelcomeFire.position.set(-5.0, getTerrainY(mission.x - 5.0, mission.z - 0.8), -0.8);
       g.add(campWelcomeFire);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-1.8, 0, 0.4], Math.PI / 2);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [1.8, 0, 0.4], -Math.PI / 2);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-5.0, 0, 0.4], 0);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-5.0, 0, -2.0], 0);
 
-      // 3. Lateral Izquierdo: Muelle de descarga de carretas (Escala proporcionada)
-      await spawn(ASSETS.polyfork.fourWheelWagon, 1.45, [-6.0, 0, -2.2], -0.25);
-      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.6, 0, -2.8], 0.3);
-      await spawn(ASSETS.polyfork.grainSack, 0.48, [-5.2, 0, -1.0], -0.4);
+      // 3. Ala Derecha: Mesa de planeación con provisiones y estantería de pergaminos
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [5.0, 0, -3.2], 0);
+      await spawn(ASSETS.polyfork.scrollRack, 1.45, [6.2, 0, -3.2], -0.4);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [5.2, 0.76, -3.2], 0.2);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [4.7, 0.76, -3.2], 0);
 
-      // 4. Rincón de Manantial: Pozo de piedra rústica a escala 1.55m
-      await spawn(ASSETS.polyfork.villageWell, 1.55, [-4.2, 0, 1.8], 0.2);
+      // 4. Tablón de Bienvenida con el Mapa del Recorrido (retirado en ala derecha)
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [4.5, 0, -1.0], -0.5);
 
-      // 5. Lateral Derecho: Mesa de planeación (0.76m altura real de mesa)
-      await spawn(ASSETS.polyfork.timberTable, 0.76, [4.8, 0, -1.8], 0);
-      // Provisiones de viaje sobre la mesa
-      await spawn(ASSETS.polyfork.wineJug, 0.22, [4.8, 0.76, -1.8], 0);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [5.1, 0.76, -1.8], 0.4);
-      await spawn(ASSETS.polyfork.goblet, 0.16, [4.5, 0.76, -1.8], 0);
+      // 5. Faroles de Sendero en las esquinas perimetrales (bien abiertos, CERO colisión)
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [-6.2, 0, 3.0], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [6.2, 0, 3.0], -0.3);
 
-      // 6. Frente Derecho: Tablón de bienvenida con el mapa de la expedición
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [4.2, 0, 2.5], -0.6);
+      // 6. Vallas de madera perimetrales delimitando el campamento
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.2, 0, 0.2], 0.8);
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.2, 0, 0.2], -0.8);
 
-      // 7. Portal de faroles medievales recibiendo a los exploradores
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [-5.2, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [5.2, 0, 3.0], -0.3);
-
-      // 8. Vallas de madera perimetrales (0.95m altura de valla)
-      await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.0, 0, 0.5], 0.8);
-      await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.0, 0, 0.5], -0.8);
-
-      // 9. Arboleda de fondo y flancos (Enmarcan la taberna a distancia segura, CERO colisión)
-      await spawn(ASSETS.trees[13], 8.2, [-8.2, 0, -4.5], 0.3); // Abedul blanco en el flanco izquierdo
-      await spawn(ASSETS.trees[14], 8.5, [8.2, 0, -4.5], -0.3); // Pino verde alto en el flanco derecho
-      await spawn(ASSETS.trees[15], 8.0, [-5.2, 0, -12.5], 0.2); // Roble frondoso tras el alero izquierdo
-      await spawn(ASSETS.trees[13], 8.2, [5.2, 0, -12.5], -0.2); // Abedul blanco tras el alero derecho
-      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -14.0], 0.1);   // Roble majestuoso elevándose tras la cumbrera
-
-      // Guía rúnica flotante de bienvenida Vermelho Bradesco
-      const guideGem = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.32, 0),
-        new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.5, roughness: 0.22 })
-      );
-      const gemY = getTerrainY(mission.x, mission.z);
-      guideGem.position.set(0, gemY + 2.2, 0.4);
-      g.add(guideGem);
-      g.userData.crystal = guideGem;
+      // 7. Arboleda natural Polyfork al fondo
+      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -6.5], 0.3); // Abedul
+      await spawn(ASSETS.trees[14], 8.5, [8.5, 0, -6.5], -0.3); // Pino alto
+      await spawn(ASSETS.trees[15], 8.5, [0.0, 0, -13.5], 0.1); // Roble majestuoso
+      await spawn(ASSETS.trees[16], 7.5, [-8.2, 0, 2.0], 0.3);  // Arce
+      await spawn(ASSETS.trees[17], 7.8, [8.2, 0, 2.0], -0.3);  // Pino joven
       break;
     }
 
+    case 'arsenal':
     case 'camp': {
-      // ═════════════════════════════════════════════════════════════════════════
-      // ESTACIÓN 01: ARSENAL Y EQUIPOS (Puesto de Inicio / Armería)
-      // Escalas humanas reales + Plaza limpia y sin colisiones:
-      // - Torre de vigía al fondo centro custodiando el horizonte (6.5m)
-      // - Ala Izquierda: Cuartel de lona, carreta, baúl y víveres
-      // - Ala Derecha: Herrería funcional, yunque y barril de temple
-      // - Centro: Armero, maniquí de armadura y fogata de guardia con trípode
-      // ═════════════════════════════════════════════════════════════════════════
+      // =========================================================================
+      // ESTACIÓN 02: ENTREGA DE EQUIPOS (Arsenal y Logística)
+      // Modelos Polyfork a escala real · Plaza frontal completamente despejada:
+      // - Torre de vigía al fondo centro custodiando el puesto (6.5m, z: -6.5)
+      // - Ala Izquierda: Carreta de pertrechos tech, cajas y baúl de equipamiento
+      // - Ala Derecha: Mostrador de entrega con strongbox tecnológico
+      // - Soportes de armadura y armero ordenados en los laterales
+      // - Faroles perimetrales en los accesos
+      // =========================================================================
 
       // 1. Torre de Vigía del Arsenal al fondo centro
-      await spawn(ASSETS.polyfork.watchtower, 6.5, [0, 0, -5.5], 0);
+      await spawn(ASSETS.polyfork.watchtower, 6.5, [0, 0, -6.5], 0);
 
-      // 2. Ala Izquierda: Tienda de campaña cuartel y carreta de pertrechos
-      await spawn(ASSETS.polyfork.canvasWallTent, 2.7, [-5.2, 0, -2.5], 0.35);
-      await spawn(ASSETS.polyfork.woodenCart, 1.35, [-6.2, 0, 0.4], 0.3);
-      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.4, 0, 0.8], 0.2);
-      await spawn(ASSETS.polyfork.grainSack, 0.48, [-5.0, 0, 1.4], -0.4);
+      // 2. Ala Izquierda: Logística, carreta de suministros y cajas de laptops
+      await spawn(ASSETS.polyfork.fourWheelWagon, 1.5, [-5.8, 0, -2.8], 0.25);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.52, [-4.2, 0, -1.2], 0.2);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.44, [-4.6, 0, -0.6], -0.3);
+      await spawn(ASSETS.polyfork.woodenCart, 1.35, [-6.2, 0, 0.8], 0.4);
 
-      // 3. Ala Derecha: Herrería de Campaña despejada (SIN carpa que colisione)
-      await spawn(ASSETS.polyfork.blacksmithForge, 2.4, [5.2, 0, -1.0], -1.2);
-      await spawn(ASSETS.polyfork.anvil, 0.82, [3.8, 0, 0.6], 0.3);
-      await spawn(ASSETS.polyfork.quenchBarrel, 0.70, [5.2, 0, 1.2], 0);
+      // 3. Ala Derecha: Mesa/mostrador de entrega de IT con cofre tecnológico
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [4.8, 0, -2.2], 0);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [4.8, 0.76, -2.2], 0);
+      await spawn(ASSETS.polyfork.armourStand, 1.85, [2.8, 0, -3.8], -0.3);
+      await spawn(ASSETS.polyfork.weaponRack, 1.50, [-2.8, 0, -3.8], 0.3);
 
-      // 4. Mostrador Central de Armería: Armero y soporte de armadura
-      await spawn(ASSETS.polyfork.weaponRack, 1.50, [-1.8, 0, -1.0], 0.3);
-      await spawn(ASSETS.polyfork.armourStand, 1.85, [1.8, 0, -1.0], -0.3);
+      // 4. Faroles de acceso lateral frontal
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [-6.0, 0, 3.0], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [6.0, 0, 3.0], -0.3);
 
-      // 5. Vivac de Guardia al frente: Fogata con trípode y leña ordenada al lateral
-      const campfire = createCampfire();
-      campfire.position.set(-0.5, getTerrainY(mission.x - 0.5, mission.z + 1.8), 1.8);
-      g.add(campfire);
-      await spawn(ASSETS.polyfork.campfireCookTripod, 1.30, [-0.5, 0, 1.8], 0);
-      await spawn(ASSETS.polyfork.firewoodStack, 0.55, [-2.2, 0, 1.8], 0.1);
-
-      // 6. Arboleda de fondo y flancos enmarcando el puesto militar (CERO colisión con tiendas o atalaya)
-      await spawn(ASSETS.trees[13], 8.5, [0.0, 0, -12.5], 0.2);  // Abedul blanco majestuoso en el fondo central
-      await spawn(ASSETS.trees[14], 8.5, [-8.5, 0, -6.5], 0.1);  // Pino alto tras la atalaya
-      await spawn(ASSETS.trees[5], 8.8, [8.5, 0, -6.5], -0.3);   // Conífera alta tras la forja
-      await spawn(ASSETS.trees[6], 7.5, [-8.2, 0, 1.5], 0.3);   // Ciprés cónico en el flanco izquierdo
-      await spawn(ASSETS.trees[15], 7.8, [8.2, 0, 1.5], -0.3);  // Roble frondoso en el flanco derecho
-
-      const crystal = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.28, 0),
-        new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.2, roughness: 0.3 })
-      );
-      const crystalY = getTerrainY(mission.x, mission.z);
-      crystal.position.set(0, crystalY + 1.6, 0);
-      g.add(crystal);
-      g.userData.crystal = crystal;
+      // 5. Arboleda perimetral Polyfork al fondo y costados
+      await spawn(ASSETS.trees[14], 8.5, [0.0, 0, -13.0], 0.2);
+      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -6.5], 0.1);
+      await spawn(ASSETS.trees[15], 8.5, [8.5, 0, -6.5], -0.3);
+      await spawn(ASSETS.trees[6], 7.5, [-8.2, 0, 1.5], 0.3);
+      await spawn(ASSETS.trees[17], 7.8, [8.2, 0, 1.5], -0.3);
       break;
     }
 
     case 'sanctuary':
     case 'monument': {
-      // ═════════════════════════════════════════════════════════════════════════
-      // ESTACIÓN 02: FIRMA DE CONTRATO Y BENEFICIOS (Santuario del Pacto)
-      // Escalas sagradas recalibradas a proporción humana:
-      // - Capilla de piedra al fondo (6.2m)
-      // - Altar central de piedra a altura de mesa sagrada (0.95m)
-      // - Atril con el gran libro de juramento (1.25m)
-      // - Caballeros guardianes de honor a estatura heroica (2.1m)
-      // - Braseros ceremoniales a cintura (1.0m) flanqueando el paso abierto
-      // - Cofre de beneficios con herrajes de hierro a tamaño de arcón real (0.52m)
-      // - Estantería de pergaminos a escala de archivo (1.45m)
-      // ═════════════════════════════════════════════════════════════════════════
+      // =========================================================================
+      // ESTACIÓN 03: FIRMA DE CONTRATO Y BENEFICIOS (Santuario del Pacto)
+      // Modelos Polyfork solemnes · Patio despejado para evitar colisión:
+      // - Capilla de piedra sagrada al fondo (6.2m, z: -7.0)
+      // - Muretes de piedra perimetrales
+      // - Altar de piedra y Atril con Libro del Pacto profundamente retirados
+      // - Caballeros guardianes de honor flanqueando el altar
+      // - Estantería de pergaminos (contratos) y arcón acorazado (beneficios)
+      // - Braseros ceremoniales en flancos laterales abiertos
+      // =========================================================================
 
       // 1. Templo/Capilla de Piedra Sagrada retirada al fondo
-      await spawn(ASSETS.polyfork.stoneChapel, 6.2, [0, 0, -6.8], 0);
+      await spawn(ASSETS.polyfork.stoneChapel, 6.2, [0, 0, -7.0], 0);
 
-      // 2. Muretes bajos de piedra perimetrales que enmarcan el recinto sagrado
-      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [-4.2, 0, -4.5], 0.3);
-      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [4.2, 0, -4.5], -0.3);
+      // 2. Muretes bajos de piedra perimetrales
+      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [-4.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [4.5, 0, -4.5], -0.3);
 
-      // 3. Altar Sagrado de Piedra en el corazón ceremonial (0.95m altura de altar)
-      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -2.4], 0);
+      // 3. Altar Sagrado de Piedra y Atril retirados en profundidad
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -3.6], 0);
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, -2.8], 0);
 
-      // 4. Atril con el Gran Libro del Pacto
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, -2.1], 0);
+      // 4. Guardia de Honor: Estatuas de Caballeros flanqueando el altar
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.1, [-2.8, 0, -4.0], 0.2);
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.1, [2.8, 0, -4.0], -0.2);
 
-      // 5. Guardia de Honor: Estatuas de Caballeros flanqueando el altar (2.1m estatura noble)
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.1, [-2.8, 0, -2.4], 0.15);
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.1, [2.8, 0, -2.4], -0.15);
+      // 5. Candelabros ceremoniales de velas
+      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [-1.8, 0, -5.2], 0);
+      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [1.8, 0, -5.2], 0);
 
-      // 6. Candelabros ceremoniales de velas junto a los escalones
-      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [-1.8, 0, -4.8], 0);
-      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [1.8, 0, -4.8], 0);
+      // 6. Lateral Izquierdo: Estantería con los pergaminos oficiales del contrato
+      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-4.5, 0, -1.8], 0.5);
 
-      // 7. Avenida de Acceso Solemne: Braseros a escala humana (1.0m) delimitando pasillo
-      await spawn(ASSETS.polyfork.standingBrazier, 1.0, [-2.4, 0, 1.0], 0);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.0, [2.4, 0, 1.0], 0);
+      // 7. Lateral Derecho: Arcón acorazado con los beneficios
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [4.5, 0, -1.8], -0.5);
 
-      // 8. Lateral Izquierdo: Estantería con los pergaminos oficiales del contrato (1.45m)
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-3.8, 0, -0.4], 0.5);
+      // 8. Braseros solemnes en los flancos laterales (abiertos a x: +/- 4.8)
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-4.8, 0, 1.2], 0);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [4.8, 0, 1.2], 0);
 
-      // 9. Lateral Derecho: Arcón acorazado con los beneficios (0.52m altura de cofre real)
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [3.8, 0, -0.4], -0.5);
+      // 9. Faroles de acceso frontal en las esquinas
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.8, 0, 3.0], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.8, 0, 3.0], -0.3);
 
-      // 10. Faroles solemnes en el acceso frontal
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.4], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.4], -0.3);
-
-      // Arboleda solemne enmarcando la capilla (CERO colisión)
-      await spawn(ASSETS.trees[6], 8.5, [-8.0, 0, -4.5], 0.3);  // Ciprés alto en el flanco izquierdo
-      await spawn(ASSETS.trees[6], 8.5, [8.0, 0, -4.5], -0.3);  // Ciprés alto en el flanco derecho
-      await spawn(ASSETS.trees[13], 8.2, [-5.2, 0, -12.5], 0.2); // Abedul tras el alero
-      await spawn(ASSETS.trees[14], 9.0, [5.2, 0, -12.5], -0.2); // Pino alto tras el alero
-      await spawn(ASSETS.trees[0], 9.2, [0.0, 0, -13.8], 0);    // Roble majestuoso tras el ábside
-
-      // Sello flotante místico del Pacto elevado sobre el altar
-      const covenantSeal = new THREE.Mesh(
-        new THREE.TorusGeometry(0.35, 0.07, 12, 32),
-        new THREE.MeshStandardMaterial({ color: 0xffd369, emissive: 0xd49b29, emissiveIntensity: 2.5, roughness: 0.3 })
-      );
-      const sealY = getTerrainY(mission.x, mission.z);
-      covenantSeal.position.set(0, sealY + 2.5, -2.4);
-      g.add(covenantSeal);
-
-      // Núcleo rúnico carmesí Bradesco en el centro del sello
-      const sealCore = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.18, 0),
-        new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.2, roughness: 0.25 })
-      );
-      sealCore.position.set(0, sealY + 2.5, -2.4);
-      g.add(sealCore);
-      g.userData.covenantSeal = covenantSeal;
+      // Arboleda solemne Polyfork al fondo
+      await spawn(ASSETS.trees[6], 8.5, [-8.5, 0, -5.0], 0.3);
+      await spawn(ASSETS.trees[6], 8.5, [8.5, 0, -5.0], -0.3);
+      await spawn(ASSETS.trees[13], 8.2, [-5.5, 0, -13.0], 0.2);
+      await spawn(ASSETS.trees[14], 9.0, [5.5, 0, -13.0], -0.2);
+      await spawn(ASSETS.trees[15], 9.2, [0.0, 0, -14.0], 0);
       break;
     }
 
+    case 'integration': {
+      // =========================================================================
+      // ESTACIÓN 03: CÍRCULO DE BIENVENIDA & INTEGRACIÓN (Plaza de Integración)
+      // Plaza comunitaria Polyfork · Acogedora, luminosa y 100% libre de colisiones:
+      // - Granero rústico comunitario al fondo (5.5m, z: -7.5) con entrada despejada
+      // - Pozo comunal en ala izquierda perimetral
+      // - Bancos rústicos en los flancos laterales (camino central 100% expedito)
+      // - Tablón oficial en ala derecha
+      // - Jardineras de flores y faroles en flancos exteriores
+      // =========================================================================
+
+      // 1. Edificio Comunitario al fondo centro (puertas totalmente libres de paso)
+      await spawn(ASSETS.polyfork.timberBarn, 5.5, [0, 0, -7.5], 0);
+
+      // 2. Ala Izquierda: Pozo rústico de aldea en el perímetro lateral
+      await spawn(ASSETS.polyfork.villageWell, 1.55, [-5.5, 0, -3.0], 0.2);
+
+      // 3. Bancos de bienvenida colocados en los flancos laterales (CERO obstáculo central)
+      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-4.6, 0, -1.2], 0.4);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [4.6, 0, -1.2], -0.4);
+
+      // 4. Ala Derecha: Tablón oficial con la Agenda y Horarios del Día
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [5.2, 0, -1.0], -0.5);
+
+      // 5. Jardineras florales y faroles en los laterales exteriores
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [-5.2, 0, 2.2], 0);
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [5.2, 0, 2.2], 0);
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [-6.0, 0, 3.5], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.3, [6.0, 0, 3.5], -0.3);
+
+      // 6. Arboleda frondosa Polyfork al fondo
+      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -6.5], 0.2);
+      await spawn(ASSETS.trees[15], 8.5, [8.5, 0, -6.5], -0.2);
+      await spawn(ASSETS.trees[16], 8.0, [0.0, 0, -13.5], 0.1);
+      break;
+    }
     case 'garden': {
       // ═════════════════════════════════════════════════════════════════════════
       // ESTACIÓN 03: HUMAND Y COMEDOR (Valle del Refectorio)
@@ -2972,8 +2824,8 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.8], 0.3);
 
-      // 7. Entrada: Tablón de Avisos de Humand (Turnos, menú diario y reglas del comedor)
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [2.0, 0, 2.6], -0.2);
+      // 7. Entrada: Tablón de Avisos en el ala lateral derecha (CERO colisión)
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [5.0, 0, 2.2], -0.35);
 
       // Arboleda frondosa del valle enmarcando el granero comedor (CERO colisión con techos o mesas)
       await spawn(ASSETS.trees[11], 8.2, [-8.2, 0, -4.5], 0.4); // Sauce llorón en el flanco izquierdo
@@ -2981,16 +2833,6 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.trees[13], 8.5, [-5.5, 0, -12.8], 0.2); // Abedul ribereño tras el alero izquierdo
       await spawn(ASSETS.trees[7], 8.5, [5.5, 0, -12.8], -0.2);  // Álamo cónico tras el alero derecho
       await spawn(ASSETS.trees[0], 9.5, [0.0, 0, -14.0], 0.1);   // Roble colosal elevándose tras la cumbrera
-
-      // Kiosco digital de la App Humand interactivo con halo verde
-      const humandTerminal = new THREE.Mesh(
-        new THREE.BoxGeometry(0.4, 0.6, 0.08),
-        new THREE.MeshStandardMaterial({ color: 0x2ee59d, emissive: 0x17a06a, emissiveIntensity: 2.5, roughness: 0.3 })
-      );
-      const termY = getTerrainY(mission.x + 2.0, mission.z + 2.6);
-      humandTerminal.position.set(2.0, termY + 1.8, 2.6);
-      g.add(humandTerminal);
-      g.userData.humandTerminal = humandTerminal;
       break;
     }
 
@@ -3010,19 +2852,19 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.watchtower, 7.2, [-4.2, 0, -3.2], 0.2);
 
       // 2. Área de Transporte y Estacionamiento: Carromatos reales 3D
-      await spawn(ASSETS.polyfork.fourWheelWagon, 1.85, [3.8, 0, -1.2], -0.2); // Carromato de 4 ruedas cubierto
-      await spawn(ASSETS.polyfork.woodenCart, 1.35, [1.0, 0, -1.5], 0.35);     // Carreta de dos ruedas
+      await spawn(ASSETS.polyfork.fourWheelWagon, 1.85, [4.0, 0, -1.8], -0.2); // Carromato de 4 ruedas cubierto
+      await spawn(ASSETS.polyfork.woodenCart, 1.35, [4.8, 0, 0.4], 0.35);     // Carreta de dos ruedas
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [5.8, 0, -0.2], 0.4);     // Valla delimitadora derecha
       await spawn(ASSETS.polyfork.woodenFence, 0.95, [5.8, 0, -2.4], 0.4);
 
-      // 3. Módulo de Protocolos de Protección Civil & Evacuación
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [-1.5, 0, 1.6], -0.25);
+      // 3. Módulo de Protocolos de Protección Civil & Evacuación (ala izquierda libre)
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [-3.8, 0, 1.8], -0.25);
 
       // 4. Depósito de Emergencias y Primeros Auxilios
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-3.8, 0, 0.8], 0.2);   // Arcón acorazado de botiquín
-      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.5, 0, 0.2], 0.1);     // Cajas de suministros
-      await spawn(ASSETS.polyfork.polyforkBarrel, 0.75, [-4.8, 0, 1.4], 0);     // Barril de reserva
-      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [1.8, 0, 1.8], -0.2);    // Banco de descanso de brigadistas
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-4.5, 0, 0.6], 0.2);   // Arcón acorazado de botiquín
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [-4.8, 0, -0.4], 0.1);    // Cajas de suministros
+      await spawn(ASSETS.polyfork.polyforkBarrel, 0.75, [-5.2, 0, 0.8], 0);     // Barril de reserva
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [4.2, 0, 1.8], -0.2);    // Banco de descanso de brigadistas
 
       // 5. Faroles de acceso a la estación
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.6], 0.3);
@@ -3032,59 +2874,81 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.trees[14], 9.0, [-8.5, 0, -5.5], 0.3); // Pino alto natural
       await spawn(ASSETS.trees[5], 9.2, [8.5, 0, -5.5], -0.3);  // Pino estilizado alto
       await spawn(ASSETS.trees[4], 8.2, [0.0, 0, -13.5], 0.1);  // Conífera tras el edificio
-
-      // Baliza de emergencia luminosa sobre la torre de vigilancia
-      const beaconGem = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.35, 0),
-        new THREE.MeshStandardMaterial({ color: 0x2ecc71, emissive: 0x27ae60, emissiveIntensity: 2.8, roughness: 0.2 })
-      );
-      const beaconY = getTerrainY(mission.x - 4.2, mission.z - 3.2);
-      beaconGem.position.set(-4.2, beaconY + 7.8, -3.2);
-      g.add(beaconGem);
-      g.userData.crystal = beaconGem;
       break;
     }
 
-    case 'vault':
+    case 'vault': {
+      // ═════════════════════════════════════════════════════════════════════════
+      // ESTACIÓN 08: TARJETA COSMOS (Paseo Marítimo & Mercado de la Ribera)
+      // Situada en la ribera sur frente al Lago Cosmos:
+      // - Mercado de convenios VIP al costado este de la plaza
+      // - Centro despejado: Altar sagrado, arcón blindado y personajes
+      // - Embarcadero de madera extendiéndose hacia el agua al norte
+      // - Puestos mercantiles, barriles, cajas de provisiones y faroles
+      // - Sauces llorones y bancos con vistas panorámicas al lago
+      // ═════════════════════════════════════════════════════════════════════════
+      // 1. Embarcadero de madera sobresaliendo de la ribera hacia el agua (al norte)
+      const jettyGeo = new THREE.BoxGeometry(3.4, 0.22, 7.5);
+      const jettyMat = new THREE.MeshStandardMaterial({ color: 0x543c26, roughness: 0.88, metalness: 0.05 });
+      const jetty = new THREE.Mesh(jettyGeo, jettyMat);
+      jetty.position.set(-5.6, 0.08, -6.5);
+      jetty.castShadow = true;
+      jetty.receiveShadow = true;
+      g.add(jetty);
+
+      const pileGeo = new THREE.CylinderGeometry(0.12, 0.12, 2.0, 8);
+      const pileMat = new THREE.MeshStandardMaterial({ color: 0x332315, roughness: 0.95 });
+      [[-7.1, -9.8], [-4.1, -9.8], [-7.1, -6.5], [-4.1, -6.5]].forEach(([px, pz]) => {
+        const p = new THREE.Mesh(pileGeo, pileMat);
+        p.position.set(px, -0.65, pz);
+        p.castShadow = true;
+        g.add(p);
+      });
+
+      // 2. Mercado / Pabellón de Convenios en el ala este (CERO obstrucción de cámara)
+      await spawn(ASSETS.buildings.market, 6.0, [5.2, 0, 0.5], -0.35);
+
+      // 3. Fondo de la plaza: Altar sagrado y arcón de beneficios
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -2.4], 0);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [0, 0, -3.4], 0);
+
+      // 4. Ala Izquierda: Puesto náutico de convenios retail y gastronomía
+      await spawn(ASSETS.polyfork.marketStall, 2.25, [-4.5, 0, 0.6], 0.35);
+      await spawn(ASSETS.polyfork.basketOfProduce, 0.45, [-3.8, 0, -0.4], 0.2);
+      await spawn(ASSETS.polyfork.polyforkBarrel, 0.75, [-5.5, 0, -2.8], 0);
+
+      // 5. Ala Derecha / Frontal: Puesto de salud, viajes y puntos cosmos (en el ala lateral)
+      await spawn(ASSETS.polyfork.marketStall, 2.25, [4.8, 0, 2.4], -0.2);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [3.6, 0, 1.8], 0.3);
+      await spawn(ASSETS.polyfork.woodenCrate, 0.45, [-4.2, 0, 2.2], -0.2);
+
+      // 6. Bancos con vista panorámica al lago y faroles en la ribera
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [-1.2, 0, -3.8], 0);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.5, 0, -3.8], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.5, 0, -3.8], -0.3);
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.2, 0, 1.2], 0.8);
+      await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.2, 0, 1.2], -0.8);
+
+      // Sauces llorones en la ribera lacustre
+      await spawn(ASSETS.trees[11], 8.5, [-8.8, 0, -5.5], 0.3);
+      await spawn(ASSETS.trees[11], 8.5, [8.8, 0, -5.5], -0.3);
+      break;
+    }
+
     case 'plaza': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 05: TARJETA COSMOS (Pabellón de Beneficios & Convenios VIP)
       // Escala humana con modelos 3D reales de la librería Polyfork:
       // - Mercado/Pabellón al fondo
-      // - Centro: Altar de piedra con la Tarjeta Cosmos VIP giratoria flotante
+      // - Centro: Altar de piedra y arcón de beneficios
       // - Ala Izquierda: Puesto de mercado con toldo y cestas de convenios retail
       // - Ala Derecha: Puesto de salud, bienestar y puntos de recompensa
-      // - Arcón de tesoros y recompensas Cosmos
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.market, 6.5, [0, 0, -5.6], 0);
 
-      // 1. Centro: Altar sagrado de piedra con la Tarjeta Cosmos flotante
-      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -0.6], 0);
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [0, 0, 0.7], 0); // Arcón de tesoros y beneficios
-
-      // Tarjeta Cosmos VIP Flotante sobre el altar
-      const cardGroup = new THREE.Group();
-      const cardBodyMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.2 });
-      const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.18 });
-      const cardMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.76, 0.035), cardBodyMat);
-      const cardGoldFrame = new THREE.Mesh(new THREE.BoxGeometry(1.23, 0.79, 0.028), goldMat);
-      cardGroup.add(cardMesh);
-      cardGroup.add(cardGoldFrame);
-      const cardChip = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.045), goldMat);
-      cardChip.position.set(-0.35, 0.10, 0.005);
-      cardGroup.add(cardChip);
-      const starCore = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.15, 0),
-        new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 3.2, roughness: 0.1 })
-      );
-      starCore.position.set(0.28, 0, 0.025);
-      cardGroup.add(starCore);
-
-      const cardY = getTerrainY(mission.x, mission.z - 0.6);
-      cardGroup.position.set(0, cardY + 1.85, -0.6);
-      g.add(cardGroup);
-      g.userData.cosmosCard = cardGroup;
-      g.userData.cosmosCardBaseY = cardY + 1.85;
+      // 1. Fondo de la plaza: Altar sagrado de piedra y arcón de recompensas (despejando el centro)
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -2.8], 0);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [0, 0, -3.8], 0); // Arcón de tesoros y beneficios
 
       // 2. Ala Izquierda: Puesto de Mercado Real 3D (Convenios Gastronomía, Tiendas y Viajes)
       await spawn(ASSETS.polyfork.marketStall, 2.25, [-4.0, 0, 0.2], 0.35);
@@ -3109,90 +2973,72 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
 
     case 'history':
     case 'harbor': {
-      // ═════════════════════════════════════════════════════════════════════════
-      // MISIÓN 06: INTRODUCCIÓN A LA COMPAÑÍA (Gran Salón Consistorial & Museo)
-      // Escala humana con modelos 3D reales de la librería Polyfork:
-      // - Ayuntamiento / Salón Consistorial al fondo (7.0m)
-      // - Centro: Altar de piedra con emblema místico y Atril con el Gran Tomo de Crónicas
-      // - Guardia de Honor: Estatuas de Caballeros Fundadores flanqueando el acceso
-      // - Tablón de la Historia y las 4 Eras corporativas
-      // - Braseros ceremoniales con el fuego de la tradición
-      // ═════════════════════════════════════════════════════════════════════════
-      await spawn(ASSETS.buildings.townhall, 7.0, [0, 0, -4.8], 0);
+      // =========================================================================
+      // ESTACIÓN 05: INTRODUCCIÓN A LA COMPAÑÍA (Salón Histórico)
+      // Edificio noble 100% Polyfork · Gran formato y CERO colisiones:
+      // - Salón señorial de piedra y madera al fondo (villageTavern 6.0m, z: -7.5)
+      // - Guardia de Honor: Estatuas de Caballeros Fundadores flanqueando la entrada
+      // - Ala Izquierda: Mesa histórica con el atril del gran libro de crónicas
+      // - Ala Derecha: Tablón oficial con los pilares, valores y misión corporativa
+      // - Braseros ceremoniales en flancos laterales abiertos
+      // =========================================================================
 
-      // 1. Centro: Altar de Piedra de la Fundación
-      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -1.4], 0);
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.30, [0, 0, 0.3], 0); // Gran Libro de Crónicas
+      // 1. Salón Señorial de la Tradición al fondo centro
+      await spawn(ASSETS.polyfork.villageTavern, 6.0, [0, 0, -7.5], 0);
 
-      // Emblema místico giratorio de Bradesco sobre el altar
-      const chronicleEmblem = new THREE.Mesh(
-        new THREE.TorusGeometry(0.38, 0.06, 12, 32),
-        new THREE.MeshStandardMaterial({ color: BRAND_PALETTE.red, emissive: BRAND_PALETTE.darkRed, emissiveIntensity: 2.4, roughness: 0.25 })
-      );
-      const embY = getTerrainY(mission.x, mission.z - 1.4);
-      chronicleEmblem.position.set(0, embY + 1.85, -1.4);
-      g.add(chronicleEmblem);
-      g.userData.armillaryRing1 = chronicleEmblem;
+      // 2. Guardia de Honor: Estatuas de los Fundadores flanqueando la puerta principal
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-3.5, 0, -4.5], 0.2);
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [3.5, 0, -4.5], -0.2);
 
-      // 2. Guardia de Honor: Estatuas de Caballeros de la Fundación
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-3.2, 0, -1.4], 0.2);
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [3.2, 0, -1.4], -0.2);
+      // 3. Ala Izquierda: Mesa con el Tomo Histórico y pergaminos
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [-4.8, 0, -2.2], 0);
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [-4.8, 0.76, -2.2], 0);
+      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-6.0, 0, -2.2], 0.4);
 
-      // 3. Tablón de Avisos Históricos (Las 4 Eras, Misión, Visión y Valores)
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [-3.8, 0, 1.2], 0.35);
+      // 4. Ala Derecha: Tablón Institucional con Misión, Visión y Valores
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [4.8, 0, -2.2], -0.5);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [5.8, 0, -2.2], -0.3);
 
-      // 4. Flancos: Braseros ceremoniales y arcón de reliquias históricas
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-2.2, 0, 1.5], 0);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [2.2, 0, 1.5], 0);
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [3.8, 0, 1.2], -0.35);
+      // 5. Braseros ceremoniales en los flancos abiertos (x: +/- 4.8)
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-4.8, 0, 1.2], 0);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [4.8, 0, 1.2], 0);
 
-      // 5. Faroles de acceso frontal
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.6], -0.3);
+      // 6. Faroles de bienvenida en esquinas
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.8, 0, 3.0], 0.3);
+      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.8, 0, 3.0], -0.3);
 
-      // Arboleda enmarcando el salón consistorial (CERO colisión)
-      await spawn(ASSETS.trees[6], 8.5, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[13], 8.5, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[16], 9.0, [0.0, 0, -13.0], 0.1);
+      // 7. Arboleda solemne Polyfork al fondo
+      await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -6.5], 0.2);
+      await spawn(ASSETS.trees[15], 8.5, [8.5, 0, -6.5], -0.2);
+      await spawn(ASSETS.trees[13], 9.0, [0.0, 0, -13.5], 0.1);
       break;
     }
-
     case 'nps':
     case 'archive': {
       // ═════════════════════════════════════════════════════════════════════════
       // MISIÓN 07: NPS (Satisfacción al Cliente & Semáforo de Calidad)
       // Escala humana con modelos 3D reales de la librería Polyfork:
       // - Cabaña rústica de Atención al Cliente (5.5m)
-      // - Centro: Tablón oficial con la Escala NPS e indicador semáforo
+      // - Centro: Tablón oficial con la Escala NPS
       // - Ala Izquierda: Mesa de escucha y entrevistas con bancos de descanso
       // - Ala Derecha: Estantería de pergaminos con el protocolo Closed Loop
       // - Jardinera de flores y faroles de cordialidad
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.polyfork.thatchedCottage, 5.5, [0, 0, -4.8], 0);
 
-      // 1. Centro: Tablón con la Escala NPS (Promotores, Pasivos, Detractores)
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.60, [0, 0, -0.6], 0);
-
-      // Gema semáforo tricolor de calidad NPS flotando sobre el tablón
-      const npsGem = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.32, 0),
-        new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 2.6, roughness: 0.2 })
-      );
-      const npsY = getTerrainY(mission.x, mission.z - 0.6);
-      npsGem.position.set(0, npsY + 2.15, -0.6);
-      g.add(npsGem);
-      g.userData.crystal = npsGem;
+      // 1. Ala Derecha: Tablón con la Escala NPS (puerta central 100% despejada)
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.60, [3.8, 0, -0.8], -0.2);
 
       // 2. Ala Izquierda: Mesa de encuestas y diálogo de satisfacción
-      await spawn(ASSETS.polyfork.timberTable, 0.76, [-3.4, 0, 0.6], 0.15);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-3.4, 0.76, 0.6], 0.2);
-      await spawn(ASSETS.polyfork.wineJug, 0.22, [-3.0, 0.76, 0.6], 0);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [-3.4, 0, 1.6], 0.15); // Banco de clientes
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [-3.8, 0, 0.4], 0.15);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-3.8, 0.76, 0.4], 0.2);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [-3.4, 0.76, 0.4], 0);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [-3.8, 0, 1.4], 0.15); // Banco de clientes
 
       // 3. Ala Derecha: Estantería de pergaminos (Protocolo Closed Loop & Seguimiento)
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [3.4, 0, 0.6], -0.25);
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [2.8, 0, 1.6], 0.2); // Urna de opiniones
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.85, [4.5, 0, 1.4], -0.3); // Jardinera floral
+      await spawn(ASSETS.polyfork.scrollRack, 1.45, [4.8, 0, -0.8], -0.25);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [3.6, 0, 1.4], 0.2); // Urna de opiniones
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.85, [4.8, 0, 1.4], -0.3); // Jardinera floral
 
       // 4. Faroles de acceso frontal
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
@@ -3210,35 +3056,23 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // MISIÓN 08: GESTOR DOCUMENTAL (Archivo Central & Scriptorium Digital)
       // Escala humana con modelos 3D reales de la librería Polyfork:
       // - Taller / Scriptorium de cantería al fondo (6.5m)
-      // - Centro: Atril de lectura con el Gran Índice de Archivos y orbe cian
+      // - Centro: Atril de lectura con el Gran Índice de Archivos
       // - Ala Izquierda: Batería de estanterías de pergaminos y documentos
       // - Ala Derecha: Mesa de escriba con velas, tintero, baúl acorazado y cajas
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.workshop, 6.5, [0, 0, -4.8], 0);
 
-      // 1. Centro: Atril con el Registro Maestro de Documentos
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.30, [0, 0, -0.6], 0);
+      // 1. Ala Izquierda: Atril con el Registro Maestro y estanterías (puerta central 100% libre)
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.30, [-2.2, 0, -0.8], 0.2);
+      await spawn(ASSETS.polyfork.scrollRack, 1.48, [-3.8, 0, -0.4], 0.25);
+      await spawn(ASSETS.polyfork.scrollRack, 1.48, [-4.6, 0, 0.8], 0.45);
 
-      // Orbe de indexación digital cian flotando sobre el atril
-      const docOrb = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.28, 0),
-        new THREE.MeshStandardMaterial({ color: 0x00d2ff, emissive: 0x0099cc, emissiveIntensity: 2.8, roughness: 0.15 })
-      );
-      const orbY = getTerrainY(mission.x, mission.z - 0.6);
-      docOrb.position.set(0, orbY + 1.85, -0.6);
-      g.add(docOrb);
-      g.userData.crystal = docOrb;
-
-      // 2. Ala Izquierda: Estanterías de pergaminos y expedientes clasificados
-      await spawn(ASSETS.polyfork.scrollRack, 1.48, [-3.2, 0, -0.4], 0.25);
-      await spawn(ASSETS.polyfork.scrollRack, 1.48, [-4.2, 0, 1.0], 0.45);
-
-      // 3. Ala Derecha: Mesa de catalogación, velas y caja fuerte
-      await spawn(ASSETS.polyfork.timberTable, 0.76, [3.4, 0, 0.4], -0.2);
-      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.60, [3.4, 0.76, 0.4], 0);
-      await spawn(ASSETS.polyfork.wineJug, 0.22, [3.8, 0.76, 0.4], 0.3); // Tintero
-      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [4.2, 0, 1.4], 0.2);
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [2.6, 0, 1.4], -0.3); // Archivo confidencial
+      // 2. Ala Derecha: Mesa de catalogación, velas y caja fuerte
+      await spawn(ASSETS.polyfork.timberTable, 0.76, [3.8, 0, 0.4], -0.2);
+      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.60, [3.8, 0.76, 0.4], 0);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [4.2, 0.76, 0.4], 0.3); // Tintero
+      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [4.6, 0, 1.4], 0.2);
+      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [3.4, 0, 1.4], -0.3); // Archivo confidencial
 
       // 4. Faroles de acceso frontal
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
@@ -3268,38 +3102,30 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [-4.2, 0, -2.5], 0.3);
       await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [4.2, 0, -2.5], -0.3);
 
-      // 2. Centro: Altar Solemne de la Verdad y Atril del Código
-      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -1.6], 0);
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, 0.2], 0); // Tomo del Código de Ética
-
-      // Gema esmeralda de la rectitud flotando sobre el altar
-      const ethicsGem = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.32, 0),
-        new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 2.8, roughness: 0.18 })
-      );
-      const ethY = getTerrainY(mission.x, mission.z - 1.6);
-      ethicsGem.position.set(0, ethY + 2.05, -1.6);
-      g.add(ethicsGem);
-      g.userData.crystal = ethicsGem;
+      // 2. Fondo: Altar Solemne de la Verdad y Atril del Código (patio central abierto)
+      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -2.8], 0);
+      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, -1.8], 0); // Tomo del Código de Ética
 
       // 3. Guardia de Honor: Caballero de la Justicia
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-2.8, 0, -0.6], 0.2);
+      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-2.8, 0, -1.2], 0.2);
 
       // 4. Canal Confidencial: Arcón blindado de denuncias y Tablón de Principios
       await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-3.8, 0, 1.2], 0.3); // Buzón blindado
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [3.6, 0, 1.2], -0.3); // Tablón de normas éticas
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [3.8, 0, 1.2], -0.3); // Tablón de normas éticas
 
-      // 5. Braseros ceremoniales con la llama de la integridad
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-2.0, 0, 1.6], 0);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [2.0, 0, 1.6], 0);
+      // 5. Braseros ceremoniales con la llama de la integridad (flancos abiertos)
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-3.6, 0, 1.6], 0);
+      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [3.6, 0, 1.6], 0);
 
       // 6. Faroles de acceso frontal
       await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.8], 0.3);
       await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.8], -0.3);
 
-      // Arboleda enmarcando el tribunal de ética (CERO colisión)
-      await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[3], 8.5, [8.5, 0, -4.5], -0.3);
+      // Arboleda alpina y riscos de alta montaña enmarcando el santuario normativo
+      await spawn(ASSETS.rocks[0], 2.2, [-7.2, 0, 1.2], 0.3);
+      await spawn(ASSETS.rocks[1], 1.8, [7.2, 0, 1.2], -0.3);
+      await spawn(ASSETS.trees[14], 9.2, [-8.5, 0, -4.5], 0.3);
+      await spawn(ASSETS.trees[14], 9.2, [8.5, 0, -4.5], -0.3);
       await spawn(ASSETS.trees[5], 9.0, [0.0, 0, -13.0], 0.1);
       break;
     }
@@ -3315,12 +3141,12 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.polyfork.villageTavern, 6.4, [0, 0, -4.8], 0);
 
-      // 1. Centro: Pozo del Pueblo en el corazón de la plaza comunal
-      await spawn(ASSETS.polyfork.villageWell, 2.20, [0, 0, -0.6], 0);
+      // 1. Ala Izquierda: Pozo del Pueblo en el atrio lateral (puerta de taberna 100% libre)
+      await spawn(ASSETS.polyfork.villageWell, 2.20, [-3.6, 0, -1.0], 0);
 
       // 2. Ala Izquierda: Gaceta de Comunicación Interna y jardinera
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.60, [-3.8, 0, 0.8], 0.35);
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.85, [-4.6, 0, 1.8], 0.1);
+      await spawn(ASSETS.polyfork.campNoticeBoard, 1.60, [-4.6, 0, 0.8], 0.35);
+      await spawn(ASSETS.polyfork.flowerPlanter, 0.85, [-5.2, 0, 1.8], 0.1);
 
       // 3. Ala Derecha: Fogonata de convivencia con bancos de troncos y asador
       await spawn(ASSETS.polyfork.stoneCampfire, 1.00, [3.4, 0, 0.6], 0);
@@ -3375,14 +3201,14 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // ═════════════════════════════════════════════════════════════════════════
       await spawn(ASSETS.buildings.townhall, 6.8, [0, 0, -4.8], 0);
 
-      // 1. Centro: Mesa de Acuerdos Bilaterales y Pacto Colectivo
-      await spawn(ASSETS.polyfork.timberTable, 0.78, [0, 0, -0.6], 0);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [0, 0.78, -0.6], 0);
-      await spawn(ASSETS.polyfork.wineJug, 0.22, [-0.4, 0.78, -0.6], 0);
-      await spawn(ASSETS.polyfork.goblet, 0.16, [0.4, 0.78, -0.6], 0);
+      // 1. Fondo del atrio: Mesa de Acuerdos Bilaterales y Pacto Colectivo (patio central abierto)
+      await spawn(ASSETS.polyfork.timberTable, 0.78, [0, 0, -2.2], 0);
+      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [0, 0.78, -2.2], 0);
+      await spawn(ASSETS.polyfork.wineJug, 0.22, [-0.4, 0.78, -2.2], 0);
+      await spawn(ASSETS.polyfork.goblet, 0.16, [0.4, 0.78, -2.2], 0);
       // Asientos bilaterales (Representación Sindical y Liderazgo Empresarial)
-      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [-1.3, 0, -0.6], Math.PI / 2);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [1.3, 0, -0.6], Math.PI / 2);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [-1.3, 0, -2.2], Math.PI / 2);
+      await spawn(ASSETS.polyfork.splitLogBench, 0.65, [1.3, 0, -2.2], Math.PI / 2);
 
       // 2. Ala Izquierda: Registro del Contrato Colectivo y Estatutos
       await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [-3.2, 0, 0.6], 0.3);
@@ -3411,7 +3237,7 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       // Escala heroica con modelos 3D reales de la librería Polyfork:
       // - Gran Castillo Real al fondo (12.0m) y 4 torres defensivas
       // - Calzada de Honor: Guardia de estatuas de caballeros y braseros triunfales
-      // - Centro: Gran Altar de Graduación con el Arcón Dorado de Logros y Corona
+      // - Centro: Gran Altar de Graduación con el Arcón Dorado de Logros
       // - Ala de Celebración: Mesa de banquete con lechón, tarta rústica y jarras
       // - Cuervos en las almenas altas
       // ═════════════════════════════════════════════════════════════════════════
@@ -3427,19 +3253,31 @@ export async function buildCheckpointStructure(mission, getTerrainY) {
       await spawn(ASSETS.polyfork.standingBrazier, 1.20, [-2.2, 0, 1.4], 0);
       await spawn(ASSETS.polyfork.standingBrazier, 1.20, [2.2, 0, 1.4], 0);
 
-      // 2. Centro: Gran Altar Sagrado de Graduación y Arcón Real de Recompensas
+      // 2. Centro: Gran Altar Sagrado de Graduación y Podio Real de Campeones (1°, 2°, 3° Lugar)
       await spawn(ASSETS.polyfork.stoneAltar, 1.05, [0, 0, -1.2], 0);
       await spawn(ASSETS.polyfork.ironStrongbox, 0.65, [0, 0, 0.4], 0);
 
-      // Emblema triunfal dorado flotando sobre el altar de graduación
-      const victoryCrown = new THREE.Mesh(
-        new THREE.TorusGeometry(0.42, 0.08, 12, 32),
-        new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffa500, emissiveIntensity: 2.8, metalness: 0.9, roughness: 0.15 })
-      );
-      const vicY = getTerrainY(mission.x, mission.z - 1.2);
-      victoryCrown.position.set(0, vicY + 2.2, -1.2);
-      g.add(victoryCrown);
-      g.userData.crystal = victoryCrown;
+      const podiumStoneMat = new THREE.MeshStandardMaterial({ color: 0x3b3530, roughness: 0.72, metalness: 0.15 });
+      const podiumGoldMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, roughness: 0.28, metalness: 0.85 });
+      const podiumSilverMat = new THREE.MeshStandardMaterial({ color: 0xb0b8c0, roughness: 0.32, metalness: 0.78 });
+      const podiumBronzeMat = new THREE.MeshStandardMaterial({ color: 0xb87333, roughness: 0.38, metalness: 0.72 });
+
+      [
+        { x: 0, z: 2.3, h: 0.42, r: 0.62, trim: podiumGoldMat },     // 1° Lugar (Centro)
+        { x: -1.65, z: 2.75, h: 0.28, r: 0.56, trim: podiumSilverMat }, // 2° Lugar (Izquierda)
+        { x: 1.65, z: 2.75, h: 0.18, r: 0.54, trim: podiumBronzeMat }   // 3° Lugar (Derecha)
+      ].forEach(pStep => {
+        const plinth = new THREE.Mesh(new THREE.CylinderGeometry(pStep.r, pStep.r * 1.08, pStep.h, 16), podiumStoneMat);
+        plinth.position.set(pStep.x, pStep.h * 0.5, pStep.z);
+        plinth.castShadow = true;
+        plinth.receiveShadow = true;
+        g.add(plinth);
+
+        const cap = new THREE.Mesh(new THREE.CylinderGeometry(pStep.r * 1.02, pStep.r * 1.02, 0.035, 16), pStep.trim);
+        cap.position.set(pStep.x, pStep.h + 0.015, pStep.z);
+        cap.receiveShadow = true;
+        g.add(cap);
+      });
 
       // 3. Ala de Celebración: Mesa de Banquete de Victoria
       await spawn(ASSETS.polyfork.timberTable, 0.76, [-5.2, 0, 0.8], 0.25);
@@ -3475,57 +3313,80 @@ async function createInstancedGroup(path, transforms) {
   const gltf = await loadModel(path);
   if (!gltf || !gltf.scene) return null;
 
-  let sourceMesh = null;
+  gltf.scene.updateMatrixWorld(true);
+  const sceneBox = new THREE.Box3().setFromObject(gltf.scene);
+  if (sceneBox.isEmpty()) return null;
+
+  const sizeY = Math.max(0.001, sceneBox.max.y - sceneBox.min.y);
+  const centerX = (sceneBox.max.x + sceneBox.min.x) * 0.5;
+  const centerZ = (sceneBox.max.z + sceneBox.min.z) * 0.5;
+  const offsetY = -sceneBox.min.y;
+  const isFlatPath = sizeY < 0.25;
+
+  const meshEntries = [];
+  const rootInverse = new THREE.Matrix4().copy(gltf.scene.matrixWorld).invert();
   gltf.scene.traverse(child => {
-    if (child.isMesh && !sourceMesh) {
-      sourceMesh = child;
+    if (child.isMesh && child.geometry) {
+      const relMatrix = new THREE.Matrix4().multiplyMatrices(rootInverse, child.matrixWorld);
+      meshEntries.push({ mesh: child, relMatrix });
     }
   });
-  if (!sourceMesh) return null;
-
-  sourceMesh.geometry.computeBoundingBox();
-  const bb = sourceMesh.geometry.boundingBox;
-  const sizeY = Math.max(0.001, bb.max.y - bb.min.y);
-  const centerX = (bb.max.x + bb.min.x) * 0.5;
-  const centerZ = (bb.max.z + bb.min.z) * 0.5;
-  const offsetY = -bb.min.y;
-
-  const mat = sourceMesh.material.clone();
-  mat.roughness = 0.85;
-  mat.metalness = 0.0;
-  mat.envMapIntensity = 0.0;
-
-  const instancedMesh = new THREE.InstancedMesh(sourceMesh.geometry, mat, transforms.length);
-  instancedMesh.castShadow = true;
-  instancedMesh.receiveShadow = true;
+  if (!meshEntries.length) return null;
 
   const dummy = new THREE.Object3D();
   const subDummy = new THREE.Object3D();
   dummy.add(subDummy);
+  const finalMat = new THREE.Matrix4();
 
-  for (let i = 0; i < transforms.length; i++) {
-    const t = transforms[i];
-    const scale = t.height / sizeY;
-    const sx = scale * (t.scaleX || 1);
-    const sz = scale * (t.scaleZ || 1);
+  const buildSingleInstanced = (entry) => {
+    const mat = entry.mesh.material.clone();
+    if (entry.mesh.geometry?.attributes?.color) {
+      mat.vertexColors = true;
+    }
+    mat.roughness = 0.85;
+    mat.metalness = 0.0;
+    mat.envMapIntensity = 0.0;
 
-    subDummy.position.set(-centerX * sx, (offsetY - 0.03) * scale, -centerZ * sz);
-    subDummy.scale.set(sx, scale, sz);
+    const instancedMesh = new THREE.InstancedMesh(entry.mesh.geometry, mat, transforms.length);
+    instancedMesh.castShadow = !isFlatPath;
+    instancedMesh.receiveShadow = true;
 
-    dummy.position.set(t.pos[0], t.pos[1], t.pos[2]);
-    dummy.rotation.y = t.rotY || 0;
-    if (t.tiltX) dummy.rotation.x = t.tiltX;
-    if (t.tiltZ) dummy.rotation.z = t.tiltZ;
-    dummy.updateMatrixWorld(true);
+    for (let i = 0; i < transforms.length; i++) {
+      const t = transforms[i];
+      const scale = t.height / sizeY;
+      const sx = scale * (t.scaleX || 1);
+      const sz = scale * (t.scaleZ || 1);
+      const yPos = isFlatPath ? (offsetY * scale + 0.015) : ((offsetY - 0.03) * scale);
 
-    subDummy.updateMatrixWorld(true);
-    instancedMesh.setMatrixAt(i, subDummy.matrixWorld);
+      subDummy.position.set(-centerX * sx, yPos, -centerZ * sz);
+      subDummy.scale.set(sx, scale, sz);
+
+      dummy.position.set(t.pos[0], t.pos[1], t.pos[2]);
+      dummy.rotation.y = t.rotY || 0;
+      dummy.rotation.x = t.tiltX || 0;
+      dummy.rotation.z = t.tiltZ || 0;
+      dummy.updateMatrixWorld(true);
+      subDummy.updateMatrixWorld(true);
+
+      finalMat.multiplyMatrices(subDummy.matrixWorld, entry.relMatrix);
+      instancedMesh.setMatrixAt(i, finalMat);
+    }
+
+    instancedMesh.instanceMatrix.needsUpdate = true;
+    instancedMesh.computeBoundingBox();
+    instancedMesh.computeBoundingSphere();
+    return instancedMesh;
+  };
+
+  if (meshEntries.length === 1) {
+    return buildSingleInstanced(meshEntries[0]);
   }
 
-  instancedMesh.instanceMatrix.needsUpdate = true;
-  instancedMesh.computeBoundingBox();
-  instancedMesh.computeBoundingSphere();
-  return instancedMesh;
+  const holder = new THREE.Group();
+  for (const entry of meshEntries) {
+    holder.add(buildSingleInstanced(entry));
+  }
+  return holder;
 }
 
 // ── Minecraft-Style Spatial Chunk World Streamer with Frustum Culling ────────
@@ -3539,13 +3400,13 @@ export class ProgressiveWorldStreamer {
     this.mixers = [];
     this.birds = [];
 
-    // 32 Spatial Chunks (8 columns x 4 rows across 920x480 continent)
-    this.chunkCols = 8;
-    this.chunkRows = 4;
-    this.minX = -380;
-    this.maxX = 540;
-    this.minZ = -240;
-    this.maxZ = 240;
+    // 60 Spatial Chunks (10 columns x 6 rows across 1560x960 extended continent)
+    this.chunkCols = 10;
+    this.chunkRows = 6;
+    this.minX = -680;
+    this.maxX = 880;
+    this.minZ = -480;
+    this.maxZ = 480;
     this.chunkW = (this.maxX - this.minX) / this.chunkCols;
     this.chunkD = (this.maxZ - this.minZ) / this.chunkRows;
 
@@ -3696,7 +3557,9 @@ export class ProgressiveWorldStreamer {
           ASSETS.bushes[0], // round-bush-cd2ac0.glb (Arbusto globular frondoso verde)
           ASSETS.bushes[1], // bush-8bb596.glb (Arbusto silvestre verde denso)
           ASSETS.bushes[2], // fern-plant-1559b8.glb (Helecho silvestre verde)
-          ASSETS.bushes[3]  // grass-tuft-a40a08.glb (Mechón de hierba)
+          ASSETS.bushes[3], // grass-tuft-a40a08.glb (Mechón de hierba)
+          ASSETS.bushes[4], // wildflower-68d3a1.glb (Flores silvestres campestres)
+          ASSETS.bushes[5]  // azalea-bush-7bb14d.glb (Arbusto en flor azalea)
         ],
         rocks: [ASSETS.rocks[0], ASSETS.rocks[1]] // Rock_1_A, Rock_1_E
       },
@@ -3725,8 +3588,8 @@ export class ProgressiveWorldStreamer {
         understory: [
           ASSETS.bushes[2], // fern-plant-1559b8.glb (Helecho silvestre verde vivo)
           ASSETS.bushes[0], // round-bush-cd2ac0.glb (Arbusto globular)
-          ASSETS.bushes[1], // bush-8bb596.glb (Arbusto silvestre)
-          ASSETS.bushes[3]  // grass-tuft-a40a08.glb (Mechón de hierba)
+          ASSETS.bushes[3], // grass-tuft-a40a08.glb (Mechón de hierba)
+          ASSETS.bushes[4]  // wildflower-68d3a1.glb (Flores silvestres)
         ],
         rocks: [ASSETS.rocks[1], ASSETS.rocks[3]] // Rock_1_E, Rock_3_A
       },
@@ -3753,7 +3616,8 @@ export class ProgressiveWorldStreamer {
         understory: [
           ASSETS.bushes[0], // round-bush-cd2ac0.glb
           ASSETS.bushes[1], // bush-8bb596.glb
-          ASSETS.bushes[3]  // grass-tuft-a40a08.glb
+          ASSETS.bushes[3], // grass-tuft-a40a08.glb
+          ASSETS.bushes[6]  // berry-bush-ee4812.glb (Arbusto con bayas)
         ],
         rocks: [ASSETS.rocks[2], ASSETS.rocks[0]] // Rock_2_A, Rock_1_A
       },
@@ -3780,8 +3644,9 @@ export class ProgressiveWorldStreamer {
         ],
         understory: [
           ASSETS.bushes[0], // round-bush-cd2ac0.glb
-          ASSETS.bushes[1], // bush-8bb596.glb
-          ASSETS.bushes[3]  // grass-tuft-a40a08.glb
+          ASSETS.bushes[3], // grass-tuft-a40a08.glb
+          ASSETS.bushes[4], // wildflower-68d3a1.glb
+          ASSETS.bushes[6]  // berry-bush-ee4812.glb
         ],
         rocks: [ASSETS.rocks[4], ASSETS.rocks[2]] // Rock_5_A, Rock_2_A
       }
@@ -3872,43 +3737,44 @@ export class ProgressiveWorldStreamer {
       }
     }
 
-    // ── 2. El Gran Cinturón Perimetral (Mountain Rim Forest Wall) ────────────
-    // Muralla densa de coníferas colosales, abedules y robles majestuosos (8.5m a 12.0m)
+    // ── 2. Bosques Exteriores Orgánicos (Transición natural sin bordes rectangulares) ──
     const rimTrees = [
-      ASSETS.trees[14], // tall-pine-tree-ab4108.glb (Pino verde natural imponente)
-      ASSETS.trees[5],  // Tree_2_C_Color1.gltf (Pino estilizado alto)
-      ASSETS.trees[13], // birch-tree-181b33.glb (Abedul tronco blanco y verde)
-      ASSETS.trees[12], // Tree_7_A_Color1.gltf (Árbol majestuoso colosal)
-      ASSETS.trees[0],  // Tree_1_A_Color1.gltf (Roble estilizado verde vivo)
-      ASSETS.trees[15]  // broadleaf-oak-997c22.glb (Roble frondoso)
+      ASSETS.trees[14],
+      ASSETS.trees[5],
+      ASSETS.trees[13],
+      ASSETS.trees[12],
+      ASSETS.trees[0],
+      ASSETS.trees[15]
     ];
 
-    const perimeterPoints = [];
-    // Borde Norte
-    for (let x = -370; x <= 530; x += 15) {
-      perimeterPoints.push([x + (seeded(seedIdx++) - 0.5) * 5, -205 + (seeded(seedIdx++) - 0.5) * 18]);
-    }
-    // Borde Sur
-    for (let x = -370; x <= 530; x += 15) {
-      perimeterPoints.push([x + (seeded(seedIdx++) - 0.5) * 5, 205 + (seeded(seedIdx++) - 0.5) * 18]);
-    }
-    // Borde Oeste
-    for (let z = -190; z <= 190; z += 15) {
-      perimeterPoints.push([-345 + (seeded(seedIdx++) - 0.5) * 18, z + (seeded(seedIdx++) - 0.5) * 5]);
-    }
-    // Borde Este
-    for (let z = -190; z <= 190; z += 15) {
-      perimeterPoints.push([505 + (seeded(seedIdx++) - 0.5) * 18, z + (seeded(seedIdx++) - 0.5) * 5]);
-    }
-
-    for (const [px, pz] of perimeterPoints) {
-      const py = this.getTerrainY(px, pz);
-      if (py < -0.3 || !canSpawnAt(px, pz, 2.6)) continue;
+    // Dispersión orgánica en la pradera exterior para evitar cortes rectangulares de vegetación
+    for (let o = 0; o < 240; o++) {
+      const ox = -640 + seeded(seedIdx++) * 1480;
+      const oz = -440 + seeded(seedIdx++) * 880;
+      // Solo poblar el anillo exterior fuera del núcleo central para continuar el bosque naturalmente
+      if (ox > -340 && ox < 490 && oz > -185 && oz < 185) continue;
+      const oy = this.getTerrainY(ox, oz);
+      if (oy < -0.3 || !canSpawnAt(ox, oz, 3.2)) continue;
 
       const model = rimTrees[Math.floor(seeded(seedIdx++) * rimTrees.length)];
-      const height = THREE.MathUtils.lerp(8.5, 12.0, seeded(seedIdx++));
-      const scaleXZ = THREE.MathUtils.lerp(0.95, 1.35, seeded(seedIdx++));
-      addInstance(model, height, [px, py, pz], seeded(seedIdx++) * Math.PI * 2, scaleXZ, scaleXZ);
+      const height = THREE.MathUtils.lerp(7.5, 11.8, seeded(seedIdx++));
+      const scaleXZ = THREE.MathUtils.lerp(0.90, 1.32, seeded(seedIdx++));
+      addInstance(model, height, [ox, oy, oz], seeded(seedIdx++) * Math.PI * 2, scaleXZ, scaleXZ);
+
+      // 1 a 2 árboles acompañantes por grupo exterior
+      const subCount = 1 + Math.floor(seeded(seedIdx++) * 2);
+      for (let sc = 0; sc < subCount; sc++) {
+        const ang = seeded(seedIdx++) * Math.PI * 2;
+        const rad = 4.5 + seeded(seedIdx++) * 9.0;
+        const sx = ox + Math.cos(ang) * rad;
+        const sz = oz + Math.sin(ang) * rad;
+        const sy = this.getTerrainY(sx, sz);
+        if (sy >= -0.3 && canSpawnAt(sx, sz, 2.2)) {
+          const subModel = rimTrees[Math.floor(seeded(seedIdx++) * rimTrees.length)];
+          const subH = THREE.MathUtils.lerp(4.8, 8.2, seeded(seedIdx++));
+          addInstance(subModel, subH, [sx, sy, sz], seeded(seedIdx++) * Math.PI * 2, 1.0, 1.0);
+        }
+      }
     }
 
     // ── 3. Dispersión Orgánica de Rocas y Elementos Naturales ────────────────
@@ -3950,6 +3816,79 @@ export class ProgressiveWorldStreamer {
         const height = THREE.MathUtils.lerp(0.70, 1.35, seeded(seedIdx++));
         const rotY = seeded(seedIdx++) * Math.PI * 2;
         addInstance(floraModel, height, [bx, by, bz], rotY);
+      }
+    }
+
+    // ── 4b. Mechones de Hierba 3D y Flores Silvestres en Lindes del Camino ──
+    const grassTuftModel = ASSETS.bushes[3];   // grass-tuft-a40a08.glb
+    const wildflowerModel = ASSETS.bushes[4];  // wildflower-68d3a1.glb
+    const fernModel = ASSETS.bushes[2];        // fern-plant-1559b8.glb
+
+    if (this.trailPoints && this.trailPoints.length > 6) {
+      for (let i = 4; i < this.trailPoints.length - 4; i += 2) {
+        const pt = this.trailPoints[i];
+        const nextPt = this.trailPoints[i + 1];
+        const px = pt.x;
+        const pz = (pt.z !== undefined) ? pt.z : pt.y;
+        const nx = nextPt.x;
+        const nz = (nextPt.z !== undefined) ? nextPt.z : nextPt.y;
+
+        // Omitir en cruces sobre puentes fluviales
+        if (Math.hypot(px - (-125), pz - (-20)) < 13 || Math.hypot(px - 80, pz - (-20)) < 13) continue;
+
+        // Omitir dentro de las plazas de las estaciones
+        let minDistSt = Infinity;
+        for (const m of this.missions) {
+          const d = Math.hypot(px - m.x, pz - m.z);
+          if (d < minDistSt) minDistSt = d;
+        }
+        if (minDistSt < 12.0) continue;
+
+        const dx = nx - px;
+        const dz = nz - pz;
+        const segLen = Math.hypot(dx, dz) || 1;
+        const sideX = -dz / segLen;
+        const sideZ = dx / segLen;
+
+        for (const side of [-1, 1]) {
+          const randVal = seeded(seedIdx++);
+          if (randVal > 0.40) { // 60% de probabilidad
+            const offsetDist = 2.4 + randVal * 2.2;
+            const fx = px + sideX * offsetDist * side + (seeded(seedIdx++) - 0.5) * 0.7;
+            const fz = pz + sideZ * offsetDist * side + (seeded(seedIdx++) - 0.5) * 0.7;
+            const fy = this.getTerrainY(fx, fz);
+            if (fy >= -0.1) {
+              const pickFlora = (randVal > 0.82) ? wildflowerModel : ((randVal > 0.68) ? fernModel : grassTuftModel);
+              const fHeight = (pickFlora === wildflowerModel) ? THREE.MathUtils.lerp(0.38, 0.54, seeded(seedIdx++)) : THREE.MathUtils.lerp(0.45, 0.75, seeded(seedIdx++));
+              const fRot = seeded(seedIdx++) * Math.PI * 2;
+              addInstance(pickFlora, fHeight, [fx, fy, fz], fRot);
+            }
+          }
+        }
+      }
+    }
+
+    // ── 4c. Colonias Naturales de Flores y Mechones en Praderas Abiertas ────
+    for (let c = 0; c < 95; c++) {
+      const cx = -340 + seeded(seedIdx++) * 820;
+      const cz = -180 + seeded(seedIdx++) * 360;
+      const cy = this.getTerrainY(cx, cz);
+      if (cy < -0.2 || cy > 36.0) continue;
+      if (isStationClearing(cx, cz)) continue;
+
+      const clumpCount = 3 + Math.floor(seeded(seedIdx++) * 3);
+      for (let k = 0; k < clumpCount; k++) {
+        const angle = seeded(seedIdx++) * Math.PI * 2;
+        const dist = 0.4 + seeded(seedIdx++) * 2.2;
+        const fx = cx + Math.cos(angle) * dist;
+        const fz = cz + Math.sin(angle) * dist;
+        const fy = this.getTerrainY(fx, fz);
+        if (fy >= -0.2) {
+          const isFlower = seeded(seedIdx++) > 0.40;
+          const model = isFlower ? wildflowerModel : grassTuftModel;
+          const h = isFlower ? THREE.MathUtils.lerp(0.35, 0.52, seeded(seedIdx++)) : THREE.MathUtils.lerp(0.44, 0.72, seeded(seedIdx++));
+          addInstance(model, h, [fx, fy, fz], seeded(seedIdx++) * Math.PI * 2);
+        }
       }
     }
 
@@ -4070,6 +4009,7 @@ export class ProgressiveWorldStreamer {
 
         if (safeClip && !safeClip.name.toLowerCase().includes('death')) {
           mixer.clipAction(safeClip).play();
+          inst.userData.mixer = mixer;
           this.mixers.push(mixer);
         }
       }
@@ -4103,21 +4043,54 @@ export class ProgressiveWorldStreamer {
   }
 
   tickStream() {
-    // Zero CPU streaming runtime cost: All 24 Chunks are pre-instanced on GPU!
+    // Zero CPU streaming runtime cost: All Chunks are pre-instanced on GPU
   }
 
-  update(dt, elapsed, cameraPos = null) {
-    for (const mixer of this.mixers) {
-      mixer.update(dt);
+  update(dt, elapsed, cameraPos = null, isOverview3D = false) {
+    // 1. Station Distance Culling & LOD in Inspection/Walk Mode
+    for (let i = 0; i < this.missions.length; i++) {
+      const m = this.missions[i];
+      if (!m.structGroup) continue;
+
+      if (isOverview3D) {
+        if (!m.structGroup.visible) m.structGroup.visible = true;
+      } else if (cameraPos) {
+        const d = Math.hypot(cameraPos.x - m.x, cameraPos.z - m.z);
+        const shouldBeVisible = (d < 360.0);
+        if (m.structGroup.visible !== shouldBeVisible) {
+          m.structGroup.visible = shouldBeVisible;
+        }
+      }
+
+      // Update station NPC/prop mixers ONLY when station structure is visible and close (< 75m)
+      const stMixers = m.structGroup?.userData?.mixers;
+      if (!stMixers || !stMixers.length || !m.structGroup.visible) continue;
+      if (!cameraPos || Math.hypot(cameraPos.x - m.x, cameraPos.z - m.z) < 75.0) {
+        for (let j = 0; j < stMixers.length; j++) {
+          stMixers[j].update(dt);
+        }
+      }
     }
 
-    for (const a of (this.roamingAnimals || [])) {
+    // 2. Roaming Animals: Cull visibility & skeletal mixer updates beyond 95m
+    const animals = this.roamingAnimals || [];
+    for (let i = 0; i < animals.length; i++) {
+      const a = animals[i];
+      if (cameraPos) {
+        const d = Math.hypot(cameraPos.x - a.position.x, cameraPos.z - a.position.z);
+        const vis = isOverview3D ? false : (d < 115.0);
+        if (a.visible !== vis) a.visible = vis;
+        if (!vis || d > 85.0) continue;
+      }
+      if (a.userData.mixer) {
+        a.userData.mixer.update(dt);
+      }
       const ph = a.userData.animPhase;
-      // Gentle natural breathing / subtle idle sway in open meadow
       a.position.y = a.userData.baseY + Math.sin(elapsed * 1.8 + ph) * 0.022;
       a.rotation.y = a.userData.baseRotY + Math.sin(elapsed * 0.5 + ph) * 0.08;
     }
 
+    // 3. Sky Birds
     for (const b of this.birds) {
       const u = b.userData;
       const angle = elapsed * u.speed + u.phase;
@@ -4131,15 +4104,31 @@ export class ProgressiveWorldStreamer {
       }
     }
 
-    // Minecraft-Style Distance Culling (Adaptive to camera altitude to prevent pop-in)
+    // 4. Minecraft-Style Spatial Chunk & Station Culling
     this.cullFrame = (this.cullFrame || 0) + 1;
-    if (cameraPos && this.cullFrame % 8 === 0) {
-      const maxDist = cameraPos.y > 35 ? 560.0 : 420.0;
+    if (cameraPos && (this.cullFrame % 4 === 0 || isOverview3D !== this._lastOverview)) {
+      this._lastOverview = isOverview3D;
+      const chunkMaxDist = isOverview3D ? 2400.0 : (cameraPos.y > 42 ? 320.0 : 185.0);
+      const stationMaxDist = isOverview3D ? 2400.0 : (cameraPos.y > 42 ? 340.0 : 210.0);
+
       for (let c = 0; c < this.chunkCols; c++) {
         for (let r = 0; r < this.chunkRows; r++) {
           const chunk = this.chunks[c][r];
           const dist = Math.hypot(cameraPos.x - chunk.cx, cameraPos.z - chunk.cz);
-          chunk.group.visible = (dist < maxDist);
+          const nextVis = dist < chunkMaxDist;
+          if (chunk.group.visible !== nextVis) {
+            chunk.group.visible = nextVis;
+          }
+        }
+      }
+
+      for (let i = 0; i < this.missions.length; i++) {
+        const m = this.missions[i];
+        if (!m.structGroup) continue;
+        const dist = Math.hypot(cameraPos.x - m.x, cameraPos.z - m.z);
+        const nextVis = dist < stationMaxDist;
+        if (m.structGroup.visible !== nextVis) {
+          m.structGroup.visible = nextVis;
         }
       }
     }
@@ -4153,6 +4142,8 @@ export async function installRealisticWorld({ scene, missions, getTerrainY, trai
 
   // Build all 9 checkpoint structures in parallel for maximum speed
   const structurePromises = missions.map(async (q, i) => {
+    // La estación 00 está fusionada con la 01 (Punto de Partida único): no se construye una segunda estructura
+    if (q.hidden) return null;
     try {
       const struct = await buildCheckpointStructure(q, getTerrainY);
       // Group at y=0 — every child already has its own correct world Y from getTerrainY
@@ -4186,96 +4177,113 @@ export async function installRealisticWorld({ scene, missions, getTerrainY, trai
 
 // ── Humanoid Adventurer Character with Realistic Proportions (1.85m height) ───
 
-// ── 8 Distinct Adventure Character Archetypes & Presets (Kenney Protagonists) ─
+// ── 8 Clases de Aventureros 3D (Librería Maestra Polyfork) ──────────────────
 export const AVATAR_PRESETS = [
   {
-    id: 'ranger',
-    name: 'Explorador Ágil',
-    skinKey: 'skaterMale',
-    tintHex: 0xffffff,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`,
-    role: 'Agilidad & Campo',
-    desc: 'Dinámico, veloz y siempre listo para recorrer nuevas rutas.',
-    primaryColor: '#e67e22'
-  },
-  {
-    id: 'valkyrie',
-    name: 'Vanguardia Urbana',
-    skinKey: 'skaterFemale',
-    tintHex: 0xffffff,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-    role: 'Energía & Impulso',
-    desc: 'Determinada y creativa, lidera la iniciativa en cada estación.',
+    id: 'paladin',
+    name: 'Caballero Real',
+    modelKey: 'knight',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    role: 'Honor y Protección',
+    desc: 'Héroe acorazado de la orden real con armadura de placas.',
     primaryColor: '#cc092f'
   },
   {
-    id: 'tinkerer',
-    name: 'Cyborg Táctico',
-    skinKey: 'cyborgFemale',
-    tintHex: 0xffffff,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3m-3.2-6.8-2.1 2.1M7.3 16.7l-2.1 2.1m0-13.6 2.1 2.1m9.4 9.4 2.1 2.1"/></svg>`,
-    role: 'Tecnología & Precisión',
-    desc: 'Equipada con visión analítica para dominar sistemas y procesos.',
-    primaryColor: '#00b4d8'
-  },
-  {
-    id: 'herald',
-    name: 'Estratega Ejecutivo',
-    skinKey: 'criminalMale',
-    tintHex: 0xffffff,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>`,
-    role: 'Liderazgo & Visión',
-    desc: 'Elegante y resolutivo, enfocado en metas y acuerdos clave.',
-    primaryColor: '#10b981'
-  },
-  {
-    id: 'paladin',
-    name: 'Centinela Bradesco',
-    skinKey: 'criminalMale',
-    tintHex: 0xffd6dc,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
-    role: 'Ética & Protección',
-    desc: 'Defensor de los valores institucionales y la seguridad integral.',
-    primaryColor: '#e11d48'
+    id: 'valkyrie',
+    name: 'Cazadora de Dragones',
+    modelKey: 'barbarian',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+    role: 'Fuerza y Coraje',
+    desc: 'Guerrera de élite forjada para liderar las grandes batallas.',
+    primaryColor: '#e67e22'
   },
   {
     id: 'mage',
-    name: 'Tecno-Analista Arcana',
-    skinKey: 'cyborgFemale',
-    tintHex: 0xe9d5ff,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/></svg>`,
-    role: 'Innovación & Datos',
-    desc: 'Transforma información compleja en decisiones claras.',
+    name: 'Sabio Arcano',
+    modelKey: 'mage',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/></svg>`,
+    role: 'Sabiduría y Magia',
+    desc: 'Custodio de los pergaminos antiguos y el saber del reino.',
     primaryColor: '#8b5cf6'
   },
   {
-    id: 'alchemist',
-    name: 'Mentora de Cultura',
-    skinKey: 'skaterFemale',
-    tintHex: 0xd1fae5,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31a2 2 0 0 1-.37 1.17l-4.26 6.39A2 2 0 0 0 7 20h10a2 2 0 0 0 1.63-3.13l-4.26-6.39A2 2 0 0 1 14 9.31V2"/><path d="M8.5 2h7"/></svg>`,
-    role: 'Cultura & Servicio',
-    desc: 'Conecta equipos y eleva la experiencia de cada cliente.',
-    primaryColor: '#14b8a6'
+    id: 'ranger',
+    name: 'Guardabosques',
+    modelKey: 'rogue',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`,
+    role: 'Agilidad y Campo',
+    desc: 'Rastreador experto de los senderos, bosques y riberas.',
+    primaryColor: '#10b981'
   },
   {
-    id: 'rogue',
-    name: 'Mensajero Estelar',
-    skinKey: 'skaterMale',
-    tintHex: 0xdbeafe,
-    iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>`,
-    role: 'Comunicación & Ritmo',
-    desc: 'Ágil para colaborar y llevar mensajes a todo el ecosistema.',
+    id: 'warden',
+    name: 'Centinela de la Guardia',
+    modelKey: 'guard',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>`,
+    role: 'Orden y Vigilancia',
+    desc: 'Vigía leal que resguarda las plazas y portales de la aldea.',
     primaryColor: '#3b82f6'
+  },
+  {
+    id: 'merchant',
+    name: 'Mercader del Reino',
+    modelKey: 'merchant',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`,
+    role: 'Estrategia y Valor',
+    desc: 'Especialista en alianzas, intercambios y prosperidad.',
+    primaryColor: '#eab308'
+  },
+  {
+    id: 'artisan',
+    name: 'Maestro Artesano',
+    modelKey: 'tradesman',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+    role: 'Ingenio y Oficio',
+    desc: 'Artífice de las herramientas, forjas y talleres del reino.',
+    primaryColor: '#d97706'
+  },
+  {
+    id: 'mountaineer',
+    name: 'Explorador de Cumbres',
+    modelKey: 'mountaineer',
+    hideMeshes: [],
+    idleClip: 'Idle',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>`,
+    role: 'Resiliencia y Meta',
+    desc: 'Conquistador de las tierras altas y las cimas del bastión.',
+    primaryColor: '#06b6d4'
   }
 ];
 
-// ── Animated 3D Character Builder (Kenney Protagonists FBX Library) ──────────
+const LEGACY_AVATAR_MAP = {
+  warrior: 'valkyrie',
+  herald: 'paladin',
+  tinkerer: 'artisan',
+  alchemist: 'mage',
+  rogue: 'ranger'
+};
 
-export function createHeroModel(avatarId = 'ranger', playerColorHex = '#cc092f', options = {}) {
-  const normId = (avatarId === 'warrior' ? 'valkyrie' : avatarId) || 'ranger';
-  const preset = AVATAR_PRESETS.find(p => p.id === normId) || AVATAR_PRESETS[0];
-  const targetHeight = options.targetHeight || 1.12;
+// ── Animated 3D Character Builder (Polyfork Rigged Characters) ───────────────
+
+export function createHeroModel(avatarId = 'paladin', playerColorHex = '#cc092f', options = {}) {
+  const mappedId = LEGACY_AVATAR_MAP[avatarId] || avatarId || 'paladin';
+  const preset = AVATAR_PRESETS.find(p => p.id === mappedId) || AVATAR_PRESETS[0];
+  const normId = preset.id;
+  const targetHeight = options.targetHeight || 1.25;
   const initialAnim = options.initialAnim || 'idle';
 
   const group = new THREE.Group();
@@ -4302,6 +4310,9 @@ export function createHeroModel(avatarId = 'ranger', playerColorHex = '#cc092f',
       }
       this.currentAnim = targetKey;
     },
+    playAnim(animName = 'idle') {
+      this.playAnimation(animName);
+    },
     update(dt = 0.016) {
       if (this.mixer) {
         const safeDt = Math.min(Math.max(dt, 0), 0.08);
@@ -4311,45 +4322,64 @@ export function createHeroModel(avatarId = 'ranger', playerColorHex = '#cc092f',
   };
 
   function attachCharacterRig() {
-    if (!cachedCharacterFBX) return;
+    const gltf = cachedPolyforkChars.get(preset.modelKey) || cachedPolyforkChars.values().next().value;
+    if (!gltf || !gltf.scene) return;
 
-    const rig = cloneSkeleton(cachedCharacterFBX);
-    const tex = skinTextureMap.get(preset.skinKey) || skinTextureMap.values().next().value || null;
-    const tint = new THREE.Color(preset.tintHex !== undefined ? preset.tintHex : 0xffffff);
+    const rig = cloneSkeleton(gltf.scene);
+    const hideSet = new Set(preset.hideMeshes || []);
 
     rig.traverse(child => {
+      if (hideSet.has(child.name)) {
+        child.visible = false;
+        return;
+      }
       if (child.isMesh || child.isSkinnedMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
         child.frustumCulled = false;
-        child.material = new THREE.MeshStandardMaterial({
-          map: tex || null,
-          color: tint,
-          roughness: 0.68,
-          metalness: 0.06
-        });
+        if (child.material) {
+          child.material = child.material.clone();
+          if (child.geometry?.attributes?.color) {
+            child.material.vertexColors = true;
+          }
+          if (child.material.map) {
+            child.material.map.colorSpace = THREE.SRGBColorSpace;
+          }
+          child.material.roughness = 0.82;
+          child.material.metalness = 0.04;
+          child.material.needsUpdate = true;
+        }
       }
     });
 
-    // Normalize scale & align feet cleanly to y = 0
-    rig.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(rig);
-    const rawH = Math.max(0.01, box.max.y - box.min.y);
-    const scale = targetHeight / rawH;
+    // Normalize scale using Polyfork character's human crown height (~1.72m) & align feet to y = 0
+    const charNode = rig.getObjectByName('character') || rig.children[0] || rig;
+    const rawH = Number(charNode?.userData?.height) || 1.74;
+    const scale = targetHeight / Math.max(0.1, rawH);
     rig.scale.setScalar(scale);
-    rig.updateMatrixWorld(true);
-    const scaledBox = new THREE.Box3().setFromObject(rig);
-    rig.position.y -= scaledBox.min.y;
+    rig.position.set(0, 0, 0);
 
     group.add(rig);
 
     const mixer = new THREE.AnimationMixer(rig);
-    const actions = {};
-    ['idle', 'run', 'jump'].forEach(key => {
-      const clip = cachedCharacterAnims[key];
-      if (clip) {
-        actions[key] = mixer.clipAction(clip);
+    const clips = gltf.animations || [];
+    const findClip = (...names) => {
+      for (const n of names) {
+        const found = clips.find(c => c.name === n || c.name.toLowerCase() === n.toLowerCase());
+        if (found) return found;
       }
+      return clips.find(c => c.name.toLowerCase().includes('idle')) || clips[0] || null;
+    };
+
+    const actions = {};
+    const clipMap = {
+      idle: findClip(preset.idleClip || 'Idle', 'Idle', 'Unarmed_Idle'),
+      walk: findClip('Walk', 'Walking_A', 'Run', 'Running_A'),
+      run: findClip('Run', 'Walk', 'Running_A', 'Walking_A'),
+      jump: findClip('Run', 'Walk', 'Idle')
+    };
+    Object.entries(clipMap).forEach(([key, clip]) => {
+      if (clip) actions[key] = mixer.clipAction(clip);
     });
 
     group.userData.mixer = mixer;
@@ -4363,7 +4393,7 @@ export function createHeroModel(avatarId = 'ranger', playerColorHex = '#cc092f',
     }
   }
 
-  if (cachedCharacterFBX) {
+  if (cachedPolyforkChars.size > 0) {
     attachCharacterRig();
   } else {
     loadCharacterModel().then(() => attachCharacterRig());
@@ -4372,66 +4402,62 @@ export function createHeroModel(avatarId = 'ranger', playerColorHex = '#cc092f',
   return group;
 }
 
-// ── In-Map Humanoid Character with Collision-Free Courtyard Arc Placement ─────
+// ── In-Map Humanoid Character with 3/4 Conversational Placement (No Base Ring) ─
 
 export function createHumanoidCharacter(player, index, mission, getTerrainY, targetMission = null, startMission = null) {
   const root = new THREE.Group();
   root.name = `Player_${player.name}`;
 
-  const teamColor = new THREE.Color(player.color || '#cc092f');
-
-  // 1. Ornate Stone Plinth Base with Glowing Team Rune Ring
-  const plinthMat = new THREE.MeshStandardMaterial({ color: 0x7a7469, roughness: 0.90 });
-  const ringMat = new THREE.MeshStandardMaterial({ color: teamColor, emissive: teamColor, emissiveIntensity: 2.8, roughness: 0.25 });
-
-  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.05, 16), plinthMat);
-  plinth.position.y = 0.025;
-  plinth.receiveShadow = true;
-  root.add(plinth);
-
-  const runeRing = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.014, 8, 20), ringMat);
-  runeRing.rotation.x = Math.PI / 2;
-  runeRing.position.y = 0.052;
-  root.add(runeRing);
-
-  // 2. Animated 3D Character from Kenney Protagonists Library
-  const heroModel = createHeroModel(player.avatarId || 'ranger', player.color || '#cc092f', {
-    targetHeight: 1.04,
-    initialAnim: 'idle'
+  // 1. Animated 3D Polyfork Character directly on terrain (no base ring, no floating elements)
+  const isPodiumChamp = (mission?.type === 'castle' || targetMission?.type === 'castle') && typeof player.podiumRank === 'number' && player.podiumRank < 3;
+  const heroModel = createHeroModel(player.avatarId || 'paladin', player.color || '#cc092f', {
+    targetHeight: 1.32,
+    initialAnim: isPodiumChamp ? 'jump' : 'idle'
   });
-  heroModel.position.y = 0.05;
+  heroModel.position.y = 0;
   root.add(heroModel);
 
-  // 3. Overhead Floating Team Crystal / Badge in Team Color
-  const gemMat = new THREE.MeshStandardMaterial({
-    color: teamColor,
-    emissive: teamColor,
-    emissiveIntensity: 2.2,
-    roughness: 0.2
-  });
-  const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.075, 0), gemMat);
-  gem.position.y = 1.28;
-  root.add(gem);
-
-  // 4. Station Courtyard Slot Placement (Proportional & 100% Collision-Free Matrix)
+  // 2. Station Courtyard Slot Placement (3/4 conversational angle + Podium formation at Castle)
   function calcStationSlot(m, idx) {
     const totalInGroup = Math.max(1, (player.totalInStation || 4));
     const isCastle = m.type === 'castle';
     const isCamp = m.type === 'camp';
+
+    // Podium formation for top 3 champions at Castle (Station 13)
+    if (isCastle && typeof player.podiumRank === 'number' && player.podiumRank < 3) {
+      const podiumSlots = [
+        { ox: 0.0, oz: 2.3, oy: 0.45, rotY: Math.PI },          // 1° Lugar (Centro elevado)
+        { ox: -1.65, oz: 2.75, oy: 0.31, rotY: Math.PI - 0.28 }, // 2° Lugar (Izquierda)
+        { ox: 1.65, oz: 2.75, oy: 0.21, rotY: Math.PI + 0.28 }   // 3° Lugar (Derecha)
+      ];
+      const ps = podiumSlots[player.podiumRank];
+      const posX = m.x + ps.ox;
+      const posZ = m.z + ps.oz;
+      const posY = getTerrainY(posX, posZ) + ps.oy;
+      return {
+        pos: new THREE.Vector3(posX, posY, posZ),
+        rotY: ps.rotY
+      };
+    }
+
+    const effectiveIdx = (isCastle && typeof player.podiumRank === 'number' && player.podiumRank >= 3) ? (player.podiumRank - 3) : idx;
+    const effectiveTotal = (isCastle && totalInGroup > 3) ? (totalInGroup - 3) : totalInGroup;
+
     const maxPerRow = 5;
-    const row = Math.floor(idx / maxPerRow);
-    const col = idx % maxPerRow;
-    const inThisRow = row === 0 ? Math.min(totalInGroup, maxPerRow) : Math.max(1, totalInGroup - maxPerRow);
-    const spacingX = isCastle ? 1.35 : 0.95;
+    const row = Math.floor(effectiveIdx / maxPerRow);
+    const col = effectiveIdx % maxPerRow;
+    const inThisRow = row === 0 ? Math.min(effectiveTotal, maxPerRow) : Math.max(1, effectiveTotal - maxPerRow);
+    const spacingX = isCastle ? 1.45 : 1.15;
     const offsetX = (col - (inThisRow - 1) / 2) * spacingX;
-    const baseZ = isCastle ? 4.0 : (isCamp ? 3.4 : 2.5);
-    const offsetZ = baseZ + row * (isCastle ? 1.3 : 1.05);
+    const baseZ = isCastle ? 4.8 : 2.0;
+    const offsetZ = baseZ + row * 1.1;
 
     const posX = m.x + offsetX;
     const posZ = m.z + offsetZ;
     const posY = getTerrainY(posX, posZ);
 
-    const rotY = Math.atan2(-offsetX, -offsetZ);
+    // Flattering 3/4 front angle: face towards camera and courtyard center
+    const rotY = (offsetX >= 0 ? -0.42 : 0.42);
 
     return {
       pos: new THREE.Vector3(posX, posY, posZ),
@@ -4449,8 +4475,8 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
     player,
     phase: Math.random() * 6,
     heroModel,
-    runeRing,
-    gem,
+    runeRing: null,
+    gem: null,
     endPos: slot.pos.clone(),
     endRot: slot.rotY,
     walkProgress: 1
