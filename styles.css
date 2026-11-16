@@ -332,10 +332,10 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:var(--body);color:var
   transition: all .15s ease;
 }
 .quick-xp-btn:hover{
-  background: #ECFDF5;
-  color: #059669;
-  border-color: rgba(16,185,129,.35);
-  box-shadow: 0 1px 4px rgba(16,185,129,.15);
+  background: #FFF1F2;
+  color: #CC092F;
+  border-color: rgba(204,9,47,.35);
+  box-shadow: 0 1px 4px rgba(204,9,47,.15);
 }
 .quick-xp-btn.del{
   background: transparent;
@@ -1073,23 +1073,23 @@ dialog .close {
   right: 14px;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: #F8FAFC;
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 50%;
+  background: #F1F5F9;
+  border: 1px solid rgba(15, 23, 42, 0.08);
   color: #64748B;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 10;
 }
 dialog .close:hover {
   background: #FFF1F2;
   border-color: #CC092F;
   color: #CC092F;
-  transform: scale(1.05);
+  transform: rotate(90deg) scale(1.05);
 }
 dialog .close svg {
   display: block;
@@ -2071,17 +2071,17 @@ dialog.hero-modal-dialog[open] {
 }
 
 .hero-modal-close {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   background: #F1F5F9;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  color: #64748b;
-  border-radius: 9px;
+  color: #64748B;
+  border-radius: 50%;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
   padding: 0;
 }
@@ -2090,7 +2090,7 @@ dialog.hero-modal-dialog[open] {
   background: #FFF1F2;
   border-color: #CC092F;
   color: #CC092F;
-  transform: scale(1.05);
+  transform: rotate(90deg) scale(1.05);
 }
 
 .hero-modal-body {
@@ -3537,22 +3537,22 @@ dialog.station-admin-modal::backdrop {
   background: #F1F5F9;
   border: 1px solid rgba(15, 23, 42, 0.08);
   color: #64748B;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .station-admin-close-btn:hover {
   background: #FFF1F2;
   border-color: #CC092F;
   color: #CC092F;
-  transform: scale(1.05);
+  transform: rotate(90deg) scale(1.05);
 }
 
 .station-admin-body {
@@ -3836,22 +3836,22 @@ dialog.content-admin-modal[open] {
   background: #F1F5F9;
   border: 1px solid rgba(15, 23, 42, 0.08);
   color: #64748B;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .content-admin-close-btn:hover {
   background: #FFF1F2;
   border-color: #CC092F;
   color: #CC092F;
-  transform: scale(1.05);
+  transform: rotate(90deg) scale(1.05);
 }
 
 /* Station selector bar */
@@ -4050,8 +4050,8 @@ dialog.content-admin-modal[open] {
 }
 
 .add-chip-btn.video:hover { border-color: rgba(225, 29, 72, 0.4); color: #E11D48; background: #FFF1F2; }
-.add-chip-btn.eval:hover { border-color: rgba(2, 132, 199, 0.4); color: #0284C7; background: #F0F9FF; }
-.add-chip-btn.chk:hover { border-color: rgba(5, 150, 105, 0.4); color: #059669; background: #ECFDF5; }
+.add-chip-btn.eval:hover { border-color: rgba(204, 9, 47, 0.4); color: #CC092F; background: #FFF1F2; }
+.add-chip-btn.chk:hover { border-color: rgba(204, 9, 47, 0.4); color: #CC092F; background: #FFF1F2; }
 .add-chip-btn.doc:hover { border-color: rgba(217, 119, 6, 0.4); color: #D97706; background: #FEFCE8; }
 .add-chip-btn.ensala:hover { border-color: rgba(79, 70, 229, 0.4); color: #4F46E5; background: #EEF2FF; }
 
@@ -4166,9 +4166,9 @@ dialog.content-admin-modal[open] {
 }
 
 .card-type-chip.badge-video { background: #FFF1F2; color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.25); }
-.card-type-chip.badge-mid { background: #F0F9FF; color: #0284C7; border: 1px solid rgba(2, 132, 199, 0.25); }
-.card-type-chip.badge-final { background: #FAF5FF; color: #9333EA; border: 1px solid rgba(147, 51, 234, 0.25); }
-.card-type-chip.badge-chk { background: #ECFDF5; color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); }
+.card-type-chip.badge-mid { background: #FFF1F2; color: #CC092F; border: 1px solid rgba(204, 9, 47, 0.25); }
+.card-type-chip.badge-final { background: #FAF5FF; color: #900F15; border: 1px solid rgba(144, 15, 21, 0.25); }
+.card-type-chip.badge-chk { background: #FFF1F2; color: #900F15; border: 1px solid rgba(144, 15, 21, 0.25); }
 .card-type-chip.badge-doc { background: #FEFCE8; color: #D97706; border: 1px solid rgba(217, 119, 6, 0.25); }
 .card-type-chip.badge-img { background: #FDF2F8; color: #DB2777; border: 1px solid rgba(219, 39, 119, 0.25); }
 .card-type-chip.badge-ensala { background: #EEF2FF; color: #4F46E5; border: 1px solid rgba(79, 70, 229, 0.25); }
@@ -4196,27 +4196,29 @@ dialog.content-admin-modal[open] {
 
 .card-delete-btn,
 .admin-del-row-btn {
-  background: transparent;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  color: #94A3B8;
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+  background: #F8FAFC;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #64748B;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .card-delete-btn:hover,
 .admin-del-row-btn:hover {
   background: #FFF1F2;
-  border-color: rgba(204, 9, 47, 0.35);
+  border-color: #CC092F;
   color: #CC092F;
-  transform: scale(1.08);
+  transform: rotate(90deg) scale(1.08);
+  box-shadow: 0 2px 6px rgba(204, 9, 47, 0.2);
 }
 
 .card-delete-btn svg,
@@ -4423,7 +4425,7 @@ dialog.content-admin-modal[open] {
 .progress-bar-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #0284C7, #059669);
+  background: linear-gradient(90deg, #CC092F, #900F15);
   transition: width 0.2s ease;
 }
 
