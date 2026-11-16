@@ -4505,7 +4505,6 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
     };
   }
 
-  const target = targetMission || mission;
   const slot = calcStationSlot(target, index);
 
   root.position.copy(slot.pos);
