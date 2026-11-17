@@ -18,6 +18,37 @@ const POLYFORK_CHAR_FILES = {
 };
 
 const cachedPolyforkChars = new Map();
+
+// ── Orientacion de estaciones y trazo del camino (configurado desde main.js) ──
+let STATION_YAW = {};
+let ROAD_PTS = [];
+export function configureStationLayout(yawMap = {}, roadPoints = []) {
+  STATION_YAW = yawMap || {};
+  ROAD_PTS = (roadPoints || []).map(p => ({ x: p.x, z: (p.z !== undefined ? p.z : p.y) }));
+}
+function stationYaw(m) {
+  return STATION_YAW[m?.id] || 0;
+}
+// Convierte un desplazamiento local de la estacion (x a la derecha, -z hacia el fondo) a mundo
+function stationLocalToWorld(m, lx, lz) {
+  const yaw = stationYaw(m);
+  const c = Math.cos(yaw), sn = Math.sin(yaw);
+  return { x: m.x + lx * c + lz * sn, z: m.z - lx * sn + lz * c };
+}
+// Distancia minima de un punto al eje del camino (segmentos)
+function distanceToRoad(x, z) {
+  let best = Infinity;
+  for (let i = 0; i < ROAD_PTS.length - 1; i++) {
+    const a = ROAD_PTS[i], b = ROAD_PTS[i + 1];
+    if (Math.abs(a.x - x) > 60 || Math.abs(a.z - z) > 60) continue;
+    const dx = b.x - a.x, dz = b.z - a.z;
+    const len2 = dx * dx + dz * dz || 1;
+    const t = Math.max(0, Math.min(1, ((x - a.x) * dx + (z - a.z) * dz) / len2));
+    const d = Math.hypot(x - (a.x + dx * t), z - (a.z + dz * t));
+    if (d < best) best = d;
+  }
+  return best;
+}
 let characterLoadPromise = null;
 
 export const BRAND_PALETTE = {
@@ -218,7 +249,104 @@ const ASSETS = {
     banner: './assets/stylized/props/banner_shield_blue.gltf'
   },
   polyfork: {
-    // Estación 0: Campamento Base & Bienvenida
+    // Modelos medievales de estaciones (Polyfork, verificados visualmente)
+    saddleRack: './assets/polyfork/saddle-on-a-rack-f034cd.glb',
+    adventurerBackpack: './assets/polyfork/adventurer-s-backpack-b1365c.glb',
+    saddledHorse: './assets/polyfork/saddled-horse-da86d3.glb',
+    kiteShield: './assets/polyfork/kite-shield-343e62.glb',
+    heaterShield: './assets/polyfork/heater-shield-c51b76.glb',
+    towerShield: './assets/polyfork/tower-shield-09ff7d.glb',
+    tateShield: './assets/polyfork/tate-standing-shield-e5513e.glb',
+    timberCrate: './assets/polyfork/timber-crate-ba0739.glb',
+    hangingSignboard: './assets/polyfork/hanging-signboard-c10e01.glb',
+    gabledFarmhouse: './assets/polyfork/gabled-farmhouse-c7534f.glb',
+    timberTrestleTable: './assets/polyfork/timber-trestle-table-024d88.glb',
+    spellScroll: './assets/polyfork/spell-scroll-29d32d.glb',
+    tableCandleLantern: './assets/polyfork/table-candle-lantern-a7b5af.glb',
+    cirioStand: './assets/polyfork/cirio-stand-828e85.glb',
+    churchPew: './assets/polyfork/church-pew-dae6d7.glb',
+    campaignMapScroll: './assets/polyfork/campaign-map-scroll-d4a382.glb',
+    drapedBanquetTable: './assets/polyfork/draped-banquet-table-0f0b81.glb',
+    commanderStool: './assets/polyfork/commander-s-camp-stool-d7fa4c.glb',
+    soldiersTent: './assets/polyfork/soldiers-tent-4bd5b9.glb',
+    torchStake: './assets/polyfork/torch-stake-d82a2c.glb',
+    villageHall: './assets/polyfork/village-hall-c6d3c8.glb',
+    factionBanner: './assets/polyfork/faction-banner-pole-39835b.glb',
+    palisadeWall: './assets/polyfork/palisade-wall-621e29.glb',
+    teokeBucket: './assets/polyfork/wooden-teoke-bucket-e65f35.glb',
+    spearRack: './assets/polyfork/weapon-rack-eb5fe6.glb',
+    farmDog: './assets/polyfork/farm-dog-723730.glb',
+    roofedWell: './assets/polyfork/roofed-well-43a2fc.glb',
+    hearthLogBench: './assets/polyfork/hearth-log-bench-c3c5ec.glb',
+    hammock: './assets/polyfork/hammock-on-posts-7d5c47.glb',
+    woolRug: './assets/polyfork/wool-rug-ab2bd1.glb',
+    sheep: './assets/polyfork/sheep-base.glb',
+    cauldronOnCoals: './assets/polyfork/cauldron-on-coals-ddbab6.glb',
+    cheeseWedge: './assets/polyfork/cheese-wedge-a5c99b.glb',
+    chickenCoop: './assets/polyfork/chicken-coop-371f97.glb',
+    villageChicken: './assets/polyfork/village-chicken-9ba715.glb',
+    hempGrainSack: './assets/polyfork/hemp-grain-sack-f91edc.glb',
+    overflowingChest: './assets/polyfork/overflowing-treasure-chest-3d6ee0.glb',
+    coinHoard: './assets/polyfork/coin-hoard-heap-07b6e4.glb',
+    goldCoinStack: './assets/polyfork/gold-coin-stack-a9ef52.glb',
+    coinPouch: './assets/polyfork/coin-pouch-be4dd8.glb',
+    jewelCasket: './assets/polyfork/jewel-casket-975ecc.glb',
+    bullionBundle: './assets/polyfork/strapped-bullion-bundle-26de2d.glb',
+    villagerNpc: './assets/polyfork/villager-40255c.glb',
+    signalBeaconTower: './assets/polyfork/signal-beacon-tower-9c0d1a.glb',
+    handBell: './assets/polyfork/hand-bell-cc0a37.glb',
+    oakBarrel: './assets/polyfork/oak-barrel-b65311.glb',
+    pigeon: './assets/polyfork/pigeon-base.glb',
+    packMule: './assets/polyfork/pack-mule-base.glb',
+    stoneFarmhouse: './assets/polyfork/stone-farmhouse-billet-2dbbf2.glb',
+    alcoveBookcase: './assets/polyfork/alcove-bookcase-83894d.glb',
+    spellbook: './assets/polyfork/spellbook-1e8dfe.glb',
+    archiveChest: './assets/polyfork/treasure-chest-c2ac4f.glb',
+    clayStoragePot: './assets/polyfork/clay-storage-pot-626452.glb',
+    campaignJournal: './assets/polyfork/campaign-journal-18037d.glb',
+    wovenBasket: './assets/polyfork/woven-storage-basket-983d80.glb',
+    farmLantern: './assets/polyfork/farm-lantern-747dc8.glb',
+    plankBench: './assets/polyfork/plank-bench-c46528.glb',
+    flameBrazier: './assets/polyfork/flame-brazier-bbf74a.glb',
+    woodenBarrelTall: './assets/polyfork/wooden-barrel-6afab0.glb',
+    countryWell: './assets/polyfork/country-well-8feec8.glb',
+    grapes: './assets/polyfork/grapes-e7ddb2.glb',
+    goat: './assets/polyfork/goat-base.glb',
+    milkChurnStand: './assets/polyfork/milk-churn-stand-130fe2.glb',
+    blacksmithShop: './assets/polyfork/blacksmith-s-shop-9c5f43.glb',
+    leatherBellows: './assets/polyfork/leather-forge-bellows-7f6d42.glb',
+    archeryTarget: './assets/polyfork/archery-target-762034.glb',
+    plankTrough: './assets/polyfork/plank-trough-baf3d5.glb',
+    farmerNpc: './assets/polyfork/farmer-304a43.glb',
+    greatHelm: './assets/polyfork/great-helm-2551bc.glb',
+    rulersThrone: './assets/polyfork/ruler-s-throne-on-b44928.glb',
+    carvedEffigy: './assets/polyfork/carved-knight-effigy-900a64.glb',
+    logCabin: './assets/polyfork/log-cabin-4fac3b.glb',
+    graniteBlock: './assets/polyfork/granite-plaza-block-712f1b.glb',
+    horsePlough: './assets/polyfork/horse-plough-85a82e.glb',
+    sawhorse: './assets/polyfork/firewood-processing-stand-b186ea.glb',
+    draftHorse: './assets/polyfork/draft-horse-519160.glb',
+    saddleQuern: './assets/polyfork/saddle-quern-food-mill-8e3657.glb',
+    choppingBlock: './assets/polyfork/chopping-block-073b5e.glb',
+    artEasel: './assets/polyfork/art-easel-078422.glb',
+    crown: './assets/polyfork/crown-a294ce.glb',
+    tupaTower: './assets/polyfork/tupa-stone-tower-801c13.glb',
+    portcullis: './assets/polyfork/barred-portcullis-2aa444.glb',
+    churchNaveWall: './assets/polyfork/church-nave-wall-a6f070.glb',
+    chestDais: './assets/polyfork/chest-dais-d2bc39.glb',
+    bardedHorse: './assets/polyfork/barded-war-horse-6e921e.glb',
+    wallTorch: './assets/polyfork/wall-torch-bracket-f5ad14.glb',
+    twoStoryHouse: './assets/polyfork/two-story-house-40f6dc.glb',
+    windmill: './assets/polyfork/windmill-3aad49.glb',
+    waterMill: './assets/polyfork/water-mill-b31972.glb',
+    stiltedGranary: './assets/polyfork/stilted-granary-3e7d7d.glb',
+    legendaryChest: './assets/polyfork/legendary-chest-4abed4.glb',
+    spilledCoinPile: './assets/polyfork/spilled-coin-pile-caccf6.glb',
+    goldIngot: './assets/polyfork/gold-ingot-8da28a.glb',
+    haystack: './assets/polyfork/haystack-77b0dd.glb',
+    wheelbarrow: './assets/polyfork/wheelbarrow-13f422.glb',
+    waterTrough: './assets/polyfork/water-trough-318ee1.glb',
+    // Estructuras y edificios base
     villageTavern: './assets/polyfork/village-tavern-4e94e3.glb',
     villageWell: './assets/polyfork/village-well-f8e361.glb',
     timberTable: './assets/polyfork/heavy-timber-picnic-table-1ac060.glb',
@@ -228,7 +356,6 @@ const ASSETS = {
     woodenFence: './assets/polyfork/wooden-fence-3d8ee7.glb',
     lampPost: './assets/polyfork/lamp-post-c9e409.glb',
     grainSack: './assets/polyfork/grain-sack-401d96.glb',
-    // Estación 1: Arsenal y Equipos
     canvasWallTent: './assets/polyfork/canvas-wall-tent-de8a04.glb',
     canvasRidgeTent: './assets/polyfork/canvas-ridge-tent-f0df0d.glb',
     watchtower: './assets/polyfork/watchtower-140f78.glb',
@@ -241,7 +368,6 @@ const ASSETS = {
     campfireCookTripod: './assets/polyfork/campfire-cook-tripod-d95a1e.glb',
     stoneCampfire: './assets/polyfork/stone-ring-campfire-8a0c6f.glb',
     firewoodStack: './assets/polyfork/firewood-stack-8a2899.glb',
-    // Estación 2: Santuario del Pacto (Firma de Contrato y Beneficios)
     stoneChapel: './assets/polyfork/stone-chapel-03e774.glb',
     stoneAltar: './assets/polyfork/stone-altar-8f3a0a.glb',
     lowStoneWall: './assets/polyfork/low-stone-wall-8a8ea3.glb',
@@ -251,7 +377,6 @@ const ASSETS = {
     ironStrongbox: './assets/polyfork/iron-banded-strongbox-698383.glb',
     standingBrazier: './assets/polyfork/standing-brazier-c9e4ee.glb',
     candleSpikeCluster: './assets/polyfork/candle-spike-cluster-d7c566.glb',
-    // Estación 3: Valle del Refectorio (Humand y Comedor)
     timberBarn: './assets/polyfork/timber-barn-90b3ce.glb',
     thatchedCottage: './assets/polyfork/thatched-cottage-0e63f5.glb',
     splitLogBench: './assets/polyfork/split-log-bench-289780.glb',
@@ -260,14 +385,12 @@ const ASSETS = {
     basketOfProduce: './assets/polyfork/basket-of-produce-7420cf.glb',
     polyforkBarrel: './assets/polyfork/barrel-aadc94.glb',
     flowerPlanter: './assets/polyfork/flower-planter-500ed2.glb',
-    // Alimentos y vajilla para el comedor y taberna
     breadLoaf: './assets/polyfork/bread-loaf-0e0ab5.glb',
     rusticPie: './assets/polyfork/pie-c27178.glb',
     goblet: './assets/polyfork/goblet-87c3ba.glb',
     wineJug: './assets/polyfork/clay-wine-jug-b4ebd3.glb',
     roastMeat: './assets/polyfork/charred-meat-haunch-be1ea2.glb',
     cazuelaPot: './assets/polyfork/cazuela-pot-79f0ee.glb',
-    // Estructuras y elementos temáticos adicionales
     villageGatehouse: './assets/polyfork/village-gatehouse-181a9e.glb',
     flowerBed: './assets/polyfork/flower-bed-708e73.glb',
     woodenGate: './assets/polyfork/wooden-gate-0e001c.glb',
@@ -282,7 +405,67 @@ const ASSETS = {
     roundBush: './assets/polyfork/round-bush-cd2ac0.glb',
     wildflower: './assets/polyfork/wildflower-68d3a1.glb',
     cobbledYardTile: './assets/polyfork/cobbled-yard-tile-d00544.glb',
-    flagstoneFloorTile: './assets/polyfork/flagstone-floor-tile-2a04ea.glb'
+    flagstoneFloorTile: './assets/polyfork/flagstone-floor-tile-2a04ea.glb',
+
+    // Modelos tematicos exclusivos descargados de Polyfork para las 17 estaciones (CERO repeticion)
+    laptop: './assets/polyfork/laptop-e775ba.glb',
+    lanyardBadge: './assets/polyfork/lanyard-and-badge-941f5a.glb',
+    accessSpeedgate: './assets/polyfork/access-control-speedgate-19705e.glb',
+    issueDesk: './assets/polyfork/issue-desk-with-gate-3ee2a9.glb',
+    vitalSignsMonitor: './assets/polyfork/vital-signs-monitor-632560.glb',
+    vaultStrongroom: './assets/polyfork/vault-strongroom-d2c032.glb',
+    waitingRoomChair: './assets/polyfork/waiting-room-chair-5e20cc.glb',
+    welcomeWeekTentStall: './assets/polyfork/welcome-week-tent-stall-c27020.glb',
+    orchestraChair: './assets/polyfork/orchestra-chair-9538ec.glb',
+    foundersStatue: './assets/polyfork/founder-s-statue-71c269.glb',
+    campusBannerPole: './assets/polyfork/campus-banner-pole-5fdf90.glb',
+    viewCube: './assets/polyfork/view-cube-1f8553.glb',
+    fireExtinguisher: './assets/polyfork/fire-extinguisher-95dca1.glb',
+    wheeledFireExtinguisher: './assets/polyfork/wheeled-fire-extinguisher-4bde8b.glb',
+    wetFloorSign: './assets/polyfork/wet-floor-sign-d39967.glb',
+    firePointStation: './assets/polyfork/fire-point-station-dfd230.glb',
+    officeCoffeeMachine: './assets/polyfork/office-coffee-machine-9da5e6.glb',
+    takeawayCoffeeCup: './assets/polyfork/takeaway-coffee-cup-1fd6dd.glb',
+    loungeSofa: './assets/polyfork/lounge-sofa-c34b3e.glb',
+    wireShelvingRack: './assets/polyfork/wire-shelving-rack-799aec.glb',
+    cafeParasol: './assets/polyfork/cafe-parasol-61a313.glb',
+    smartphone: './assets/polyfork/smartphone-5f05e5.glb',
+    servingTray: './assets/polyfork/serving-tray-a1cf27.glb',
+    waterCarafe: './assets/polyfork/water-carafe-6f1774.glb',
+    wasteSortingStation: './assets/polyfork/waste-sorting-station-adeefd.glb',
+    atmTerminal: './assets/polyfork/atm-terminal-3b84f5.glb',
+    ticketRedemptionKiosk: './assets/polyfork/ticket-redemption-kiosk-052608.glb',
+    bandedCashBundle: './assets/polyfork/banded-cash-bundle-7da278.glb',
+    bigWrappedPresent: './assets/polyfork/big-wrapped-present-57b639.glb',
+    wrappedPresentPile: './assets/polyfork/wrapped-present-pile-b2ddd9.glb',
+    vintageMicrophoneStand: './assets/polyfork/vintage-microphone-stand-c5ba82.glb',
+    callHeadset: './assets/polyfork/call-headset-a95887.glb',
+    conferenceCameraBar: './assets/polyfork/conference-camera-bar-419e10.glb',
+    whiteboard: './assets/polyfork/whiteboard-ea98f7.glb',
+    computerBenchRunLit: './assets/polyfork/computer-bench-run-lit-87d9cf.glb',
+    lecturerPodium: './assets/polyfork/lecturer-s-podium-e77fe6.glb',
+    professor: './assets/polyfork/professor-14dc4d.glb',
+    filingCabinet: './assets/polyfork/filing-cabinet-f8a251.glb',
+    writeUpDesk: './assets/polyfork/write-up-desk-38763a.glb',
+    breakoutSofaModule: './assets/polyfork/breakout-sofa-module-1bb15e.glb',
+    benchDeskModule: './assets/polyfork/bench-desk-module-23c16f.glb',
+    meetingRoomDisplay: './assets/polyfork/meeting-room-display-fddfc3.glb',
+    heavyTimberPicnicTable: './assets/polyfork/heavy-timber-picnic-table-1ac060.glb',
+    charredMeatHaunch: './assets/polyfork/charred-meat-haunch-be1ea2.glb',
+    pie: './assets/polyfork/pie-c27178.glb',
+    clayWineJug: './assets/polyfork/clay-wine-jug-b4ebd3.glb',
+    goblet: './assets/polyfork/goblet-87c3ba.glb',
+    trophyPlinth: './assets/polyfork/natural-20-trophy-plinth-c31c9c.glb',
+    handCursor: './assets/polyfork/hand-cursor-62192f.glb',
+    goldBalanceScale: './assets/polyfork/gold-balance-scale-66497b.glb',
+    bookshelf: './assets/polyfork/bookshelf-5e881a.glb',
+    colonnadeRun: './assets/polyfork/colonnade-run-d765e3.glb',
+    facultyOfficeDesk: './assets/polyfork/faculty-office-desk-a6575a.glb',
+    paintedTavernaChair: './assets/polyfork/painted-taverna-chair-f4e97e.glb',
+    graduateInGown: './assets/polyfork/graduate-in-gown-c72050.glb',
+    trophyCabinet: './assets/polyfork/trophy-cabinet-e963ac.glb',
+    cameraGizmo: './assets/polyfork/camera-gizmo-2d038e.glb',
+    noticeboardWallRun: './assets/polyfork/noticeboard-wall-run-1f7ea8.glb'
   },
   animals: {
     deer: './assets/stylized/animals/Deer.gltf',
@@ -2578,633 +2761,305 @@ function createCobblestoneTexture() {
 
 // ── Checkpoint Builders (Richly Dressed Environmental Outposts) ───────────────
 
+// ── Escenografia tematica de cada estacion ───────────────────────────────────
+// Marco local: x a la derecha de la camara, -z hacia el fondo. El camino cruza por z ~ 0,
+// por eso toda la utileria vive en z <= -3.5 y los edificios al fondo (z ~ -9 a -11).
+// Formato: [modelo, altura real (m), x, z, giro, elevacion sobre otro objeto, opciones]
+// Ningun modelo se repite entre estaciones.
+const STATION_SETS = {
+  // 01 Recepcion & Kit de Expedicion: puerta del reino y entrega del equipo del expedicionario
+  1: [
+    [ASSETS.polyfork.villageGatehouse, 6.8, 0, -8.6, 0],
+    [ASSETS.polyfork.armourStand, 1.85, -3.0, -4.9, 0.35],
+    [ASSETS.polyfork.saddleRack, 1.35, -4.6, -4.2, 0.7],
+    [ASSETS.polyfork.adventurerBackpack, 0.6, -1.75, -3.75, 0.3],
+    [ASSETS.polyfork.kiteShield, 0.95, -0.95, -4.5, 0.1],
+    [ASSETS.polyfork.timberCrate, 0.7, 2.3, -4.2, -0.2],
+    [ASSETS.polyfork.timberCrate, 0.55, 2.3, -4.2, 0.45, 0.7],
+    [ASSETS.polyfork.timberCrate, 0.6, 3.3, -3.9, 0.35],
+    [ASSETS.polyfork.fourWheelWagon, 1.8, 4.6, -6.0, 1.57],
+    [ASSETS.polyfork.saddledHorse, 2.0, 6.6, -4.2, -1.57]
+  ],
+  // 02 Pacto & Beneficios: casa del notario, libro de registro y arcon de prestaciones
+  2: [
+    [ASSETS.polyfork.gabledFarmhouse, 6.2, 0, -9.6, 0],
+    [ASSETS.polyfork.chainedBookLectern, 1.3, -1.6, -4.8, 0.35],
+    [ASSETS.polyfork.ironStrongbox, 0.6, 2.0, -4.6, -0.3],
+    [ASSETS.polyfork.spellScroll, 0.06, 1.8, -4.6, 0.25, 0.6],
+    [ASSETS.polyfork.tableCandleLantern, 0.28, 2.35, -4.6, 0, 0.6],
+    [ASSETS.polyfork.cirioStand, 1.7, -1.4, -6.6, 0],
+    [ASSETS.polyfork.cirioStand, 1.7, 1.4, -6.6, 0],
+    [ASSETS.polyfork.flowerBed, 0.4, -4.6, -5.8, 0.2],
+    [ASSETS.polyfork.flowerBed, 0.4, 4.6, -5.8, -0.2]
+  ],
+  // 03 Hoy Comienza tu Historia: campamento de la compania, mesa de consejo con el mapa de la jornada
+  3: [
+    [ASSETS.polyfork.canvasWallTent, 3.4, 0, -8.4, 0],
+    [ASSETS.polyfork.canvasRidgeTent, 1.6, -4.9, -8.6, 0.4],
+    [ASSETS.polyfork.soldiersTent, 2.4, 5.4, -9.6, -0.4],
+    [ASSETS.polyfork.drapedBanquetTable, 0.78, 0, -4.9, 0],
+    [ASSETS.polyfork.campaignMapScroll, 0.06, 0, -4.9, 0.3, 0.78],
+    [ASSETS.polyfork.commanderStool, 0.5, -1.25, -4.9, 1.57],
+    [ASSETS.polyfork.commanderStool, 0.5, 1.25, -4.9, -1.57],
+    [ASSETS.polyfork.commanderStool, 0.5, 0, -6.05, 0],
+    [ASSETS.polyfork.stoneCampfire, 0.9, 4.4, -4.8, 0],
+    [ASSETS.polyfork.splitLogBench, 0.45, 4.4, -6.0, 0],
+    [ASSETS.polyfork.splitLogBench, 0.45, 5.7, -4.6, 1.57],
+    [ASSETS.polyfork.torchStake, 1.6, -2.2, -6.7, 0],
+    [ASSETS.polyfork.torchStake, 1.6, 2.2, -6.7, 0]
+  ],
+  // 04 Conoce de que Formas Parte: sede del reino, estandartes de las dos casas aliadas y su historia
+  4: [
+    [ASSETS.polyfork.villageHall, 8.0, 0, -10.8, 0],
+    [ASSETS.polyfork.factionBanner, 4.0, -2.9, -6.3, 0.15],
+    [ASSETS.polyfork.factionBanner, 4.0, 2.9, -6.3, -0.15],
+    [ASSETS.polyfork.heaterShield, 0.85, -2.9, -5.3, 0.2],
+    [ASSETS.polyfork.towerShield, 1.4, 2.9, -5.3, -0.2],
+    [ASSETS.polyfork.standingKnightStatue, 2.6, 0, -5.6, 0],
+    [ASSETS.polyfork.signpost, 2.2, -5.4, -4.4, 0.5],
+    [ASSETS.polyfork.flowerPlanter, 0.45, -5.4, -7.0, 0],
+    [ASSETS.polyfork.flowerPlanter, 0.45, 5.4, -7.0, 0]
+  ],
+  // 05 Nos Cuidamos: torre vigia, empalizada con puerta de control de acceso y brigada contra fuego
+  5: [
+    [ASSETS.polyfork.watchtower, 8.5, -5.3, -8.8, 0.25],
+    [ASSETS.polyfork.palisadeWall, 2.8, 0.4, -9.2, 0],
+    [ASSETS.polyfork.woodenGate, 1.8, 3.0, -9.2, 0],
+    [ASSETS.polyfork.palisadeWall, 2.8, 5.6, -9.2, 0],
+    [ASSETS.polyfork.quenchBarrel, 0.75, -1.6, -4.9, 0],
+    [ASSETS.polyfork.teokeBucket, 0.45, -0.8, -4.4, 0],
+    [ASSETS.polyfork.teokeBucket, 0.45, -2.4, -4.3, 0.6],
+    [ASSETS.polyfork.spearRack, 1.6, -3.0, -5.5, 0.5],
+    [ASSETS.polyfork.tateShield, 1.5, 4.8, -5.6, -0.3],
+    [ASSETS.polyfork.farmDog, 0.65, 2.0, -4.6, -0.8]
+  ],
+  // 06 Pausa de Recarga: cabana de descanso, pozo, tetera al fuego, hamaca y pastoreo
+  6: [
+    [ASSETS.polyfork.thatchedCottage, 5.4, 0, -9.4, 0],
+    [ASSETS.polyfork.roofedWell, 2.6, -4.9, -6.3, 0.4],
+    [ASSETS.polyfork.campfireCookTripod, 1.4, 0, -6.2, 0],
+    [ASSETS.polyfork.woolRug, 0.02, 0, -4.4, 1.57],
+    [ASSETS.polyfork.hearthLogBench, 0.45, -2.3, -5.0, 0.6],
+    [ASSETS.polyfork.hearthLogBench, 0.45, 2.3, -5.0, -0.6],
+    [ASSETS.polyfork.hammock, 1.5, 5.4, -6.2, -0.5],
+    [ASSETS.polyfork.haystack, 1.7, 6.3, -9.0, 0],
+    [ASSETS.polyfork.sheep, 1.0, 6.0, -3.9, -2.4]
+  ],
+  // 07 Humand & Comedor: refectorio, tablon de registro de entradas, cocina comunal y gallinero
+  7: [
+    [ASSETS.polyfork.timberBarn, 6.0, 0, -11.2, 0],
+    [ASSETS.polyfork.campNoticeBoard, 2.1, -4.9, -6.9, 0.45],
+    [ASSETS.polyfork.timberTrestleTable, 0.78, -2.3, -5.0, 0.1],
+    [ASSETS.polyfork.breadLoaf, 0.14, -2.7, -5.0, 0.3, 0.78],
+    [ASSETS.polyfork.cheeseWedge, 0.12, -1.9, -4.95, 0, 0.78],
+    [ASSETS.polyfork.basketOfProduce, 0.5, -4.4, -4.6, 0],
+    [ASSETS.polyfork.cauldronOnCoals, 1.6, 2.4, -5.3, -0.2],
+    [ASSETS.polyfork.clayBreadOven, 1.7, 4.7, -6.6, -0.6],
+    [ASSETS.polyfork.grainSack, 0.7, 5.7, -4.7, 0],
+    [ASSETS.polyfork.hempGrainSack, 0.8, 6.5, -5.2, 0.4],
+    [ASSETS.polyfork.chickenCoop, 2.0, -6.5, -9.6, 0.6],
+    [ASSETS.polyfork.villageChicken, 0.4, -5.0, -5.8, 0.8],
+    [ASSETS.polyfork.villageChicken, 0.4, -5.8, -5.2, -1.2]
+  ],
+  // 08 Tarjeta Cosmos: casa del gremio de mercaderes, puestos con convenios y tesoro de privilegios
+  8: [
+    [ASSETS.polyfork.twoStoryHouse, 7.6, 0, -11.2, 0],
+    [ASSETS.polyfork.marketStall, 2.4, -4.7, -5.8, 0.45],
+    [ASSETS.polyfork.marketStall, 2.4, 4.7, -5.8, -0.45],
+    [ASSETS.polyfork.overflowingChest, 1.1, 0, -5.6, 0],
+    [ASSETS.polyfork.coinHoard, 0.3, -1.25, -4.8, 0],
+    [ASSETS.polyfork.bullionBundle, 0.33, 1.25, -4.9, -0.3],
+    [ASSETS.polyfork.coinPouch, 0.34, 0.75, -4.4, 0],
+    [ASSETS.polyfork.jewelCasket, 0.35, -0.6, -4.25, 0.4],
+    [ASSETS.polyfork.goldCoinStack, 0.14, 1.65, -4.5, 0],
+    [ASSETS.polyfork.goldIngot, 0.08, 1.95, -4.85, 0.5],
+    [ASSETS.polyfork.spilledCoinPile, 0.08, -1.85, -4.4, 0],
+    [ASSETS.polyfork.villagerNpc, 1.72, -3.6, -4.1, 0.45]
+  ],
+  // 09 Cultura & Comunicacion Interna: torre de senales, pregonero con campana y palomas mensajeras
+  9: [
+    [ASSETS.polyfork.signalBeaconTower, 9.0, -4.3, -9.0, 0.2],
+    [ASSETS.polyfork.oakBarrel, 0.95, 0.8, -5.0, 0],
+    [ASSETS.polyfork.handBell, 0.35, 0.8, -5.0, 0.4, 0.95],
+    [ASSETS.polyfork.pigeon, 0.3, 2.0, -4.5, -0.5],
+    [ASSETS.polyfork.pigeon, 0.3, 2.5, -5.1, 1.2],
+    [ASSETS.polyfork.pigeon, 0.3, 1.6, -5.6, 2.4],
+    [ASSETS.polyfork.trailSignpost, 2.0, 4.9, -4.8, -0.4],
+    [ASSETS.polyfork.standingBrazier, 1.1, -1.5, -7.0, 0],
+    [ASSETS.polyfork.standingBrazier, 1.1, -7.1, -6.8, 0],
+    [ASSETS.polyfork.woodenCart, 1.4, 5.0, -7.0, -0.8],
+    [ASSETS.polyfork.packMule, 1.5, 2.1, -7.9, -1.3]
+  ],
+  // 10 E-Learning & Academia: casa de los sabios, claustro con arcos y biblioteca
+  10: [
+    [ASSETS.polyfork.stoneFarmhouse, 7.5, 0, -10.0, 0],
+    [ASSETS.polyfork.colonnadeRun, 3.4, -4.9, -7.8, 0.35],
+    [ASSETS.polyfork.colonnadeRun, 3.4, 4.9, -7.8, -0.35],
+    [ASSETS.polyfork.alcoveBookcase, 2.2, -2.6, -6.8, 0.2],
+    [ASSETS.polyfork.alcoveBookcase, 2.2, 2.6, -6.8, -0.2],
+    [ASSETS.polyfork.scrollRack, 1.8, -4.7, -5.2, 0.6],
+    [ASSETS.polyfork.spellbook, 0.12, -4.7, -5.2, 0.6, 1.8]
+  ],
+  // 11 Gestor Documental: granero-archivo elevado, arcon de expedientes y tinajas de pergaminos
+  11: [
+    [ASSETS.polyfork.stiltedGranary, 5.2, 0, -9.2, 0],
+    [ASSETS.polyfork.archiveChest, 0.65, -1.6, -5.2, 0.25],
+    [ASSETS.polyfork.farmLantern, 0.35, -1.95, -5.2, 0, 0.65],
+    [ASSETS.polyfork.campaignJournal, 0.05, -1.35, -5.15, 0.3, 0.65],
+    [ASSETS.polyfork.clayStoragePot, 0.55, 1.3, -5.4, 0],
+    [ASSETS.polyfork.clayStoragePot, 0.5, 1.9, -5.0, 0.8],
+    [ASSETS.polyfork.clayStoragePot, 0.55, 1.6, -6.0, 2.0],
+    [ASSETS.polyfork.woodenCrate, 0.65, -3.9, -6.0, 0.3],
+    [ASSETS.polyfork.woodenCrate, 0.55, -3.9, -6.0, 0.9, 0.65],
+    [ASSETS.polyfork.wovenBasket, 0.4, -2.9, -4.6, 0],
+    [ASSETS.polyfork.wheelbarrow, 0.9, 4.5, -5.6, -0.6]
+  ],
+  // 12 Tu Equipo te Estaba Esperando: taberna de la compania, brasero de reunion y bancas largas
+  12: [
+    [ASSETS.polyfork.villageTavern, 7.0, 0, -10.4, 0],
+    [ASSETS.polyfork.hangingSignboard, 1.9, 4.9, -6.6, -0.3],
+    [ASSETS.polyfork.flameBrazier, 0.85, 0, -5.6, 0],
+    [ASSETS.polyfork.plankBench, 0.45, -1.8, -5.6, 1.57],
+    [ASSETS.polyfork.plankBench, 0.45, 1.8, -5.6, 1.57],
+    [ASSETS.polyfork.woodenBarrelTall, 0.95, -5.2, -6.4, 0],
+    [ASSETS.polyfork.polyforkBarrel, 0.92, -4.15, -7.05, 0.5],
+    [ASSETS.polyfork.polyforkBarrel, 0.92, -6.15, -7.5, 1.1]
+  ],
+  // 13 Almuerzo en Equipo: molino y mesa larga de banquete al aire libre
+  13: [
+    [ASSETS.polyfork.windmill, 9.0, -5.3, -10.4, 0.3],
+    [ASSETS.polyfork.heavyTimberPicnicTable, 0.8, 0, -5.2, 0],
+    [ASSETS.polyfork.roastMeat, 0.22, -0.5, -5.2, 0.3, 0.8],
+    [ASSETS.polyfork.rusticPie, 0.1, 0.5, -5.2, 0, 0.8],
+    [ASSETS.polyfork.wineJug, 0.26, 0, -5.45, 0, 0.8],
+    [ASSETS.polyfork.grapes, 0.2, -0.2, -4.95, 0, 0.8],
+    [ASSETS.polyfork.goblet, 0.18, -0.95, -5.0, 0, 0.8],
+    [ASSETS.polyfork.goblet, 0.18, 0.95, -5.0, 0, 0.8],
+    [ASSETS.polyfork.goblet, 0.18, 0.3, -5.4, 0, 0.8],
+    [ASSETS.polyfork.countryWell, 2.1, 4.7, -7.6, -0.4],
+    [ASSETS.polyfork.milkChurnStand, 1.1, -4.3, -6.1, 0.4],
+    [ASSETS.polyfork.goat, 0.9, 5.7, -4.8, -2.0]
+  ],
+  // 14 Voz del Cliente (NPS): taller artesano donde se mide la calidad; el cliente da en el blanco
+  14: [
+    [ASSETS.polyfork.blacksmithForge, 3.9, 3.3, -9.0, -0.2],
+    [ASSETS.polyfork.blacksmithShop, 4.6, -3.9, -9.4, 0.3],
+    [ASSETS.polyfork.anvil, 0.8, 0.4, -5.4, 0.3],
+    [ASSETS.polyfork.greatHelm, 0.32, 0.4, -5.4, 0.5, 0.8],
+    [ASSETS.polyfork.leatherBellows, 1.6, 2.6, -5.6, -0.4],
+    [ASSETS.polyfork.firewoodStack, 0.8, 6.1, -5.8, -0.3],
+    [ASSETS.polyfork.plankTrough, 0.55, 4.3, -4.8, -0.2],
+    [ASSETS.polyfork.archeryTarget, 1.5, -4.7, -5.2, 0.5],
+    [ASSETS.polyfork.farmerNpc, 1.72, -1.8, -4.6, 0.6]
+  ],
+  // 15 Pilares Normativos & Etica: santuario, trono de justicia y balanza de la rectitud
+  15: [
+    [ASSETS.polyfork.stoneChapel, 8.0, 0, -10.4, 0],
+    [ASSETS.polyfork.rulersThrone, 2.6, 0, -5.9, 0],
+    [ASSETS.polyfork.stoneAltar, 1.0, -2.9, -5.0, 0.35],
+    [ASSETS.polyfork.goldBalanceScale, 0.5, -2.9, -5.0, 0.35, 1.0],
+    [ASSETS.polyfork.carvedEffigy, 0.8, 2.9, -5.0, -0.35],
+    [ASSETS.polyfork.candleSpikeCluster, 0.45, -1.6, -6.6, 0],
+    [ASSETS.polyfork.candleSpikeCluster, 0.45, 1.6, -6.6, 0],
+    [ASSETS.polyfork.lowStoneWall, 0.9, -5.5, -6.8, 0.5],
+    [ASSETS.polyfork.lowStoneWall, 0.9, 5.5, -6.8, -0.5]
+  ],
+  // 16 Representacion & Sindicato: logia del gremio, tribuna de piedra, asamblea y oficios
+  16: [
+    [ASSETS.polyfork.logCabin, 5.0, 0, -10.4, 0],
+    [ASSETS.polyfork.graniteBlock, 0.45, 0, -6.6, 0],
+    [ASSETS.polyfork.churchPew, 1.05, -1.3, -4.6, Math.PI],
+    [ASSETS.polyfork.churchPew, 1.05, 1.3, -4.6, Math.PI],
+    [ASSETS.polyfork.sawhorse, 1.0, 4.5, -5.4, -0.4],
+    [ASSETS.polyfork.horsePlough, 1.0, 6.0, -7.4, -0.9],
+    [ASSETS.polyfork.draftHorse, 2.0, 6.7, -9.6, -1.3],
+    [ASSETS.polyfork.saddleQuern, 0.6, -4.5, -5.6, 0.4],
+    [ASSETS.polyfork.choppingBlock, 0.85, -5.3, -4.8, 0]
+  ],
+  // 17 Cuentanos tu Historia: bastion de cierre, podio de honor, retrato y constancias
+  17: [
+    [ASSETS.polyfork.tupaTower, 5.5, -6.6, -11.4, 0],
+    [ASSETS.polyfork.tupaTower, 5.5, 6.6, -11.4, 0.8],
+    [ASSETS.polyfork.portcullis, 5.2, 0, -10.9, 0],
+    [ASSETS.polyfork.churchNaveWall, 5.2, -2.7, -10.9, 0],
+    [ASSETS.polyfork.churchNaveWall, 5.2, 2.7, -10.9, 0],
+    [ASSETS.polyfork.wallTorch, 0.7, -2.7, -10.55, 0, 2.6],
+    [ASSETS.polyfork.wallTorch, 0.7, 2.7, -10.55, 0, 2.6],
+    [ASSETS.polyfork.chestDais, 0.45, 0, -1.4, 0, 0, { podium: true }],
+    [ASSETS.polyfork.chestDais, 0.31, -1.8, -0.9, 0, 0, { podium: true }],
+    [ASSETS.polyfork.chestDais, 0.21, 1.8, -0.9, 0, 0, { podium: true }],
+    [ASSETS.polyfork.artEasel, 1.6, -4.4, -5.0, 0.6],
+    [ASSETS.polyfork.legendaryChest, 0.95, 3.2, -5.2, -0.5],
+    [ASSETS.polyfork.crown, 0.22, 3.2, -5.2, -0.5, 0.95],
+    [ASSETS.polyfork.bardedHorse, 2.1, 6.4, -5.0, -2.0]
+  ]
+};
+
+// Posiciones del podio de campeones en la estacion 17 (deben coincidir con los estrados)
+const PODIUM_SLOTS = [
+  { ox: 0.0, oz: -1.4, oy: 0.45, rotY: 0 },
+  { ox: -1.8, oz: -0.9, oy: 0.31, rotY: 0.25 },
+  { ox: 1.8, oz: -0.9, oy: 0.21, rotY: -0.25 }
+];
+
+const ROAD_CLEARANCE = 2.7; // media banda transitable visible (~2.5 m) + margen
+
 export async function buildCheckpointStructure(mission, getTerrainY) {
   const g = new THREE.Group();
   g.name = `Checkpoint_${mission.id}_${mission.type}`;
+  g.rotation.y = stationYaw(mission);
 
   const stationMixers = [];
+  const set = STATION_SETS[Number(mission.id) === 0 ? 1 : Number(mission.id)] || [];
+  let lastBaseShift = 0;
 
-  // Each spawn places its object at the EXACT terrain height for its world position
-  async function spawn(path, targetHeight = 3.0, pos = [0, 0, 0], rotY = 0) {
-    const inst = await instantiate(path, targetHeight, true);
-    if (!inst) return null;
-    const worldX = mission.x + pos[0];
-    const worldZ = mission.z + pos[2];
-    const gy = getTerrainY(worldX, worldZ);
-    inst.position.set(pos[0], gy + (pos[1] || 0), pos[2]);
+  for (const entry of set) {
+    const [path, height, lx, lz0, rotY = 0, lift = 0, opts = {}] = entry;
+    const inst = await instantiate(path, height, true);
+    if (!inst) continue;
+
+    // Huella real del modelo ya escalado (radio horizontal aproximado)
     inst.rotation.y = rotY;
+    inst.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(inst);
+    const size = box.getSize(new THREE.Vector3());
+    const radius = 0.5 * Math.max(size.x, size.z);
+
+    // Garantia de paso libre: si el objeto invade la banda del camino se retira hacia el fondo
+    let shift = 0;
+    if (lift > 0) {
+      shift = lastBaseShift; // los objetos apoyados acompanan a su base
+    } else if (!opts.podium) {
+      const need = ROAD_CLEARANCE + radius * 0.9;
+      while (shift < 6.0) {
+        const w = stationLocalToWorld(mission, lx, lz0 - shift);
+        if (distanceToRoad(w.x, w.z) >= need) break;
+        shift += 0.4;
+      }
+      if (shift >= 6.0) {
+        console.warn('Objeto omitido por invadir el camino en estacion', mission.id, path);
+        continue;
+      }
+      lastBaseShift = shift;
+    }
+
+    const lz = lz0 - shift;
+    const w = stationLocalToWorld(mission, lx, lz);
+    const gy = getTerrainY(w.x, w.z);
+    inst.position.set(lx, gy + lift, lz);
     g.add(inst);
 
-    if (inst.userData.animations?.length) {
-      const animTarget = inst.children[0] || inst;
-      const mixer = new THREE.AnimationMixer(animTarget);
-      const safeClip = inst.userData.animations.find(a => {
-        const name = a.name.toLowerCase();
-        return (name.includes('idle') || name.includes('eating') || name.includes('walk')) && !name.includes('death') && !name.includes('attack');
-      }) || inst.userData.animations[0];
-
-      if (safeClip && !safeClip.name.toLowerCase().includes('death')) {
-        const action = mixer.clipAction(safeClip);
-        action.play();
+    // Animacion de reposo (Idle) para personas y animales
+    const anims = inst.userData.animations || [];
+    if (anims.length) {
+      const pick = anims.find(a => /idle/i.test(a.name)) || anims.find(a => /eat/i.test(a.name)) ||
+        anims.find(a => !/death|attack|run|walk/i.test(a.name));
+      if (pick) {
+        const mixer = new THREE.AnimationMixer(inst.children[0] || inst);
+        mixer.clipAction(pick).play();
+        mixer.update(Math.random() * 2);
         stationMixers.push(mixer);
       }
-    }
-    return inst;
-  }
-
-  const stationId = Number(mission.id);
-  switch (stationId) {
-    case 0:
-    case 1: {
-      // =========================================================================
-      // ESTACIÓN 01: RECEPCIÓN & KIT DE EXPEDICIÓN (Portal de Bienvenida)
-      // Tema didáctico: Primer día, recepción y entrega de equipamiento de trabajo (laptop, credencial).
-      // 100% Polyfork · Espacio central de aventureros limpio (CERO colisiones):
-      // - Tienda cuartel de expedición al fondo centro (canvasWallTent 3.2m, z: -6.5)
-      // - Tienda auxiliar de campaña en ala izquierda (canvasRidgeTent 2.3m, [-5.5, 0, -3.5])
-      // - Carreta logística de 4 ruedas con cajas de equipamiento (fourWheelWagon 1.6m, [-5.8, 0, 0.8])
-      // - Cajas de embalaje y laptops (woodenCrate 0.52m, 0.44m)
-      // - Mesa de recepción con pergaminos y credenciales (timberTable 0.76m, [4.8, 0, -2.5])
-      // - Tablón de bienvenida con el mapa oficial de expedición (campNoticeBoard 1.55m, [4.8, 0, 0.5])
-      // - Faroles de sendero perimetrales y vallas de bienvenida
-      // =========================================================================
-      await spawn(ASSETS.polyfork.canvasWallTent, 3.2, [0, 0, -6.5], 0);
-      await spawn(ASSETS.polyfork.canvasRidgeTent, 2.3, [-5.5, 0, -3.5], 0.35);
-
-      // Logística: Carreta y cajas de equipamiento tecnológico
-      await spawn(ASSETS.polyfork.fourWheelWagon, 1.6, [-5.8, 0, 0.8], 0.25);
-      await spawn(ASSETS.polyfork.woodenCrate, 0.52, [-4.2, 0, 0.8], 0.2);
-      await spawn(ASSETS.polyfork.woodenCrate, 0.44, [-4.5, 0, 1.4], -0.3);
-
-      // Mostrador de recepción y kit
-      await spawn(ASSETS.polyfork.timberTable, 0.76, [4.8, 0, -2.5], 0);
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [5.8, 0, -2.5], -0.4);
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [4.8, 0, 0.5], -0.5);
-
-      // Delimitación y faroles perimetrales
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [-6.0, 0, 3.2], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [6.0, 0, 3.2], -0.3);
-      await spawn(ASSETS.polyfork.woodenFence, 0.95, [-7.2, 0, 0.2], 0.8);
-      await spawn(ASSETS.polyfork.woodenFence, 0.95, [7.2, 0, 0.2], -0.8);
-
-      // Arboleda de bienvenida Polyfork al fondo
-      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -6.5], 0.3);
-      await spawn(ASSETS.trees[14], 8.5, [8.5, 0, -6.5], -0.3);
-      await spawn(ASSETS.trees[15], 8.5, [0.0, 0, -13.5], 0.1);
-      break;
-    }
-
-    case 2: {
-      // =========================================================================
-      // ESTACIÓN 02: PACTO & BENEFICIOS (Firma de Contrato y Prestaciones)
-      // Tema didáctico: Firma formal del contrato individual de trabajo y catálogo de prestaciones.
-      // - Capilla de piedra solemne al fondo (stoneChapel 6.2m, z: -7.0)
-      // - Altar sagrado de piedra con atril y Gran Libro del Contrato (stoneAltar, chainedBookLectern)
-      // - Arcón blindado de beneficios laborales (ironStrongbox 0.52m)
-      // - Estantería con pergaminos de prestaciones oficiales (scrollRack 1.45m)
-      // - Muretes de piedra perimetrales (lowStoneWall)
-      // - Braseros ceremoniales con la llama institucional (standingBrazier)
-      // - Velas ceremoniales sobre el atril (candleSpikeCluster)
-      // =========================================================================
-      await spawn(ASSETS.polyfork.stoneChapel, 6.2, [0, 0, -7.0], 0);
-      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [-4.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [4.5, 0, -4.5], -0.3);
-
-      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -3.6], 0);
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, -2.6], 0);
-      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [-1.6, 0, -4.8], 0);
-      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.65, [1.6, 0, -4.8], 0);
-
-      // Flanco izquierdo: Archivo de contratos individuales
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-4.5, 0, -1.8], 0.5);
-
-      // Flanco derecho: Arcón acorazado con catálogo de beneficios
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [4.5, 0, -1.8], -0.5);
-
-      // Braseros ceremoniales
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-4.8, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [4.8, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.8, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.8, 0, 3.0], -0.3);
-
-      // Arboleda solemne Polyfork al fondo
-      await spawn(ASSETS.trees[6], 8.5, [-8.5, 0, -5.0], 0.3);
-      await spawn(ASSETS.trees[6], 8.5, [8.5, 0, -5.0], -0.3);
-      await spawn(ASSETS.trees[13], 8.2, [0.0, 0, -13.5], 0.2);
-      break;
-    }
-
-    case 3: {
-      // =========================================================================
-      // ESTACIÓN 03: HOY COMIENZA TU HISTORIA (Plaza de Integración)
-      // Tema didáctico: Bienvenida al grupo en sala, presentaciones y explicación de la agenda.
-      // - Granero rústico comunitario al fondo (timberBarn 5.5m, z: -7.5) con entrada 100% libre
-      // - Pozo comunal de bienvenida en el ala izquierda (villageWell 1.55m, [-5.5, 0, -3.0])
-      // - Poste de señalización y agenda del día en ala derecha (trailSignpost 1.5m, [5.2, 0, -1.0])
-      // - Jardineras de flores en los flancos frontales (flowerPlanter 0.65m)
-      // - Bancos colocados estrictamente en las alas laterales (splitLogBench a x: +/- 4.8)
-      // - CORREDOR CENTRAL X: -3.0 A +3.0 Y Z: -5.5 A +2.0 COMPLETAMENTE DESPEJADO
-      // =========================================================================
-      await spawn(ASSETS.polyfork.timberBarn, 5.5, [0, 0, -7.5], 0);
-      await spawn(ASSETS.polyfork.villageWell, 1.55, [-5.5, 0, -3.0], 0.2);
-      await spawn(ASSETS.polyfork.trailSignpost, 1.5, [5.2, 0, -1.0], -0.5);
-
-      // Bancos en las alas laterales abiertas (CERO obstáculo central)
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-4.8, 0, -1.0], 0.4);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [4.8, 0, -1.0], -0.4);
-
-      // Jardineras florales y faroles en flancos exteriores
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [-5.2, 0, 2.2], 0);
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [5.2, 0, 2.2], 0);
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [-6.0, 0, 3.5], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [6.0, 0, 3.5], -0.3);
-
-      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -6.5], 0.2);
-      await spawn(ASSETS.trees[15], 8.5, [8.5, 0, -6.5], -0.2);
-      await spawn(ASSETS.trees[16], 8.0, [0.0, 0, -13.5], 0.1);
-      break;
-    }
-
-    case 4: {
-      // =========================================================================
-      // ESTACIÓN 04: CONOCE DE QUÉ FORMAS PARTE (Historia & Orígenes de la Empresa)
-      // Tema didáctico: Historia Bradesco-Bradescard, modelo de negocio, clientes, cultura y valores.
-      // - Salón señorial de la tradición al fondo (villageTavern 6.0m, z: -7.5)
-      // - Guardia de Honor: Estatuas de caballeros fundadores (standingKnightStatue a los costados)
-      // - Mesa de planeación con la Gran Crónica Histórica (timberTable + chainedBookLectern)
-      // - Poste de hitos históricos (signpost)
-      // - Braseros ceremoniales en flancos laterales abiertos
-      // =========================================================================
-      await spawn(ASSETS.polyfork.villageTavern, 6.0, [0, 0, -7.5], 0);
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-3.8, 0, -4.5], 0.2);
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [3.8, 0, -4.5], -0.2);
-
-      // Crónica y pergaminos históricos en ala izquierda
-      await spawn(ASSETS.polyfork.timberTable, 0.76, [-4.8, 0, -2.0], 0);
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [-4.8, 0.76, -2.0], 0);
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-6.0, 0, -2.0], 0.4);
-
-      // Poste de hitos en ala derecha
-      await spawn(ASSETS.polyfork.signpost, 1.55, [4.8, 0, -1.8], -0.5);
-
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-4.8, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [4.8, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.8, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.8, 0, 3.0], -0.3);
-
-      await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -6.5], 0.2);
-      await spawn(ASSETS.trees[15], 8.5, [8.5, 0, -6.5], -0.2);
-      await spawn(ASSETS.trees[13], 9.0, [0.0, 0, -13.5], 0.1);
-      break;
-    }
-
-    case 5: {
-      // =========================================================================
-      // ESTACIÓN 05: NOS CUIDAMOS, CUIDAMOS LA CONFIANZA (Protección Civil & Seguridad)
-      // Tema didáctico: Protocolos de protección civil, emergencias y control vehicular.
-      // - Torre de vigilancia y control (watchtower 7.2m, [-4.5, 0, -3.5])
-      // - Puerta vehicular y valla de acceso (woodenGate 1.35m, woodenFence)
-      // - Carreta de transporte vehicular (woodenCart 1.35m, [4.5, 0, -1.5])
-      // - Puesto de primeros auxilios: Arcón blindado de botiquín y barril contra incendios (ironStrongbox, quenchBarrel)
-      // - Tablón de rutas de evacuación y brigadas de piso (campNoticeBoard 1.55m, [-4.5, 0, 1.5])
-      // =========================================================================
-      await spawn(ASSETS.polyfork.watchtower, 7.2, [-4.5, 0, -3.5], 0.2);
-      await spawn(ASSETS.polyfork.woodenCart, 1.35, [4.5, 0, -1.5], -0.2);
-      await spawn(ASSETS.polyfork.woodenGate, 1.35, [4.0, 0, 1.5], 0.4);
-      await spawn(ASSETS.polyfork.woodenFence, 0.95, [5.6, 0, 1.5], 0.4);
-
-      // Botiquín de emergencias y barril de agua
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-4.8, 0, 0.5], 0.2);
-      await spawn(ASSETS.polyfork.quenchBarrel, 0.85, [-3.8, 0, 0.5], 0);
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [-4.5, 0, 1.8], -0.25);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.5, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.5, 0, 3.0], -0.3);
-
-      await spawn(ASSETS.trees[14], 9.0, [-8.5, 0, -5.5], 0.3);
-      await spawn(ASSETS.trees[5], 9.2, [8.5, 0, -5.5], -0.3);
-      await spawn(ASSETS.trees[4], 8.2, [0.0, 0, -13.5], 0.1);
-      break;
-    }
-
-    case 6: {
-      // =========================================================================
-      // ESTACIÓN 06: PAUSA DE RECARGA (Oasis de Descanso & Café)
-      // Tema didáctico: Espacio de descanso, recarga de energía y café previo al bloque operativo.
-      // - Cabaña acogedora de descanso al fondo (thatchedCottage 4.8m, z: -7.0)
-      // - Mesa de café rústica con jarras de agua, tazas y aperitivos (heavyTimberPicnicTable, clayWineJug, goblet, rusticPie)
-      // - Bancos de descanso con PERSONAJES SENTADOS en ellos (splitLogBench a x: +/- 2.8)
-      // - Macizos florales y arbustos florecientes (flowerBed, azaleaBush, roundBush)
-      // - Camino central completamente libre
-      // =========================================================================
-      await spawn(ASSETS.polyfork.thatchedCottage, 4.8, [0, 0, -7.0], 0);
-
-      // Mesa de café y refrigerios
-      await spawn(ASSETS.polyfork.heavyTimberPicnicTable, 0.76, [0, 0, -2.8], 0);
-      await spawn(ASSETS.polyfork.clayWineJug, 0.22, [-0.4, 0.76, -2.8], 0);
-      await spawn(ASSETS.polyfork.goblet, 0.16, [0.4, 0.76, -2.8], 0);
-      await spawn(ASSETS.polyfork.rusticPie, 0.10, [0, 0.76, -2.8], 0.2);
-
-      // Bancos de descanso en laterales donde se sientan los personajes
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-2.8, 0, 0.5], Math.PI / 2);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [2.8, 0, 0.5], -Math.PI / 2);
-
-      // Entorno de jardín botánico relajante
-      await spawn(ASSETS.polyfork.flowerBed, 0.45, [-4.8, 0, 1.2], 0.2);
-      await spawn(ASSETS.polyfork.azaleaBush, 1.10, [4.8, 0, 1.2], -0.2);
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [-5.2, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.3, [5.2, 0, 3.0], -0.3);
-
-      await spawn(ASSETS.trees[11], 8.0, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[16], 8.0, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -13.0], 0.2);
-      break;
-    }
-
-    case 7: {
-      // =========================================================================
-      // ESTACIÓN 07: HUMAND & COMEDOR (Comedor Corporativo & Registro de Asistencia)
-      // Tema didáctico: Uso de la App Humand para registro de entradas/salidas, incidencias y comedor.
-      // - Gran Salón Comedor al fondo (timberBarn 5.8m, z: -7.0) con puertas despejadas
-      // - Horno artesanal de pan en ala derecha (clayBreadOven 1.6m, [4.8, 0, -2.0])
-      // - Puesto de buffet y autoservicio en ala izquierda (marketStall 2.15m, [-4.8, 0, -2.0])
-      // - Suministros alimentarios: Cesta de frutas frescas, sacos de harina y barril
-      // - Mesas laterales con servicio de comedor (cazuelaPot, roastMeat, breadLoaf)
-      // - Puerta y paso central 100% expeditos
-      // =========================================================================
-      await spawn(ASSETS.polyfork.timberBarn, 5.8, [0, 0, -7.0], 0);
-
-      // Cocina y Panadería
-      await spawn(ASSETS.polyfork.clayBreadOven, 1.60, [4.8, 0, -2.0], -0.8);
-      await spawn(ASSETS.polyfork.basketOfProduce, 0.48, [3.6, 0, -1.8], 0.1);
-      await spawn(ASSETS.polyfork.polyforkBarrel, 0.85, [5.2, 0, -0.6], 0.2);
-
-      // Autoservicio / Buffet
-      await spawn(ASSETS.polyfork.marketStall, 2.15, [-4.8, 0, -2.0], 0.8);
-      await spawn(ASSETS.polyfork.grainSack, 0.48, [-3.8, 0, -1.2], -0.3);
-
-      // Mesas laterales con comida servida
-      await spawn(ASSETS.polyfork.timberTable, 0.76, [-3.6, 0, 1.0], 0.1);
-      await spawn(ASSETS.polyfork.cazuelaPot, 0.18, [-3.6, 0.76, 1.0], 0);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-3.2, 0.76, 1.0], 0.3);
-
-      await spawn(ASSETS.polyfork.timberTable, 0.76, [3.6, 0, 1.0], -0.1);
-      await spawn(ASSETS.polyfork.charredMeatHaunch, 0.20, [3.6, 0.76, 1.0], 0);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [3.2, 0.76, 1.0], -0.3);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.2, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.2, 0, 3.0], -0.3);
-
-      await spawn(ASSETS.trees[11], 8.2, [-8.5, 0, -4.5], 0.4);
-      await spawn(ASSETS.trees[16], 8.0, [8.5, 0, -4.5], -0.4);
-      await spawn(ASSETS.trees[13], 8.5, [0.0, 0, -13.5], 0.2);
-      break;
-    }
-
-    case 8: {
-      // =========================================================================
-      // ESTACIÓN 08: TARJETA COSMOS (Paseo de la Ribera & Convenios VIP)
-      // Tema didáctico: Paseo de la Ribera: Beneficios, convenios comerciales y privilegios exclusivos.
-      // - Embarcadero y puente de madera extendiéndose al norte hacia el lago Cosmos
-      // - Puesto de convenios y alianzas VIP (marketStall 2.2m en ala derecha)
-      // - Arcón dorado de recompensas Cosmos (ironStrongbox en ala izquierda)
-      // - Banco con vista panorámica a la ribera (splitLogBench)
-      // - Sauces llorones ribereños enmarcando el agua
-      // =========================================================================
-      await spawn(ASSETS.polyfork.woodenBridge, 1.35, [-4.8, 0, -4.5], 0);
-
-      // Puesto de convenios retail y salud
-      await spawn(ASSETS.polyfork.marketStall, 2.25, [4.5, 0, -1.0], -0.35);
-      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [3.5, 0, 0.4], 0.3);
-
-      // Arcón de beneficios Cosmos y catálogo de descuentos
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-3.5, 0, 0.4], 0.2);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-1.5, 0, -2.5], 0);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.0, 0, 2.5], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.0, 0, 2.5], -0.3);
-
-      await spawn(ASSETS.trees[11], 8.5, [-8.5, 0, -5.0], 0.3);
-      await spawn(ASSETS.trees[11], 8.5, [8.5, 0, -5.0], -0.3);
-      break;
-    }
-
-    case 9: {
-      // =========================================================================
-      // ESTACIÓN 09: CULTURA & COMUNICACIÓN INTERNA (Ágora de la Comunidad & Convivencia)
-      // Tema didáctico: Canales oficiales de comunicación, valores compartidos y cómo nos mantenemos conectados.
-      // - Gran portal de la comunidad al fondo (villageGatehouse 6.2m, z: -7.0)
-      // - Fogata comunitaria de piedra con asador y pila de leña en ala derecha (stoneRingCampfire, firewoodStack)
-      // - Tablón oficial de la Gaceta y Noticias Internas en ala izquierda (campNoticeBoard)
-      // - Jardinera floral enmarcando el sendero
-      // - Entrada central totalmente libre
-      // =========================================================================
-      await spawn(ASSETS.polyfork.villageGatehouse, 6.2, [0, 0, -7.0], 0);
-
-      // Fogata de convivencia en ala derecha
-      await spawn(ASSETS.polyfork.stoneRingCampfire, 0.95, [3.8, 0, 0.2], 0);
-      await spawn(ASSETS.polyfork.firewoodStack, 0.60, [5.2, 0, 0.2], 0);
-
-      // Tablón de la gaceta corporativa en ala izquierda
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [-4.5, 0, -0.8], 0.35);
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [-5.0, 0, 1.5], 0.1);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.2, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.2, 0, 3.0], -0.3);
-
-      await spawn(ASSETS.trees[14], 8.5, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[0], 8.5, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[13], 9.0, [0.0, 0, -13.5], 0.2);
-      break;
-    }
-
-    case 10: {
-      // =========================================================================
-      // ESTACIÓN 10: E-LEARNING & ACADEMIA (Academia Digital de Aprendizaje)
-      // Tema didáctico: Plataforma digital de aprendizaje continuo, capacitaciones de inicio y ruta de formación.
-      // - Cabaña de estudio y sabiduría al fondo (thatchedCottage 5.2m, z: -6.8)
-      // - Atril con el compendio de cursos y certificaciones (chainedBookLectern a la izquierda)
-      // - Estantería con los rollos y módulos de estudio (scrollRack)
-      // - Mesa de estudio con velas de concentración (heavyTimberPicnicTable, candleSpikeCluster)
-      // - Poste indicador de rutas de aprendizaje (signpost a la derecha)
-      // =========================================================================
-      await spawn(ASSETS.polyfork.thatchedCottage, 5.2, [0, 0, -6.8], 0);
-
-      // Biblioteca y lectura en ala izquierda
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [-2.8, 0, -1.5], 0.2);
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [-4.5, 0, -1.5], 0.35);
-
-      // Mesa de estudio en ala derecha
-      await spawn(ASSETS.polyfork.heavyTimberPicnicTable, 0.76, [3.8, 0, -1.5], -0.2);
-      await spawn(ASSETS.polyfork.candleSpikeCluster, 0.60, [3.8, 0.76, -1.5], 0);
-      await spawn(ASSETS.polyfork.signpost, 1.55, [4.8, 0, 1.0], -0.3);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.8], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.8], -0.3);
-
-      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[15], 8.5, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -13.0], 0.2);
-      break;
-    }
-
-    case 11: {
-      // =========================================================================
-      // ESTACIÓN 11: TU INICIO EN ORDEN: GESTOR DOCUMENTAL (Archivo Central & Scriptorium)
-      // Tema didáctico: Gestor documental corporativo, resguardo de archivos y procesos esenciales.
-      // - Scriptorium de cantería al fondo (blacksmithForge 5.5m, z: -6.5)
-      // - Arcón blindado de expedientes confidenciales (ironStrongbox en ala izquierda)
-      // - Batería de cajas de archivo resguardadas (woodenCrate a la derecha)
-      // - Estantería de pergaminos clasificados (scrollRack a la derecha)
-      // - Poste de lineamientos y resguardo documental (trailSignpost a la izquierda)
-      // =========================================================================
-      await spawn(ASSETS.polyfork.blacksmithForge, 5.5, [0, 0, -6.5], 0);
-
-      // Archivo confidencial y normativa en ala izquierda
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [-3.8, 0, -1.0], 0.2);
-      await spawn(ASSETS.polyfork.trailSignpost, 1.50, [-4.5, 0, 1.0], 0.3);
-
-      // Cajas de documentación y estantería en ala derecha
-      await spawn(ASSETS.polyfork.woodenCrate, 0.50, [3.8, 0, -1.0], 0.2);
-      await spawn(ASSETS.polyfork.woodenCrate, 0.44, [4.2, 0, -0.4], -0.3);
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [4.8, 0, 0.8], -0.4);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.8], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.8], -0.3);
-
-      await spawn(ASSETS.trees[14], 8.8, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[5], 8.8, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[4], 8.5, [0.0, 0, -13.0], 0.1);
-      break;
-    }
-
-    case 12: {
-      // =========================================================================
-      // ESTACIÓN 12: TU EQUIPO TE ESTABA ESPERANDO (Pabellón de Recepción de Equipo)
-      // Tema didáctico: Recepción por tu líder y compañeros: propósito, actividades, retos e incorporación.
-      // - Salón de bienvenida comunitaria al fondo (villageTavern 5.8m, z: -7.0)
-      // - Mesa de bienvenida con refrigerios y detalles de ingreso (heavyTimberPicnicTable, goblet, breadLoaf)
-      // - Pozo comunal de bienvenida en el ala izquierda (villageWell)
-      // - Jardineras florales y faroles festivos enmarcando el espacio
-      // - Centro completamente abierto para el círculo de bienvenida
-      // =========================================================================
-      await spawn(ASSETS.polyfork.villageTavern, 5.8, [0, 0, -7.0], 0);
-
-      // Mesa de bienvenida con detalles del equipo
-      await spawn(ASSETS.polyfork.heavyTimberPicnicTable, 0.76, [3.8, 0, -1.2], -0.2);
-      await spawn(ASSETS.polyfork.goblet, 0.16, [3.5, 0.76, -1.2], 0);
-      await spawn(ASSETS.polyfork.goblet, 0.16, [4.1, 0.76, -1.2], 0);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [3.8, 0.76, -1.2], 0.2);
-
-      // Pozo de bienvenida en ala izquierda
-      await spawn(ASSETS.polyfork.villageWell, 1.55, [-4.5, 0, -1.5], 0.2);
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [-5.0, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [5.0, 0, 1.2], 0);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.2, 0, 2.8], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.2, 0, 2.8], -0.3);
-
-      await spawn(ASSETS.trees[16], 8.0, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[11], 8.0, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -13.5], 0.2);
-      break;
-    }
-
-    case 13: {
-      // =========================================================================
-      // ESTACIÓN 13: TU HISTORIA CONTINÚA: ALMUERZO EN EQUIPO (Banquete de Integración)
-      // Tema didáctico: Cierre del bloque compartido, resolución de dudas y almuerzo de integración.
-      // - Gran Salón Comedor al fondo (timberBarn 5.8m, z: -7.0)
-      // - Gran mesa de banquete central con PERSONAJES SENTADOS ALREDEDOR
-      // - Banquete abundante: Cazuela humeante, pierna asada, tarta rústica, jarras y copas
-      // - Jardinera de flores y faroles festivos
-      // =========================================================================
-      await spawn(ASSETS.polyfork.timberBarn, 5.8, [0, 0, -7.0], 0);
-
-      // Mesa de banquete en el centro donde comen juntos
-      await spawn(ASSETS.polyfork.heavyTimberPicnicTable, 0.76, [0, 0, 0.8], 0);
-      await spawn(ASSETS.polyfork.cazuelaPot, 0.18, [0, 0.76, 0.8], 0);
-      await spawn(ASSETS.polyfork.charredMeatHaunch, 0.20, [-0.5, 0.76, 0.8], 0.3);
-      await spawn(ASSETS.polyfork.rusticPie, 0.10, [0.5, 0.76, 0.8], -0.3);
-      await spawn(ASSETS.polyfork.clayWineJug, 0.22, [-0.8, 0.76, 0.8], 0);
-      await spawn(ASSETS.polyfork.goblet, 0.16, [0.8, 0.76, 0.8], 0);
-
-      // Adornos florales en las alas exteriores
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [-4.5, 0, 1.5], 0);
-      await spawn(ASSETS.polyfork.flowerPlanter, 0.65, [4.5, 0, 1.5], 0);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.2, 0, 3.0], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.2, 0, 3.0], -0.3);
-
-      await spawn(ASSETS.trees[11], 8.2, [-8.5, 0, -4.5], 0.4);
-      await spawn(ASSETS.trees[16], 8.0, [8.5, 0, -4.5], -0.4);
-      await spawn(ASSETS.trees[0], 9.5, [0.0, 0, -14.0], 0.1);
-      break;
-    }
-
-    case 14: {
-      // =========================================================================
-      // ESTACIÓN 14: VOZ DEL CLIENTE: NPS (Satisfacción & Metodología de Servicio)
-      // Tema didáctico: Metodología, escala y aplicación de la encuesta NPS para medir lealtad.
-      // - Cabaña de atención y calidad al fondo (thatchedCottage 5.4m, z: -6.5)
-      // - Urna / Buzón de retroalimentación de clientes (ironStrongbox en ala derecha)
-      // - Mesa de encuestas y diálogo de servicio (heavyTimberPicnicTable en ala izquierda)
-      // - Estantería con el protocolo Closed-Loop de resolución (scrollRack en ala derecha)
-      // - Poste de la metodología NPS (signpost)
-      // =========================================================================
-      await spawn(ASSETS.polyfork.thatchedCottage, 5.4, [0, 0, -6.5], 0);
-
-      // Mesa de escucha en ala izquierda
-      await spawn(ASSETS.polyfork.heavyTimberPicnicTable, 0.76, [-3.8, 0, -0.8], 0.15);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-3.8, 0.76, -0.8], 0.2);
-
-      // Urna de feedback y protocolo en ala derecha
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.52, [3.6, 0, -0.8], 0.2);
-      await spawn(ASSETS.polyfork.scrollRack, 1.45, [4.8, 0, -0.8], -0.25);
-      await spawn(ASSETS.polyfork.signpost, 1.55, [-4.5, 0, 1.5], 0.3);
-
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.8], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.8], -0.3);
-
-      await spawn(ASSETS.trees[13], 8.2, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[7], 8.2, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[0], 9.0, [0.0, 0, -13.0], 0.2);
-      break;
-    }
-
-    case 15: {
-      // =========================================================================
-      // ESTACIÓN 15: PILARES NORMATIVOS & CÓDIGO DE ÉTICA (Tribunal de Integridad)
-      // Tema didáctico: Código de ética y conducta, directrices de vestimenta, PLD y gestión de riesgos.
-      // - Santuario de alta montaña de piedra sagrada (stoneChapel 6.5m, z: -6.8)
-      // - Muretes de cantería enmarcando el atrio de justicia (lowStoneWall)
-      // - Altar de la verdad y Atril con el Tomo del Código de Conducta (stoneAltar, chainedBookLectern)
-      // - Guardián de la Integridad: Estatua de Caballero de la Rectitud (standingKnightStatue)
-      // - Buzón blindado confidencial de denuncias (ironStrongbox)
-      // - Braseros ceremoniales con la llama de la transparencia (standingBrazier)
-      // =========================================================================
-      await spawn(ASSETS.polyfork.stoneChapel, 6.5, [0, 0, -6.8], 0);
-      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [-4.2, 0, -3.5], 0.3);
-      await spawn(ASSETS.polyfork.lowStoneWall, 0.80, [4.2, 0, -3.5], -0.3);
-
-      // Altar y Gran Tomo del Código
-      await spawn(ASSETS.polyfork.stoneAltar, 0.95, [0, 0, -3.0], 0);
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [0, 0, -2.0], 0);
-
-      // Caballero de la rectitud y buzón confidencial
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.2, [-2.8, 0, -1.8], 0.2);
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.55, [3.2, 0, -1.8], -0.3);
-
-      // Braseros solemnes
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [-4.2, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.05, [4.2, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-5.2, 0, 2.8], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [5.2, 0, 2.8], -0.3);
-
-      await spawn(ASSETS.trees[14], 9.2, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[14], 9.2, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[5], 9.0, [0.0, 0, -13.0], 0.1);
-      break;
-    }
-
-    case 16: {
-      // =========================================================================
-      // ESTACIÓN 16: REPRESENTACIÓN & SINDICATO (Foro de Diálogo Bilateral & Acuerdos)
-      // Tema didáctico: Información institucional sobre representación sindical, derechos y acompañamiento laboral.
-      // - Salón consistorial de acuerdos al fondo (villageGatehouse 6.2m, z: -6.8)
-      // - Mesa de negociación bilateral con asientos en ambos costados (heavyTimberPicnicTable, splitLogBench)
-      // - Atril con el Contrato Colectivo de Trabajo (chainedBookLectern en ala izquierda)
-      // - Tablón informativo de asambleas y derechos laborales (campNoticeBoard en ala derecha)
-      // - Vallas de madera perimetrales delimitando el recinto cívico
-      // =========================================================================
-      await spawn(ASSETS.polyfork.villageGatehouse, 6.2, [0, 0, -6.8], 0);
-
-      // Mesa de diálogo bilateral
-      await spawn(ASSETS.polyfork.heavyTimberPicnicTable, 0.76, [0, 0, -1.8], 0);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [-1.4, 0, -1.8], Math.PI / 2);
-      await spawn(ASSETS.polyfork.splitLogBench, 0.45, [1.4, 0, -1.8], -Math.PI / 2);
-
-      // Registro del Contrato Colectivo y Tablón
-      await spawn(ASSETS.polyfork.chainedBookLectern, 1.25, [-3.5, 0, 0.2], 0.3);
-      await spawn(ASSETS.polyfork.campNoticeBoard, 1.55, [3.5, 0, 0.2], -0.35);
-
-      await spawn(ASSETS.polyfork.woodenFence, 0.95, [-6.2, 0, 0.5], 0.8);
-      await spawn(ASSETS.polyfork.woodenFence, 0.95, [6.2, 0, 0.5], -0.8);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [-4.8, 0, 2.6], 0.3);
-      await spawn(ASSETS.polyfork.lampPost, 2.4, [4.8, 0, 2.6], -0.3);
-
-      await spawn(ASSETS.trees[12], 9.0, [-8.5, 0, -4.5], 0.3);
-      await spawn(ASSETS.trees[14], 9.0, [8.5, 0, -4.5], -0.3);
-      await spawn(ASSETS.trees[10], 9.2, [0.0, 0, -13.0], 0.1);
-      break;
-    }
-
-    case 17: {
-      // =========================================================================
-      // ESTACIÓN 17: CUÉNTANOS TU HISTORIA: TU HUELLA (Gran Bastión de Graduación)
-      // Tema didáctico: Sesión de cierre, graduación, podio de los 3 campeones con mayores logros XP.
-      // - Gran Bastión / Castillo real de la cumbre (buildings.castle 12.0m, z: -4.5)
-      // - Torres defensivas perimetrales (buildings.cannonTower 8.0m, buildings.tower 7.0m)
-      // - Calzada de honor flanqueada por caballeros triunfales y braseros de victoria
-      // - PODIO REAL DE CAMPEONES: Plintos para 1°, 2° y 3° Lugar en el centro con aventureros celebrando
-      // - Gran Altar de Graduación con el Arcón Dorado de Constancias
-      // =========================================================================
-      await spawn(ASSETS.buildings.castle, 12.0, [0, 0, -4.5], 0);
-      await spawn(ASSETS.buildings.cannonTower, 8.0, [-7.5, 0, 2.5], 0.3);
-      await spawn(ASSETS.buildings.cannonTower, 8.0, [7.5, 0, 2.5], -0.3);
-      await spawn(ASSETS.buildings.tower, 7.0, [-7.5, 0, -8.0], 0);
-      await spawn(ASSETS.buildings.tower, 7.0, [7.5, 0, -8.0], 0);
-
-      // Calzada de Honor: Caballeros de guardia y braseros triunfales
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.4, [-3.2, 0, -0.8], 0.2);
-      await spawn(ASSETS.polyfork.standingKnightStatue, 2.4, [3.2, 0, -0.8], -0.2);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.20, [-2.2, 0, 1.2], 0);
-      await spawn(ASSETS.polyfork.standingBrazier, 1.20, [2.2, 0, 1.2], 0);
-
-      // Altar de constancias de graduación
-      await spawn(ASSETS.polyfork.stoneAltar, 1.05, [0, 0, -1.2], 0);
-      await spawn(ASSETS.polyfork.ironStrongbox, 0.65, [0, 0, 0.3], 0);
-
-      // Podio de Campeones (1°, 2°, 3° Lugar)
-      const podiumStoneMat = new THREE.MeshStandardMaterial({ color: 0x3b3530, roughness: 0.72, metalness: 0.15 });
-      const podiumGoldMat = new THREE.MeshStandardMaterial({ color: 0xd4ac0d, roughness: 0.28, metalness: 0.85 });
-      const podiumSilverMat = new THREE.MeshStandardMaterial({ color: 0xb0b8c0, roughness: 0.32, metalness: 0.78 });
-      const podiumBronzeMat = new THREE.MeshStandardMaterial({ color: 0xb87333, roughness: 0.38, metalness: 0.72 });
-
-      [
-        { x: 0, z: 2.3, h: 0.42, r: 0.62, trim: podiumGoldMat },     // 1° Lugar (Centro)
-        { x: -1.65, z: 2.75, h: 0.28, r: 0.56, trim: podiumSilverMat }, // 2° Lugar (Izquierda)
-        { x: 1.65, z: 2.75, h: 0.18, r: 0.54, trim: podiumBronzeMat }   // 3° Lugar (Derecha)
-      ].forEach(pStep => {
-        const plinth = new THREE.Mesh(new THREE.CylinderGeometry(pStep.r, pStep.r * 1.08, pStep.h, 16), podiumStoneMat);
-        plinth.position.set(pStep.x, pStep.h * 0.5, pStep.z);
-        plinth.castShadow = true;
-        plinth.receiveShadow = true;
-        g.add(plinth);
-
-        const cap = new THREE.Mesh(new THREE.CylinderGeometry(pStep.r * 1.02, pStep.r * 1.02, 0.035, 16), pStep.trim);
-        cap.position.set(pStep.x, pStep.h + 0.015, pStep.z);
-        cap.receiveShadow = true;
-        g.add(cap);
-      });
-
-      // Mesa de celebración de graduación en ala izquierda
-      await spawn(ASSETS.polyfork.heavyTimberPicnicTable, 0.76, [-5.2, 0, 0.8], 0.25);
-      await spawn(ASSETS.polyfork.charredMeatHaunch, 0.22, [-5.2, 0.76, 0.8], 0.1);
-      await spawn(ASSETS.polyfork.rusticPie, 0.10, [-5.6, 0.76, 0.8], 0.3);
-      await spawn(ASSETS.polyfork.breadLoaf, 0.12, [-4.8, 0.76, 0.8], -0.2);
-      await spawn(ASSETS.polyfork.wineJug, 0.22, [-5.0, 0.76, 0.6], 0);
-      await spawn(ASSETS.polyfork.goblet, 0.16, [-5.4, 0.76, 0.6], 0);
-
-      // Cuervos vigías en las almenas altas
-      await spawn(ASSETS.animals.crow, 0.42, [-7.5, 8.0, 2.5], 0.2);
-      await spawn(ASSETS.animals.crow, 0.42, [7.5, 8.0, 2.5], -0.2);
-
-      await spawn(ASSETS.trees[12], 10.5, [-13.5, 0, -5.0], 0.2);
-      await spawn(ASSETS.trees[14], 10.5, [13.5, 0, -5.0], -0.2);
-      await spawn(ASSETS.trees[10], 11.0, [-8.0, 0, -16.5], 0.3);
-      await spawn(ASSETS.trees[5], 11.0, [8.0, 0, -16.5], -0.3);
-      await spawn(ASSETS.trees[0], 12.0, [0.0, 0, -18.0], 0);
-      break;
     }
   }
 
@@ -3353,21 +3208,36 @@ export class ProgressiveWorldStreamer {
 
     const isStationClearing = (x, z) => {
       for (const m of this.missions) {
-        const rad = (m.id === 13) ? 18.0 : 11.5;
-        if (Math.hypot(x - m.x, z - m.z) < rad) return true;
+        if (m.hidden) continue;
+        const dx = x - m.x, dz = z - m.z;
+        const yaw = stationYaw(m);
+        const c = Math.cos(yaw), sn = Math.sin(yaw);
+        // Marco local de la estacion: lx lateral, lz profundidad
+        const lx = dx * c - dz * sn;
+        const lz = dx * sn + dz * c;
+
+        // 1. Nucleo protegido: Plaza frontal, area de transito de aventureros y fachada
+        if (lz > -11.5 && lz < 9.0 && Math.abs(lx) < 7.5) return true;
+
+        // 2. Corredor de vision de la camara: Evita arboles tapando la escena de la estacion
+        if (lz >= 8.5 && lz <= 16.0 && Math.abs(lx) < 6.5) return true;
+
+        // 3. Buffer de seguridad radial en el centro de la estacion
+        const coreRad = (m.id === 17) ? 14.0 : 8.0;
+        if (Math.hypot(dx, dz) < coreRad) return true;
       }
       return false;
     };
 
     const canSpawnAt = (x, z, radius = 2.0) => {
-      // 1. Never spawn inside or near stations (11.5m clear perimeter, 18m en Bastión)
+      // 1. Never spawn inside or near station core plazas
       if (isStationClearing(x, z)) return false;
 
       // 2. Keep clear of the walking trail path
       if (this.trailPoints && this.trailPoints.length) {
         for (let i = 0; i < this.trailPoints.length; i++) {
           const pt = this.trailPoints[i];
-          if (Math.hypot(x - pt.x, z - pt.y) < (radius + 5.5)) return false;
+          if (Math.hypot(x - pt.x, z - (pt.z !== undefined ? pt.z : pt.y)) < (radius + 4.2)) return false;
         }
       }
 
@@ -3558,6 +3428,141 @@ export class ProgressiveWorldStreamer {
         rocks: [ASSETS.rocks[4], ASSETS.rocks[2]] // Rock_5_A, Rock_2_A
       }
     };
+
+    // ── 0. Arboledas y Cinturones Boscosos Envolventes de las Estaciones ──────
+    // Genera arboledas frondosas en semicírculo detrás del edificio principal y en los flancos,
+    // garantizando CERO colisiones con el edificio, utilería, camino y corredor de cámara.
+    const STATION_SURROUNDING_OFFSETS = [
+      // Fila 1 Trasera (Inmediatamente detrás del edificio principal)
+      { lx: -4.8, lz: -12.5, r: 1.8, isMother: false },
+      { lx: 4.8, lz: -12.5, r: 1.8, isMother: false },
+      { lx: -7.8, lz: -13.0, r: 2.0, isMother: true },
+      { lx: 7.8, lz: -13.0, r: 2.0, isMother: true },
+
+      // Fila 2 Trasera (Canopia media detrás del edificio)
+      { lx: -2.8, lz: -16.2, r: 2.2, isMother: true },
+      { lx: 0.0, lz: -17.5, r: 2.4, isMother: true },
+      { lx: 2.8, lz: -16.2, r: 2.2, isMother: true },
+      { lx: -6.5, lz: -16.8, r: 2.0, isMother: false },
+      { lx: 6.5, lz: -16.8, r: 2.0, isMother: false },
+
+      // Fila 3 Trasera (Cresta de bosque profundo)
+      { lx: -10.5, lz: -20.5, r: 2.2, isMother: true },
+      { lx: -4.5, lz: -21.5, r: 2.2, isMother: true },
+      { lx: 0.0, lz: -22.5, r: 2.4, isMother: true },
+      { lx: 4.5, lz: -21.5, r: 2.2, isMother: true },
+      { lx: 10.5, lz: -20.5, r: 2.2, isMother: true },
+
+      // Fila 4 Trasera (Telón de fondo exterior)
+      { lx: -14.0, lz: -24.5, r: 2.2, isMother: true },
+      { lx: -8.0, lz: -25.5, r: 2.2, isMother: true },
+      { lx: 0.0, lz: -26.5, r: 2.4, isMother: true },
+      { lx: 8.0, lz: -25.5, r: 2.2, isMother: true },
+      { lx: 14.0, lz: -24.5, r: 2.2, isMother: true },
+
+      // Flanco Izquierdo (Enmarcado lateral)
+      { lx: -9.5, lz: -8.5, r: 1.9, isMother: false },
+      { lx: -10.0, lz: -4.0, r: 1.9, isMother: false },
+      { lx: -10.5, lz: 0.5, r: 1.8, isMother: false },
+      { lx: -13.5, lz: -6.5, r: 2.0, isMother: true },
+      { lx: -14.5, lz: -11.0, r: 2.0, isMother: true },
+      { lx: -15.0, lz: -1.5, r: 1.9, isMother: false },
+
+      // Flanco Derecho (Enmarcado lateral)
+      { lx: 9.5, lz: -8.5, r: 1.9, isMother: false },
+      { lx: 10.0, lz: -4.0, r: 1.9, isMother: false },
+      { lx: 10.5, lz: 0.5, r: 1.8, isMother: false },
+      { lx: 13.5, lz: -6.5, r: 2.0, isMother: true },
+      { lx: 14.5, lz: -11.0, r: 2.0, isMother: true },
+      { lx: 15.0, lz: -1.5, r: 1.9, isMother: false }
+    ];
+
+    const SHRUB_LOCAL_OFFSETS = [
+      { dx: 1.6, dz: 0.4 },
+      { dx: -1.4, dz: 1.1 },
+      { dx: 0.7, dz: -1.5 }
+    ];
+
+    for (const m of this.missions) {
+      if (m.hidden) continue;
+      const set = STATION_SETS[Number(m.id) === 0 ? 1 : Number(m.id)] || [];
+      const sectorKey = getSectorAt(m.x, m.z, m.baseY || 0);
+      const palette = SECTOR_PALETTES[sectorKey] || SECTOR_PALETTES.oak_forest;
+
+      for (const cand of STATION_SURROUNDING_OFFSETS) {
+        const w = stationLocalToWorld(m, cand.lx, cand.lz);
+        const wy = this.getTerrainY(w.x, w.z);
+        if (wy < -0.2 || wy > 40.0) continue;
+
+        // 1. Distancia minima estricta al camino
+        if (distanceToRoad(w.x, w.z) < 4.2) continue;
+
+        // 2. Proteccion estricta de la plaza y linea de vista de la camara
+        if (cand.lz > -2.0 && Math.abs(cand.lx) < 7.5) continue;
+        if (cand.lz > 1.0 && Math.abs(cand.lx) < 7.0) continue;
+
+        // 3. Verificacion anticolision con cada pieza de la estacion (edificio y utileria)
+        let hitProp = false;
+        for (const p of set) {
+          const pw = stationLocalToWorld(m, p[2], p[3]);
+          const pRadius = (p[1] > 5.0) ? 3.5 : 1.2;
+          if (Math.hypot(w.x - pw.x, w.z - pw.z) < (cand.r + pRadius + 0.8)) {
+            hitProp = true;
+            break;
+          }
+        }
+        if (hitProp) continue;
+
+        // 4. Verificacion de espacio con otros arboles colocados
+        let hitTree = false;
+        for (let i = 0; i < placedColliders.length; i++) {
+          const c = placedColliders[i];
+          if (Math.hypot(w.x - c.x, w.z - c.z) < (cand.r + c.r)) {
+            hitTree = true;
+            break;
+          }
+        }
+        if (hitTree) continue;
+
+        // Instanciar arbol segun estrato y bioma
+        const treeModel = cand.isMother
+          ? palette.mothers[Math.floor(seeded(seedIdx++) * palette.mothers.length)]
+          : palette.children[Math.floor(seeded(seedIdx++) * palette.children.length)];
+
+        const height = cand.isMother
+          ? THREE.MathUtils.lerp(8.5, 11.8, seeded(seedIdx++))
+          : THREE.MathUtils.lerp(5.2, 7.8, seeded(seedIdx++));
+
+        const scaleXZ = THREE.MathUtils.lerp(0.92, 1.22, seeded(seedIdx++));
+        const rotY = seeded(seedIdx++) * Math.PI * 2;
+        const tiltX = (seeded(seedIdx++) - 0.5) * 0.05;
+        const tiltZ = (seeded(seedIdx++) - 0.5) * 0.05;
+
+        addInstance(treeModel, height, [w.x, wy, w.z], rotY, scaleXZ, scaleXZ, tiltX, tiltZ);
+        placedColliders.push({ x: w.x, z: w.z, r: cand.r });
+
+        // Sotobosque natural al pie del arbol (arbusto o flor silvestre)
+        for (const sh of SHRUB_LOCAL_OFFSETS) {
+          const sx = w.x + sh.dx;
+          const sz = w.z + sh.dz;
+          const sy = this.getTerrainY(sx, sz);
+          if (sy > -0.2 && distanceToRoad(sx, sz) >= 3.8) {
+            let hitOther = false;
+            for (let i = 0; i < placedColliders.length; i++) {
+              const c = placedColliders[i];
+              if (Math.hypot(sx - c.x, sz - c.z) < (0.8 + c.r)) { hitOther = true; break; }
+            }
+            if (!hitOther) {
+              const shrubModel = palette.understory[Math.floor(seeded(seedIdx++) * palette.understory.length)];
+              const sHeight = THREE.MathUtils.lerp(0.85, 1.40, seeded(seedIdx++));
+              addInstance(shrubModel, sHeight, [sx, sy, sz], seeded(seedIdx++) * Math.PI * 2);
+              placedColliders.push({ x: sx, z: sz, r: 0.8 });
+              break;
+            }
+          }
+        }
+      }
+    }
 
     // ── 1. Arboledas Orgánicas Zonificadas por Sector (Sin colisiones, 3 estratos) ──
     for (let g = 0; g < 320; g++) {
@@ -3760,7 +3765,7 @@ export class ProgressiveWorldStreamer {
         for (const side of [-1, 1]) {
           const randVal = seeded(seedIdx++);
           if (randVal > 0.40) { // 60% de probabilidad
-            const offsetDist = 2.4 + randVal * 2.2;
+            const offsetDist = 3.2 + randVal * 2.0;
             const fx = px + sideX * offsetDist * side + (seeded(seedIdx++) - 0.5) * 0.7;
             const fz = pz + sideZ * offsetDist * side + (seeded(seedIdx++) - 0.5) * 0.7;
             const fy = this.getTerrainY(fx, fz);
@@ -4365,7 +4370,7 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
 
   const target = targetMission || mission;
   const targetId = Number(target.id);
-  const isStationSitting = (targetId === 6 || targetId === 13) && index < 4;
+  const isStationSitting = false;
   const isPodiumChamp = (targetId === 17 || target.type === 'castle') && typeof player.podiumRank === 'number' && player.podiumRank < 3;
 
   // 1. Animated 3D Polyfork Character directly on terrain (no base ring, no floating elements)
@@ -4377,107 +4382,18 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
   heroModel.position.y = 0;
   root.add(heroModel);
 
-  // 2. Station Courtyard Slot Placement (3/4 conversational angle + Sitting at Station 06 & 13 + Podium formation at Station 17)
+  // 2. Station Courtyard Slot Placement (Flat, organic conversational arc on terrain; podium at Bastion)
   function calcStationSlot(m, idx) {
     const totalInGroup = Math.max(1, (player.totalInStation || 4));
     const mId = Number(m.id);
     const isCastle = mId === 17 || m.type === 'castle';
+    const yaw = stationYaw(m);
 
-    // A. Station 06: Pausa de Recarga (Personajes sentados en los bancos de descanso)
-    if (mId === 6) {
-      if (idx === 0) {
-        const posX = m.x - 2.8;
-        const posZ = m.z + 0.2;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: Math.PI / 2
-        };
-      } else if (idx === 1) {
-        const posX = m.x + 2.8;
-        const posZ = m.z + 0.2;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: -Math.PI / 2
-        };
-      } else if (idx === 2) {
-        const posX = m.x - 2.8;
-        const posZ = m.z + 0.8;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: Math.PI / 2
-        };
-      } else if (idx === 3) {
-        const posX = m.x + 2.8;
-        const posZ = m.z + 0.8;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: -Math.PI / 2
-        };
-      }
-      const offX = (idx - 4 - 0.5) * 1.15;
-      const posX = m.x + offX;
-      const posZ = m.z + 2.2;
-      return {
-        pos: new THREE.Vector3(posX, getTerrainY(posX, posZ), posZ),
-        rotY: 0
-      };
-    }
-
-    // B. Station 13: Almuerzo en Equipo (Personajes sentados compartiendo el banquete)
-    if (mId === 13) {
-      if (idx === 0) {
-        const posX = m.x - 0.72;
-        const posZ = m.z + 0.5;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: Math.PI / 2
-        };
-      } else if (idx === 1) {
-        const posX = m.x + 0.72;
-        const posZ = m.z + 0.5;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: -Math.PI / 2
-        };
-      } else if (idx === 2) {
-        const posX = m.x - 0.72;
-        const posZ = m.z + 1.1;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: Math.PI / 2
-        };
-      } else if (idx === 3) {
-        const posX = m.x + 0.72;
-        const posZ = m.z + 1.1;
-        return {
-          pos: new THREE.Vector3(posX, getTerrainY(posX, posZ) + 0.40, posZ),
-          rotY: -Math.PI / 2
-        };
-      }
-      const offX = (idx - 4 - 0.5) * 1.2;
-      const posX = m.x + offX;
-      const posZ = m.z + 2.5;
-      return {
-        pos: new THREE.Vector3(posX, getTerrainY(posX, posZ), posZ),
-        rotY: 0
-      };
-    }
-
-    // C. Podium formation for top 3 champions at Castle (Station 17)
+    // Podio de campeones del Bastion (sobre los estrados de la estacion 17)
     if (isCastle && typeof player.podiumRank === 'number' && player.podiumRank < 3) {
-      const podiumSlots = [
-        { ox: 0.0, oz: 2.3, oy: 0.45, rotY: Math.PI },          // 1° Lugar (Centro elevado)
-        { ox: -1.65, oz: 2.75, oy: 0.31, rotY: Math.PI - 0.28 }, // 2° Lugar (Izquierda)
-        { ox: 1.65, oz: 2.75, oy: 0.21, rotY: Math.PI + 0.28 }   // 3° Lugar (Derecha)
-      ];
-      const ps = podiumSlots[player.podiumRank];
-      const posX = m.x + ps.ox;
-      const posZ = m.z + ps.oz;
-      const posY = getTerrainY(posX, posZ) + ps.oy;
-      return {
-        pos: new THREE.Vector3(posX, posY, posZ),
-        rotY: ps.rotY
-      };
+      const ps = PODIUM_SLOTS[player.podiumRank];
+      const w = stationLocalToWorld(m, ps.ox, ps.oz);
+      return { pos: new THREE.Vector3(w.x, getTerrainY(w.x, w.z) + ps.oy, w.z), rotY: ps.rotY + yaw };
     }
 
     const effectiveIdx = (isCastle && typeof player.podiumRank === 'number' && player.podiumRank >= 3) ? (player.podiumRank - 3) : idx;
@@ -4489,20 +4405,12 @@ export function createHumanoidCharacter(player, index, mission, getTerrainY, tar
     const inThisRow = row === 0 ? Math.min(effectiveTotal, maxPerRow) : Math.max(1, effectiveTotal - maxPerRow);
     const spacingX = isCastle ? 1.45 : 1.15;
     const offsetX = (col - (inThisRow - 1) / 2) * spacingX;
-    const baseZ = isCastle ? 4.8 : 2.0;
-    const offsetZ = baseZ + row * 1.1;
+    const offsetZ = (isCastle ? 3.2 : 1.8) + row * 1.1;
 
-    const posX = m.x + offsetX;
-    const posZ = m.z + offsetZ;
-    const posY = getTerrainY(posX, posZ);
-
-    // Flattering 3/4 front angle: face towards camera and courtyard center
-    const rotY = (offsetX >= 0 ? -0.42 : 0.42);
-
-    return {
-      pos: new THREE.Vector3(posX, posY, posZ),
-      rotY
-    };
+    const w = stationLocalToWorld(m, offsetX, offsetZ);
+    // Angulo tres cuartos hacia la camara
+    const rotY = (offsetX >= 0 ? -0.38 : 0.38) + yaw;
+    return { pos: new THREE.Vector3(w.x, getTerrainY(w.x, w.z), w.z), rotY };
   }
 
   const slot = calcStationSlot(target, index);

@@ -2,7 +2,7 @@ import * as THREE from './vendor/three/build/three.module.js';
 window.THREE = THREE;
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 import { Sky } from './vendor/three/examples/jsm/objects/Sky.js';
-import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS } from './realistic-assets.js?v=300.0.0';
+import { installRealisticWorld, createHumanoidCharacter, createHeroModel, AVATAR_PRESETS, configureStationLayout } from './realistic-assets.js?v=309.0.0';
 
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -853,6 +853,40 @@ const roadWaypoints = [
 const roadCurve = new THREE.CatmullRomCurve3(roadWaypoints, false, 'catmullrom', 0.20);
 const trailPoints2D = roadCurve.getSpacedPoints(600).map(p => new THREE.Vector2(p.x, p.z));
 
+// ── Orientacion de cada estacion segun el camino ─────────────────────────────
+// El set de cada estacion se gira para que su fondo (edificio y utileria) quede en el
+// sector mas alejado de los tramos de entrada y salida del camino: el paso queda libre.
+const STATION_YAW = {};
+(function computeStationYaw() {
+  const reach = 13;
+  SEED.forEach(st => {
+    let ci = 0, md = Infinity;
+    trailPoints2D.forEach((p, i) => { const d = Math.hypot(p.x - st.x, p.y - st.z); if (d < md) { md = d; ci = i; } });
+    const arms = [];
+    for (const dir of [-1, 1]) {
+      for (let i = ci; i >= 0 && i < trailPoints2D.length; i += dir) {
+        const p = trailPoints2D[i];
+        if (Math.hypot(p.x - st.x, p.y - st.z) >= reach) { arms.push(Math.atan2(p.x - st.x, p.y - st.z)); break; }
+      }
+    }
+    let back = Math.PI;
+    if (arms.length === 1) back = arms[0] + Math.PI;
+    else if (arms.length === 2) {
+      const a = arms.map(x => ((x % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)).sort((p, q) => p - q);
+      const g1 = a[1] - a[0], g2 = Math.PI * 2 - g1;
+      back = g1 > g2 ? (a[0] + a[1]) / 2 : a[1] + g2 / 2;
+    }
+    // Rotacion del grupo: el eje local -Z apunta hacia el fondo calculado
+    STATION_YAW[st.id] = back - Math.PI;
+  });
+})();
+configureStationLayout(STATION_YAW, trailPoints2D);
+function stationOffset(q, ox, oz) {
+  const yaw = STATION_YAW[q.id] || 0;
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  return { x: ox * c + oz * s, z: -ox * s + oz * c };
+}
+
 // ── High-Definition 512x512 Procedural Tiling Textures ───────────────────────
 function createProceduralTile(drawFn) {
   const size = 512;
@@ -1481,8 +1515,8 @@ function createRusticTrailDetails() {
       const nextP = points[inIdx + 1];
       const dir = new THREE.Vector3().subVectors(nextP, p).normalize();
       const side = new THREE.Vector3(-dir.z, 0, dir.x).normalize();
-      spawnThresholdGatepost(p.x + side.x * 1.9, p.z + side.z * 1.9, dir);
-      spawnThresholdGatepost(p.x - side.x * 1.9, p.z - side.z * 1.9, dir);
+      spawnThresholdGatepost(p.x + side.x * 3.1, p.z + side.z * 3.1, dir);
+      spawnThresholdGatepost(p.x - side.x * 3.1, p.z - side.z * 3.1, dir);
     }
 
     // Exit gateposts (where road crosses out of courtyard)
@@ -1498,8 +1532,8 @@ function createRusticTrailDetails() {
       const nextP = points[outIdx + 1];
       const dir = new THREE.Vector3().subVectors(nextP, p).normalize();
       const side = new THREE.Vector3(-dir.z, 0, dir.x).normalize();
-      spawnThresholdGatepost(p.x + side.x * 1.9, p.z + side.z * 1.9, dir);
-      spawnThresholdGatepost(p.x - side.x * 1.9, p.z - side.z * 1.9, dir);
+      spawnThresholdGatepost(p.x + side.x * 3.1, p.z + side.z * 3.1, dir);
+      spawnThresholdGatepost(p.x - side.x * 3.1, p.z - side.z * 3.1, dir);
     }
   });
 
@@ -1587,7 +1621,7 @@ function createRusticTrailDetails() {
       const nextP = points[Math.min(points.length - 1, midIdx + 2)];
       const dir = new THREE.Vector3().subVectors(nextP, p).normalize();
       const side = new THREE.Vector3(-dir.z, 0, dir.x).normalize();
-      const signPos = new THREE.Vector3(p.x + side.x * 2.3, 0, p.z + side.z * 2.3);
+      const signPos = new THREE.Vector3(p.x + side.x * 3.3, 0, p.z + side.z * 3.3);
       spawnDirectionalSignpost(nxt, signPos, dir);
     }
   }
@@ -1613,7 +1647,7 @@ function createRusticTrailDetails() {
     const side = new THREE.Vector3(-dir.z, 0, dir.x).normalize();
 
     const sideSign = (i % 2 === 0) ? 1 : -1;
-    const curbDist = 1.85 + (Math.sin(i * 3.7) * 0.5 + 0.5) * 0.40;
+    const curbDist = 3.0 + (Math.sin(i * 3.7) * 0.5 + 0.5) * 0.40; // fuera de la banda transitable (+-2.5 m)
     const cx = p.x + side.x * (curbDist * sideSign);
     const cz = p.z + side.z * (curbDist * sideSign);
     const cy = getTerrainY(cx, cz);
@@ -1910,14 +1944,8 @@ const worldReady = installRealisticWorld({
 
 // ── Players / Adventurers Management ──────────────────────────────────────────
 function rebuildPlayers(startMission = null, targetMission = null) {
-  const toRemove = [];
-  scene.traverse(obj => {
-    if (obj && obj.name && typeof obj.name === 'string' && obj.name.startsWith('Player_')) {
-      toRemove.push(obj);
-    }
-  });
-  toRemove.forEach(obj => scene.remove(obj));
-  anim.players.forEach(x => scene.remove(x));
+  // Limpieza O(1) directa y eficiente sin recorrer el arbol completo de la escena
+  anim.players.forEach(p => scene.remove(p));
   anim.players = [];
 
   players.forEach((p, i) => {
@@ -2244,7 +2272,7 @@ function renderUI() {
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, 5)" type="button" title="Sumar 5 XP a ${p.name}">+5 XP</button>
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, 10)" type="button" title="Sumar 10 XP a ${p.name}">+10 XP</button>
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, -5)" type="button" title="Restar 5 XP a ${p.name}">-5 XP</button>
-            <button class="quick-xp-btn del" onclick="window.deletePlayer(${p.id})" type="button" title="Eliminar a ${p.name}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            <button class="quick-xp-btn del" onclick="window.deletePlayer(${p.id})" type="button" title="Eliminar a ${p.name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
           </div>
         </div>`;
       }).join('')
@@ -2354,18 +2382,19 @@ const SHOTS = {
 function cameraPose(q) {
   const s = SHOTS[q.id] || SHOTS[1];
   const wy = getTerrainY(q.x, q.z);
-  const lookX = q.x + (s.lx || 0);
+  // Encuadre definido en el marco local de la estacion y girado segun su orientacion
+  const lookOff = stationOffset(q, s.lx || 0, s.lz !== undefined ? s.lz : -2.0);
+  const camOff = stationOffset(q, s.o[0], s.o[2]);
   const lookY = wy + (s.h || 2.4);
-  const lookZ = q.z + (s.lz !== undefined ? s.lz : -2.0);
   return {
-    pos: new THREE.Vector3(q.x + s.o[0], wy + s.o[1], q.z + s.o[2]),
-    look: new THREE.Vector3(lookX, lookY, lookZ)
+    pos: new THREE.Vector3(q.x + camOff.x, wy + s.o[1], q.z + camOff.z),
+    look: new THREE.Vector3(q.x + lookOff.x, lookY, q.z + lookOff.z)
   };
 }
 
 function cinematicEase(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
-function startTravel(id, show = true) {
+function startTravel(id, show = true, customDuration = null) {
   overview3DMode = false;
   if (checkpointLabelsLayer) {
     checkpointLabelsLayer.classList.remove('visible');
@@ -2418,8 +2447,9 @@ function startTravel(id, show = true) {
     return;
   }
 
-  // Vuelo parabólico continuo, ligero y fluido (~1.8s a 2.5s) a baja altitud siguiendo el terreno
-  const duration = clamp(dist * 0.0042 + 1.50, 1.75, 2.55);
+  // Vuelo parabólico continuo: dinámico y rápido (0.85s al saltar del mapa, o ~1.8s a 2.5s entre estaciones)
+  const defaultDuration = clamp(dist * 0.0042 + 1.50, 1.75, 2.55);
+  const duration = (typeof customDuration === 'number' && customDuration > 0) ? customDuration : defaultDuration;
 
   const midX = (camera.position.x + targetPose.pos.x) * 0.5;
   const midZ = (camera.position.z + targetPose.pos.z) * 0.5;
@@ -2899,7 +2929,8 @@ overview3dBtn?.addEventListener('click', () => setOverview3DMode(!overview3DMode
 
 window.jumpFromMapToMission = function(missionId) {
   setOverview3DMode(false, true);
-  setMission(Number(missionId), true);
+  // Picada cinemática ágil y dinámica de 0.85s (transición rápida del mapa general a la estación)
+  setMission(Number(missionId), true, 0.85);
 };
 
 
@@ -3034,7 +3065,7 @@ function nextMission() {
   setMission(current + 1, true);
 }
 
-function setMission(id, move = true) {
+function setMission(id, move = true, customDuration = null) {
   const targetId = clamp(Number(id) ?? 0, 0, MAX_MISSION);
   if (move && overview3DMode) {
     setOverview3DMode(false, true);
@@ -3098,7 +3129,7 @@ function setMission(id, move = true) {
   applyStates();
   updateSunShadow(true);
   if (current !== 0) {
-    startTravel(current, true);
+    startTravel(current, true, customDuration);
   } else {
     // Station 0 Lobby: completely peaceful, zero camera flight!
     const pose = cameraPose(getMission(0));
@@ -3517,7 +3548,7 @@ function renderModalFullPlayersList() {
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, 5)" type="button" title="Sumar 5 XP a ${p.name}">+5 XP</button>
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, 10)" type="button" title="Sumar 10 XP a ${p.name}">+10 XP</button>
             <button class="quick-xp-btn" onclick="window.modifyXp(${p.id}, -5)" type="button" title="Restar 5 XP a ${p.name}">-5 XP</button>
-            <button class="quick-xp-btn del" onclick="window.deletePlayer(${p.id})" type="button" title="Eliminar a ${p.name}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            <button class="quick-xp-btn del" onclick="window.deletePlayer(${p.id})" type="button" title="Eliminar a ${p.name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
           </div>
         </div>
       </div>
@@ -4466,6 +4497,11 @@ async function openStationMediaHub(stationId) {
 
   activeEvalContext.stationId = sId;
   activeEvalContext.playlist = playlist;
+
+  const countEl = document.getElementById('mediaHubItemsCount');
+  if (countEl && playlist) {
+    countEl.textContent = `${playlist.length} ${playlist.length === 1 ? 'cápsula' : 'cápsulas'}`;
+  }
 
   if (mediaHubItemsList) {
     mediaHubItemsList.innerHTML = '';
@@ -5876,7 +5912,7 @@ function renderContentAdminSequence() {
         </div>
         <span class="card-title-text">${it.title || 'Sin título'}</span>
       </div>
-      <button type="button" class="card-delete-btn" title="Eliminar elemento" onclick="event.stopPropagation(); window.contentAdminDeleteItem(${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      <button type="button" class="card-delete-btn" title="Eliminar elemento" onclick="event.stopPropagation(); window.contentAdminDeleteItem(${idx})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
     `;
     listEl.appendChild(card);
   });
@@ -6211,7 +6247,7 @@ function renderAdminEnSalaKeypoints(keypoints) {
     row.innerHTML = `
       <span class="chk-num">${idx + 1}</span>
       <input type="text" class="admin-input" value="${(kp || '').replace(/"/g, '&quot;')}" placeholder="Punto clave..." oninput="window.contentAdminSyncEnSalaKeypoint(${idx}, this.value)">
-      <button type="button" class="admin-del-row-btn" title="Eliminar punto" onclick="window.contentAdminDeleteEnSalaKeypoint(${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      <button type="button" class="admin-del-row-btn" title="Eliminar punto" onclick="window.contentAdminDeleteEnSalaKeypoint(${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
     `;
     listEl.appendChild(row);
   });
@@ -6227,7 +6263,7 @@ function renderAdminChecklistItems(checklistItems) {
     row.innerHTML = `
       <span class="chk-num">${chkIdx + 1}</span>
       <input type="text" class="admin-input" value="${chk.label || ''}" placeholder="Texto del punto a verificar..." oninput="window.contentAdminSyncChecklistItem(${chkIdx}, this.value)">
-      <button type="button" class="card-delete-btn" title="Eliminar punto" onclick="window.contentAdminDeleteChecklistItem(${chkIdx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      <button type="button" class="card-delete-btn" title="Eliminar punto" onclick="window.contentAdminDeleteChecklistItem(${chkIdx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
     `;
     container.appendChild(row);
   });

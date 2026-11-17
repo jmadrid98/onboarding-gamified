@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#8fcad8">
   <title>Expedición Mi comienzo en Bradesco</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css?v=300.0.0">
+  <link rel="stylesheet" href="styles.css?v=309.0.0">
   <script type="importmap">
   {
     "imports": {
@@ -481,45 +481,43 @@
     <button id="grantNpsXpBtn" class="primary wide" style="margin-top:.5rem;padding:12px;font-size:.85rem">+ Dominar Metodología NPS y Otorgar 25 XP</button>
   </dialog>
 
-  <!-- Modal Centro de Aprendizaje / Consola de Cápsulas Multimedia Armonizada -->
-  <dialog id="mediaHubDialog" class="media-hub-dialog cyber-codex">
-    <div class="media-hub-glow-ambient"></div>
-    <div class="media-hub-modal-header">
-      <div class="media-hub-modal-title-group">
-        <div class="media-header-top-row">
-          <span class="media-live-dot"></span>
-          <span class="eyebrow" id="mediaHubStationEyebrow">MISIÓN 01 · PUNTO DE PARTIDA</span>
+  <!-- Modal Centro de Aprendizaje / Visor de Cápsulas Multimedia -->
+  <dialog id="mediaHubDialog" class="media-hub-dialog">
+    <div class="media-hub-container">
+      <header class="media-hub-header">
+        <div class="media-hub-header-info">
+          <div class="media-hub-badge-row">
+            <span class="media-hub-status-dot"></span>
+            <span class="media-hub-eyebrow" id="mediaHubStationEyebrow">MISIÓN 01 · PUNTO DE PARTIDA</span>
+          </div>
+          <h2 class="media-hub-title" id="mediaHubStationTitle">Cápsulas & Centro Multimedia</h2>
         </div>
-        <h2 class="display" id="mediaHubStationTitle">Cápsulas & Centro Multimedia</h2>
-      </div>
-      <button id="closeMediaHubBtn" class="close-cyber-btn" type="button" title="Cerrar reproductor"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-      </div>
-    </div>
-
-    <div class="media-hub-modal-body">
-      <!-- Panel Principal: Pantalla de Gran Formato -->
-      <div class="media-hub-player-section">
-        <div class="media-hub-screen-container" id="mediaHubScreenContainer">
-          <div class="screen-corner-tl"></div>
-          <div class="screen-corner-br"></div>
-          <!-- Video, Image or PDF dynamically mounted here -->
-          <div id="mediaStageScreen" class="media-stage-screen"></div>
+        <div class="media-hub-header-actions">
+          <button id="closeMediaHubBtn" class="media-hub-close-btn" type="button" title="Cerrar cápsulas">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
-      </div>
+      </header>
 
-      <!-- Panel Lateral: Lista Ordenada de Contenidos -->
-      <div class="media-hub-playlist-section">
-        <div class="playlist-section-header">
-          <div class="playlist-header-left">
-            <span class="playlist-icon-chip">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff8ca3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-            </span>
-            <span class="playlist-section-title">Contenidos de la Misión</span>
+      <div class="media-hub-body">
+        <!-- Panel Principal: Pantalla de Gran Formato -->
+        <div class="media-hub-player-section">
+          <div class="media-hub-screen-container" id="mediaHubScreenContainer">
+            <!-- Video, Image or PDF dynamically mounted here -->
+            <div id="mediaStageScreen" class="media-stage-screen"></div>
           </div>
         </div>
-        
-        <div id="mediaHubItemsList" class="media-hub-playlist-list">
-          <!-- Playlist items rendered dynamically -->
+
+        <!-- Panel Lateral: Lista Ordenada de Contenidos -->
+        <div class="media-hub-playlist-section">
+          <div class="media-hub-col-header">
+            <span class="col-title">Contenidos de la Misión</span>
+            <span class="col-count" id="mediaHubItemsCount">Secuencia</span>
+          </div>
+          
+          <div id="mediaHubItemsList" class="media-hub-playlist-list">
+            <!-- Playlist items rendered dynamically -->
+          </div>
         </div>
       </div>
     </div>
@@ -981,7 +979,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="main.js?v=300.0.0"></script>
+  <script type="module" src="main.js?v=309.0.0"></script>
 </body>
 </html>
 
